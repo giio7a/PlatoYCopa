@@ -1,0 +1,120 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+      <h1 class="gradient-text">Contáctanos</h1>
+      <p class="header-subtitle">Estamos aquí para hacer de tu evento una experiencia inolvidable</p>
+  </div>
+</header>
+
+<!-- Contacto -->
+<section class="contact-section">
+  <div class="container">
+      <div class="contact-container">
+          <!-- Información de Contacto -->
+          <div class="contact-info">
+              <h4>Información de contacto</h4>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-telephone-plus"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Teléfono</strong>
+                      <span>
+                          <a href="tel:+522223780903">+52 (222) 378-0903</a>
+                      </span>
+                  </div>
+              </div>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Email</strong>
+                      <span>
+                          <a href="mailto:info@platoycopa.com">Platoycopa.oficial.com</a>
+                      </span>
+                  </div>
+              </div>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Dirección</strong>
+                      <span>
+                          <a href="https://www.google.com/maps/search/?api=1&query=Puebla,+Puebla" target="_blank" rel="noopener noreferrer">
+                              Puebla, Puebla
+                          </a>
+                      </span>
+                  </div>
+              </div>
+              
+              <!-- Redes Sociales -->
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-share"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Redes Sociales</strong>
+                      <span>
+                          <a href="https://www.facebook.com/share/15qpCyANjq/" target="_blank" rel="noopener noreferrer">Facebook</a> |
+                          <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0" target="_blank" rel="noopener noreferrer">Instagram</a> |
+                          <a href="https://wa.me/5212223780903" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                      </span>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Formulario -->
+          <div class="contact-form">
+              <h4>Envíanos un mensaje</h4>
+              <form action="/contact-form" method="POST" id="contactForm" novalidate>
+                  <div class="form-group">
+                      <i class="bi bi-person form-icon"></i>
+                      <input type="text" name="name" class="form-control" placeholder="Nombre completo" required data-validate="name">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-envelope form-icon"></i>
+                      <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required data-validate="email">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-telephone form-icon"></i>
+                      <input type="tel" name="phone" class="form-control" placeholder="Teléfono" required data-validate="phone">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-tags form-icon"></i>
+                      <select name="eventType" class="form-control" required>
+                          <option value="" selected disabled>Tipo de Evento</option>
+                          {{#each tiposEventos}}
+                          <option value="{{id}}">{{nombre}}</option>
+                          {{/each}}
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-chat-text form-icon"></i>
+                      <textarea name="message" class="form-control" placeholder="Escribe tu mensaje..." required data-validate="message" rows="4"></textarea>
+                  </div>
+                  <button type="submit" class="btn-send">Enviar Mensaje</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</section>
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+  ¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+
+{{#if error}}
+<div class="alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+  Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+

@@ -1,0 +1,159 @@
+/* Estilos para validación de formularios manteniendo el diseño original */
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Mantener el icono del formulario en su posición original */
+.form-group .form-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+/* Asegurar que el icono permanezca visible incluso con errores */
+.form-group textarea.form-control + .form-icon {
+  top: 25px;
+  transform: none;
+}
+
+/* Estilo para campos inválidos sin cambiar el padding o posición */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+/* Mensaje de error debajo del campo, sin afectar la posición del icono */
+.error-message {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+  text-align: left;
+  padding-left: 45px; /* Alinear con el texto del campo */
+}
+
+/* Alerta de formulario */
+.form-alert {
+  margin-bottom: 1rem;
+}
+
+/* Estilos para la validación de estrellas */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  font-size: 2rem;
+  color: #ddd;
+  margin: 0;
+  transition: color 0.2s;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+  color: var(--gold);
+}
+
+/* Estilos específicos para mantener el diseño original */
+.contact-form .form-control {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(229, 199, 107, 0.2);
+  color: var(--white);
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border-radius: 50px;
+  transition: var(--transition-normal);
+}
+
+.contact-form .form-control:focus {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 0.2rem rgba(229, 199, 107, 0.1);
+  color: var(--white);
+}
+
+.contact-form textarea.form-control {
+  border-radius: 20px;
+  min-height: 120px;
+  padding-top: 1rem;
+}
+
+.contact-form .btn-send {
+  background-color: var(--gold);
+  color: var(--black);
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition-normal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.contact-form .btn-send:hover {
+  background-color: var(--gold-dark);
+}
+
+/* Mejorar estilo visual para las estrellas */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  font-size: 2rem;
+  color: #ddd;
+  margin: 0;
+  padding: 0 0.2rem;
+  transition: all 0.2s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label,
+.star-rating label.selected {
+  color: var(--gold);
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  transform: scale(1.1);
+}
+
+/* Mejorar el mensaje de error */
+.rating-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.rating-container .error-message {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+

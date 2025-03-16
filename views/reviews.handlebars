@@ -1,0 +1,324 @@
+<!-- Header -->
+<header class="header">
+ <div class="header-content">
+     <h1 class="gradient-text">Reseñas de Nuestros Clientes</h1>
+     <p class="header-subtitle">Descubre lo que nuestros clientes dicen sobre nuestro servicio</p>
+ </div>
+</header>
+
+<!-- Contenido Principal -->
+<main class="main-container">
+ <!-- Resumen de Reseñas -->
+ <section class="reviews-summary">
+     <div class="row align-items-center">
+         <div class="col-md-4 text-center mb-4 mb-md-0">
+             <div class="rating-overview">
+                 <div class="rating-value gradient-text">{{ratingAverage}}</div>
+                 <div class="rating-stars">
+                     {{#times fullStars}}
+                     <i class="bi bi-star-fill"></i>
+                     {{/times}}
+                     {{#if halfStar}}
+                     <i class="bi bi-star-half"></i>
+                     {{/if}}
+                     {{#times emptyStars}}
+                     <i class="bi bi-star"></i>
+                     {{/times}}
+                 </div>
+                 <div class="rating-count">Basado en {{totalReviews}} reseñas</div>
+             </div>
+         </div>
+         <div class="col-md-8">
+             <div class="rating-bars">
+                 {{#each ratingDistribution}}
+                 <div class="rating-bar">
+                     <span class="bar-label">{{stars}}</span>
+                     <div class="bar-container">
+                         <div class="bar" style="width: {{percentage}}%;"></div>
+                     </div>
+                     <span class="bar-percentage">{{percentage}}%</span>
+                 </div>
+                 {{/each}}
+             </div>
+         </div>
+     </div>
+ </section>
+
+ <!-- Filtros y Ordenamiento -->
+<section class="review-filters-container">
+    <div class="review-filters">
+        <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <div class="filter-scroll-container">
+                {{#each popularEventTypes}}
+                <button class="filter-btn" data-filter="{{id}}">{{nombre}} <span class="review-count">({{count}})</span></button>
+                {{/each}}
+            </div>
+        </div>
+        <select class="sort-select" id="sortReviews">
+            <option value="recent">Más recientes</option>
+            <option value="highest">Mayor calificación</option>
+            <option value="lowest">Menor calificación</option>
+        </select>
+    </div>
+</section>
+
+ <!-- Lista de Reseñas -->
+ <section class="reviews-grid py-5">
+     {{#each reviews}}
+     <div class="review-card" data-category="{{tipo_evento_id}}" data-rating="{{calificacion}}" data-date="{{fecha_timestamp}}">
+         <div class="review-header">
+             <div class="reviewer-info">
+                 <div class="reviewer-avatar">
+                     <i class="bi bi-person-circle"></i>
+                 </div>
+                 <div class="reviewer-details">
+                     <h5 class="reviewer-name">{{nombre_cliente}}</h5>
+                     <span class="review-date">{{fecha}}</span>
+                     <div class="verified-badge">
+                         {{#if verificado}}
+                         <i class="bi bi-patch-check-fill"></i> Verificado
+                         {{/if}}
+                     </div>
+                 </div>
+             </div>
+             <div class="review-rating">
+                 {{#times calificacion}}
+                 <i class="bi bi-star-fill"></i>
+                 {{/times}}
+                 {{#times (subtract 5 calificacion)}}
+                 <i class="bi bi-star"></i>
+                 {{/times}}
+             </div>
+         </div>
+         <div class="review-content">
+             <p class="review-text">
+                 {{comentario}}
+             </p>
+             <div class="review-footer">
+                 <span class="event-type">
+                     <i class="bi {{eventIcon}}"></i> {{tipo_evento}}
+                 </span>
+                 {{#if imagenes}}
+                 <div class="review-images">
+                     {{#each imagenes}}
+                     <img src="{{this}}" alt="Foto del evento" class="review-image">
+                     {{/each}}
+                 </div>
+                 {{/if}}
+             </div>
+         </div>
+     </div>
+     {{/each}}
+ </section>
+
+ <!-- Paginación -->
+ <div class="pagination-container">
+     <ul class="pagination">
+         <li class="page-item {{#unless hasPrevPage}}disabled{{/unless}}">
+             <a class="page-link" href="?page={{prevPage}}" aria-label="Anterior">
+                 <i class="bi bi-chevron-left"></i>
+             </a>
+         </li>
+         {{#each pages}}
+         <li class="page-item {{#if active}}active{{/if}}">
+             <a class="page-link" href="?page={{number}}">{{number}}</a>
+         </li>
+         {{/each}}
+         <li class="page-item {{#unless hasNextPage}}disabled{{/unless}}">
+             <a class="page-link" href="?page={{nextPage}}" aria-label="Siguiente">
+                 <i class="bi bi-chevron-right"></i>
+             </a>
+         </li>
+     </ul>
+ </div>
+</main>
+
+<!-- Botón flotante para agregar reseña -->
+<button class="add-review-btn" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+ <i class="bi bi-plus-circle"></i> Agregar Reseña
+</button>
+
+<!-- Modal para Agregar Reseña -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+   <div class="modal-content">
+       <div class="modal-header">
+           <h5 class="modal-title" id="addReviewModalLabel">
+               <i class="bi bi-pencil-square"></i> Agregar Reseña
+           </h5>
+           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <div class="modal-body">
+           <form id="reviewForm" action="/submit-review" method="POST" novalidate>
+               <div class="form-group">
+                   <label for="orderNumber" class="form-label">
+                       <i class="bi bi-hash"></i> Número de Contrato *
+                   </label>
+                   <input type="text" class="form-control" id="orderNumber" name="orderNumber" required data-validate="contractNumber">
+                   <small class="form-text">Ingrese el número de contrato para verificar que es un cliente real. Solo clientes con contratos pueden dejar reseñas.</small>
+               </div>
+               
+               <div class="form-group">
+                   <label for="reviewerName" class="form-label">
+                       <i class="bi bi-person"></i> Nombre *
+                   </label>
+                   <input type="text" class="form-control" id="reviewerName" name="reviewerName" required data-validate="name">
+               </div>
+               
+               <div class="form-group">
+                   <label for="eventType" class="form-label">
+                       <i class="bi bi-calendar-event"></i> Tipo de Evento *
+                   </label>
+                   <select class="form-select" id="eventType" name="eventType" required>
+                       <option value="" selected disabled>Selecciona el tipo de evento</option>
+                       {{#each tiposEventos}}
+                       <option value="{{id}}">{{nombre}}</option>
+                       {{/each}}
+                   </select>
+               </div>
+               
+               <div class="form-group">
+                   <label class="form-label">
+                       <i class="bi bi-star"></i> Calificación *
+                   </label>
+                   <div class="rating-container">
+                       <div class="star-rating">
+                           <input type="radio" id="star5" name="calificacion" value="5" required>
+                           <label for="star5" title="5 estrellas">★</label>
+                           <input type="radio" id="star4" name="calificacion" value="4">
+                           <label for="star4" title="4 estrellas">★</label>
+                           <input type="radio" id="star3" name="calificacion" value="3">
+                           <label for="star3" title="3 estrellas">★</label>
+                           <input type="radio" id="star2" name="calificacion" value="2">
+                           <label for="star2" title="2 estrellas">★</label>
+                           <input type="radio" id="star1" name="calificacion" value="1">
+                           <label for="star1" title="1 estrella">★</label>
+                       </div>
+                   </div>
+               </div>
+               
+               <div class="form-group">
+                   <label for="reviewText" class="form-label">
+                       <i class="bi bi-chat-quote"></i> Tu Reseña *
+                   </label>
+                   <textarea class="form-control" id="reviewText" name="comentario" rows="3" required data-validate="message"></textarea>
+               </div>
+               
+               <div class="form-group file-upload">
+                   <label for="reviewImages" class="form-label">
+                       <i class="bi bi-image"></i> Subir Fotos (opcional)
+                    </label>
+                    <i class="bi bi-upload"></i>
+                    <input type="file" class="form-control" id="reviewImages" name="imagenes" multiple accept="image/*">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" form="reviewForm" class="btn btn-submit-review">
+                <i class="bi bi-send"></i> Enviar Reseña
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+   ¡Reseña enviada con éxito! Será publicada después de ser revisada.
+   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+
+{{#if error}}
+<div class="alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+   Hubo un error al enviar tu reseña. Por favor, intenta nuevamente.
+   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+
+<script src="/js/form-validation.js"></script>
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+     // Animación para las barras de calificación
+     setTimeout(() => {
+         document.querySelectorAll('.bar').forEach(bar => {
+             const width = bar.style.width;
+             bar.style.width = '0';
+             setTimeout(() => {
+                 bar.style.width = width;
+             }, 300);
+         });
+     }, 500);
+     
+     // Funcionalidad para los filtros
+     const filterButtons = document.querySelectorAll('.filter-btn');
+     const reviewCards = document.querySelectorAll('.review-card');
+     
+     filterButtons.forEach(button => {
+         button.addEventListener('click', function() {
+             // Remover clase active de todos los botones
+             filterButtons.forEach(btn => btn.classList.remove('active'));
+             // Agregar clase active al botón clickeado
+             this.classList.add('active');
+             
+             // Obtener el filtro seleccionado
+             const filter = this.getAttribute('data-filter');
+             
+             // Filtrar las reseñas
+             reviewCards.forEach(card => {
+                 if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                     card.style.display = 'block';
+                 } else {
+                     card.style.display = 'none';
+                 }
+             });
+         });
+     });
+
+     // Funcionalidad para ordenar
+     const sortSelect = document.getElementById('sortReviews');
+     sortSelect.addEventListener('change', function() {
+         const sortValue = this.value;
+         const reviewsContainer = document.querySelector('.reviews-grid');
+         const reviewsArray = Array.from(reviewCards);
+         
+         // Ordenar las reseñas según la opción seleccionada
+         reviewsArray.sort((a, b) => {
+             if (sortValue === 'recent') {
+                 return b.getAttribute('data-date') - a.getAttribute('data-date');
+             } else if (sortValue === 'highest') {
+                 return b.getAttribute('data-rating') - a.getAttribute('data-rating');
+             } else if (sortValue === 'lowest') {
+                 return a.getAttribute('data-rating') - b.getAttribute('data-rating');
+             }
+         });
+         
+         // Reordenar las reseñas en el DOM
+         reviewsArray.forEach(review => {
+             reviewsContainer.appendChild(review);
+         });
+     });
+     
+     // Validación adicional para el formulario de reseñas
+     const ratingInputs = document.querySelectorAll('input[name="calificacion"]');
+     const reviewForm = document.getElementById('reviewForm');
+     
+     reviewForm.addEventListener('submit', function(e) {
+         // Verificar si se ha seleccionado una calificación
+         let ratingSelected = false;
+         ratingInputs.forEach(input => {
+             if (input.checked) {
+                 ratingSelected = true;
+             }
+         });
+         
+         if (!ratingSelected) {
+             e.preventDefault();
+             alert('Por favor, selecciona una calificación');
+         }
+     });
+ });
+</script>
+

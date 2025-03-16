@@ -1,0 +1,83 @@
+<!-- Header -->
+<header class="header">
+    <div class="header-content">
+        <h1 class="gradient-text">Sobre Nosotros</h1>
+        <p class="header-subtitle">Descubre la pasión y el compromiso detrás de Plato y Copa</p>
+    </div>
+</header>
+
+<!-- Sobre Nosotros -->
+<section class="about-section">
+    <div class="container">
+        <div class="row">
+            {{#each aboutCards}}
+            <div class="col-md-4 mb-4">
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="bi {{icon}}"></i>
+                    </div>
+                    <h3 class="about-title">{{title}}</h3>
+                    <p class="about-text">{{{text}}}</p>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+
+<!-- Línea de Tiempo -->
+<section class="timeline-section">
+    <div class="container">
+        <h2 class="text-center gradient-text mb-5">Nuestra Trayectoria</h2>
+        <div class="timeline">
+            {{#each timeline}}
+            <div class="timeline-item timeline-{{position}}">
+                <div class="timeline-content">
+                    <h3 class="timeline-year">{{year}}</h3>
+                    <p>{{text}}</p>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+
+<!-- Equipo -->
+<section class="team-section">
+    <div class="container">
+        <h2 class="text-center gradient-text mb-5">Nuestro Equipo Directivo</h2>
+        <div class="row">
+            {{#each team}}
+            <div class="col-md-4">
+                <div class="team-member">
+                    <img src="{{image}}" alt="{{name}}">
+                    <h4>{{name}}</h4>
+                    <p>{{position}}</p>
+                    <p class="about-text">{{bio}}</p>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+
+<!-- Logros y Estadísticas -->
+<section class="achievements-section">
+    <div class="container">
+        <h2 class="text-center gradient-text mb-5">Nuestros Logros</h2>
+        <div class="row">
+            {{#each achievements}}
+            <div class="col-md-3 col-6 mb-4">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="bi {{icon}}"></i>
+                    </div>
+                    <div class="achievement-number">{{number}}</div>
+                    <div class="achievement-text">{{text}}</div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,461 @@
+<!-- Hero Section -->
+<section class="hero">
+   <div class="hero-content animate-fadeIn">
+       <h1 class="gradient-text">Plato y Copa</h1>
+       <p class="hero-tagline">Servicio de meseros</p>
+       <p class="hero-description">Elevamos la experiencia de tus eventos con un servicio excepcional y atención al detalle impecable</p>
+       
+       <div class="container feature-container">
+           <div class="row">
+               <div class="col-md-4 mb-4 animate-fadeIn delay-1">
+                   <a href="#servicios" class="text-decoration-none">
+                       <div class="feature-box text-center">
+                           <div class="feature-icon">
+                               <i class="bi bi-award"></i>
+                           </div>
+                           <h5>Servicio premium</h5>
+                           <p>Atención personalizada de primer nivel</p>
+                       </div>
+                   </a>
+               </div>
+               <div class="col-md-4 mb-4 animate-fadeIn delay-2">
+                   <a href="#servicios" class="text-decoration-none">
+                       <div class="feature-box text-center">
+                           <div class="feature-icon">
+                               <i class="bi bi-stars"></i>
+                           </div>
+                           <h5>Experiencia</h5>
+                           <p>Años de excelencia en eventos</p>
+                       </div>
+                   </a>
+               </div>
+               <div class="col-md-4 mb-4 animate-fadeIn delay-3">
+                   <a href="#servicios" class="text-decoration-none">
+                       <div class="feature-box text-center">
+                           <div class="feature-icon">
+                               <i class="bi bi-clock-history"></i>
+                           </div>
+                           <h5>Disponibilidad</h5>
+                           <p>24/7 para tus necesidades</p>
+                       </div>
+                   </a>
+               </div>
+           </div>
+       </div>
+
+       <div class="btn-container animate-fadeIn delay-4">
+           <a href="https://wa.me/5212223780903" class="btn btn-gold">Reservar ahora</a>
+           <a href="#servicios" class="btn btn-outline-gold">Nuestros servicios</a>
+       </div>
+   </div>
+</section>
+
+<!-- Servicios -->
+<section id="servicios" class="services-section">
+   <div class="container">
+       <h2 class="section-title gradient-text">Nuestros Servicios</h2>
+       <p class="section-subtitle">Experiencia y profesionalismo en cada momento de tu evento</p>
+       
+       <div class="row">
+           {{#each services}}
+               <div class="col-lg-3 col-md-6 mb-4">
+                   <a href="/servicios/{{id}}" class="text-decoration-none service-link">
+                       <div class="service-card">
+                           <div class="service-icon">
+                               <i class="bi {{icono}}"></i>
+                           </div>
+                           <h5 class="service-title">{{titulo}}</h5>
+                           <p class="service-description">{{descripcion_corta}}</p>
+                       </div>
+                   </a>
+               </div>
+           {{/each}}
+       </div>
+   </div>
+</section>
+
+<!-- Reseñas -->
+<section class="reviews-section m-0" id="resenas">
+   <div class="container">
+       <h2 class="section-title gradient-text">Lo que dicen nuestros clientes</h2>
+       <p class="section-subtitle">Testimonios de clientes satisfechos</p>
+       
+       <div class="row">
+           {{#each reviews}}
+           <div class="col-lg-4 col-md-6 mb-4">
+               <a href="/resenas" class="text-decoration-none review-link">
+                   <div class="review-card">
+                       <div class="review-header">
+                           <div class="reviewer-info">
+                               <h5>{{nombre_cliente}}</h5>
+                               <span>{{fecha}}</span>
+                           </div>
+                           <div class="verified-badge">
+                               {{#if verificado}}Verificado{{/if}}
+                           </div>
+                       </div>
+                       <div class="review-stars">
+                           {{#times calificacion}}★{{/times}}{{#times (subtract 5 calificacion)}}☆{{/times}}
+                       </div>
+                       <p class="review-text">
+                           "{{comentario}}"
+                       </p>
+                       <div class="review-footer">
+                           <span class="event-type">{{tipo_evento}}</span>
+                       </div>
+                   </div>
+               </a>
+           </div>
+           {{/each}}
+       </div>
+
+       <!-- Botón para ver más reseñas -->
+       <div class="text-center mt-4">
+           <a href="/resenas" class="btn btn-gold">Ver más reseñas</a>
+       </div>
+   </div>
+</section>
+
+<!-- Estadísticas -->
+<section class="stats-section">
+   <div class="container">
+       <div class="row">
+           {{#each stats}}
+           <div class="col-md-3 col-6 mb-4 mb-md-0">
+               <div class="stat-card">
+                   <div class="stat-icon">
+                       <i class="bi {{icono}}"></i>
+                   </div>
+                   <div class="stat-number">{{numero}}</div>
+                   <div class="stat-label">{{label}}</div>
+               </div>
+           </div>
+           {{/each}}
+       </div>
+   </div>
+</section>
+
+<!-- Galería -->
+<section class="gallery-section" id="galeria">
+   <div class="container">
+       <h2 class="section-title gradient-text">Nuestra Galería</h2>
+       <p class="section-subtitle">Explora nuestros momentos más destacados</p>
+       
+       <div id="galleryCarousel" class="carousel slide gallery-carousel" data-bs-ride="carousel">
+           <div class="carousel-inner">
+               {{#each galleryImages}}
+               <div class="carousel-item {{#if @first}}active{{/if}}">
+                   <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
+               </div>
+               {{/each}}
+           </div>
+<button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+               <span class="visually-hidden">Anterior</span>
+           </button>
+           <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+               <span class="carousel-control-next-icon" aria-hidden="true"></span>
+               <span class="visually-hidden">Siguiente</span>
+           </button>
+       </div>
+       
+       <div class="text-center mt-4">
+           <a href="/galeria" class="btn btn-outline-gold">Ver galería completa</a>
+       </div>
+   </div>
+</section>
+
+<!-- Sección de Cotización -->
+<section id="cotizacion" class="reservation-section">
+  <div class="container">
+      <h2 class="section-title gradient-text">Cotiza tu Servicio</h2>
+      <p class="section-subtitle">Calcula el costo de tu evento y reserva al instante</p>
+      
+      <div class="row justify-content-center">
+          <div class="col-lg-10">
+              <div class="reservation-form">
+                  <form id="quotationForm" action="/quote-form" method="POST" novalidate>
+                      <!-- Información Personal -->
+                      <div class="row mb-4">
+                          <div class="col-12">
+                              <h5 class="text-gold mb-3">Información Personal</h5>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-person form-icon"></i>
+                                  <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Nombre completo" required data-validate="name">
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-envelope form-icon"></i>
+                                  <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required data-validate="email">
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-telephone form-icon"></i>
+                                  <input type="tel" class="form-control" id="phone" name="phone" placeholder="Teléfono" required data-validate="phone">
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group date-picker-container">
+                                  <i class="bi bi-calendar-event form-icon"></i>
+                                  <label for="eventDate" class="date-label">
+                                    <input type="date" class="form-control" id="eventDate" name="eventDate" placeholder="Fecha del evento" required min="{{currentDate}}">
+                                    <span class="date-input-addon">
+                                        <i class="bi bi-calendar-check"></i>
+                                    </span>
+                                  </label>
+                                  <span class="date-helper-text">Haz clic para seleccionar fecha</span>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Detalles del Servicio -->
+                      <div class="row mb-4">
+                          <div class="col-12">
+                              <h5 class="text-gold mb-3">Detalles del Servicio</h5>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-people form-icon"></i>
+                                  <input type="number" id="numWaiters" name="numWaiters" class="form-control" placeholder="Número de meseros" min="1" required data-validate="number">
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-clock form-icon"></i>
+                                  <select id="serviceDuration" name="serviceDuration" class="form-control" required>
+                                      <option value="" selected disabled>Duración del servicio</option>
+                                      <option value="6">6 horas ($350 por mesero)</option>
+                                      <option value="8">8 horas ($450 por mesero)</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-geo-alt form-icon"></i>
+                                  <select id="serviceLocation" name="serviceLocation" class="form-control" required>
+                                      <option value="" selected disabled>Ubicación del servicio</option>
+                                      <option value="local">Local</option>
+                                      <option value="foraneo">Foráneo (precio adicional)</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <i class="bi bi-tags form-icon"></i>
+                                  <select id="eventType" name="eventType" class="form-control" required>
+                                      <option value="" selected disabled>Tipo de evento</option>
+                                      {{#each tiposEventos}}
+                                      <option value="{{id}}">{{nombre}}</option>
+                                      {{/each}}
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Servicios Adicionales -->
+                      <div class="row mb-4">
+                          <div class="col-12">
+                              <h5 class="text-gold mb-3">Servicios Adicionales</h5>
+                          </div>
+                          <div class="col-md-4">
+                              <div class="service-option">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" id="lavalozas" name="lavalozas">
+                                      <label class="form-check-label" for="lavalozas">
+                                          Lavalozas
+                                          <span class="service-price">$300</span>
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-md-4">
+                              <div class="service-option">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" id="cuidaCoches" name="cuidaCoches">
+                                      <label class="form-check-label" for="cuidaCoches">
+                                          Cuidacoches
+                                          <span class="service-price">$400</span>
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-md-4">
+                              <div class="service-option">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" id="montajeDesmontaje" name="montajeDesmontaje">
+                                      <label class="form-check-label" for="montajeDesmontaje">
+                                          Montaje y desmontaje
+                                          <span class="service-price">$80 por mesero</span>
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <!-- Resultado de la Cotización -->
+                      <div class="quotation-result">
+                          <div class="row align-items-center">
+                              <div class="col-md-7">
+                                  <div class="quotation-details">
+                                      <h5 class="text-gold">Detalles de la cotización:</h5>
+                                      <ul id="quotationDetails" class="quotation-list">
+                                          <li>Servicio base: <span id="baseServiceCost">$0.00</span></li>
+                                          <li>Servicios adicionales: <span id="additionalServicesCost">$0.00</span></li>
+                                          <li>Cargo por ubicación: <span id="locationCharge">$0.00</span></li>
+                                      </ul>
+                                  </div>
+                              </div>
+                              <div class="col-md-5">
+                                  <div class="total-price">
+                                      <h4>Total estimado:</h4>
+                                      <div class="price-display" id="totalPrice">$0.00</div>
+                                      <p class="price-note">*Precio aproximado, puede variar según la distancia en servicios foráneos</p>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Botones de Acción -->
+                      <div class="form-actions">
+                          <div class="row">
+                              <div class="col-md-6 mb-3 mb-md-0 mx-auto">
+                                  <button type="button" id="saveQuotation" class="btn btn-gold w-100">
+                                      <i class="bi bi-save me-2"></i>Guardar cotización
+                                  </button>
+                              </div>
+                              <div class="col-md-6 mx-auto" id="reserveButtonContainer" style="display: none;">
+                                  <a href="#" id="reserveButton" class="btn btn-custom w-100">
+                                      <i class="bi bi-whatsapp me-2"></i>Reservar ahora
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+<!-- Contacto -->
+<section class="contact-section" id="contacto">
+   <div class="container">
+       <h2 class="section-title gradient-text">Contáctanos</h2>
+       <p class="section-subtitle">Estamos aquí para hacer de tu evento una experiencia inolvidable</p>
+       
+       <div class="contact-container">
+           <!-- Información de Contacto -->
+           <div class="contact-info">
+               <h4>Información de contacto</h4>
+               
+               <div class="contact-item">
+                   <div class="contact-icon">
+                       <i class="bi bi-telephone-plus"></i>
+                   </div>
+                   <div class="contact-text">
+                       <strong>Teléfono</strong>
+                       <span>
+                           <a href="tel:+522223780903">+52 (222) 378-0903</a>
+                       </span>
+                   </div>
+               </div>
+               
+               <div class="contact-item">
+                   <div class="contact-icon">
+                       <i class="bi bi-envelope"></i>
+                   </div>
+                   <div class="contact-text">
+                       <strong>Email</strong>
+                       <span>
+                           <a href="mailto:info@platoycopa.com">Platoycopa.oficial.com</a>
+                       </span>
+                   </div>
+               </div>
+               
+               <div class="contact-item">
+                   <div class="contact-icon">
+                       <i class="bi bi-geo-alt"></i>
+                   </div>
+                   <div class="contact-text">
+                       <strong>Dirección</strong>
+                       <span>
+                           <a href="https://www.google.com/maps/search/?api=1&query=Puebla,+Puebla" target="_blank" rel="noopener noreferrer">
+                               Puebla, Puebla
+                           </a>
+                       </span>
+                   </div>
+               </div>
+               
+               <!-- Redes Sociales -->
+               <div class="contact-item">
+                   <div class="contact-icon">
+                       <i class="bi bi-share"></i>
+                   </div>
+                   <div class="contact-text">
+                       <strong>Redes Sociales</strong>
+                       <span>
+                           <a href="https://www.facebook.com/share/15qpCyANjq/" target="_blank" rel="noopener noreferrer">Facebook</a> |
+                           <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0" target="_blank" rel="noopener noreferrer">Instagram</a> |
+                           <a href="https://wa.me/5212223780903" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                       </span>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Formulario -->
+           <div class="contact-form">
+               <h4>Envíanos un mensaje</h4>
+               <form action="/contact-form" method="POST" id="homeContactForm" novalidate>
+                   <div class="form-group">
+                       <i class="bi bi-person form-icon"></i>
+                       <input type="text" name="name" class="form-control" placeholder="Nombre completo" required data-validate="name">
+                   </div>
+                   <div class="form-group">
+                       <i class="bi bi-envelope form-icon"></i>
+                       <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required data-validate="email">
+                   </div>
+                   <div class="form-group">
+                       <i class="bi bi-telephone form-icon"></i>
+                       <input type="tel" name="phone" class="form-control" placeholder="Teléfono" required data-validate="phone">
+                   </div>
+                   <div class="form-group">
+                       <i class="bi bi-tags form-icon"></i>
+                       <select name="eventType" class="form-control" required>
+                           <option value="" selected disabled>Tipo de Evento</option>
+                           {{#each tiposEventos}}
+                           <option value="{{id}}">{{nombre}}</option>
+                           {{/each}}
+                       </select>
+                   </div>
+                   <div class="form-group">
+                       <i class="bi bi-chat-text form-icon"></i>
+                       <textarea name="message" class="form-control" placeholder="Escribe tu mensaje..." required data-validate="message" rows="4"></textarea>
+                   </div>
+                   <button type="submit" class="btn-send">Enviar Mensaje</button>
+               </form>
+           </div>
+       </div>
+   </div>
+</section>
+
+<script src="/js/form-validation.js"></script>
+<script src="/js/quotation-calculator.js"></script>
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+ ¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
+ <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+
+{{#if error}}
+<div class="alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+ Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
+ <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+

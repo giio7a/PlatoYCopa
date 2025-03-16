@@ -1,0 +1,196 @@
+<!-- Header -->
+<header class="header">
+   <div class="header-content">
+       <h1 class="gradient-text">Nuestros Servicios</h1>
+       <p class="header-subtitle">Experiencias culinarias excepcionales para cada ocasión</p>
+   </div>
+</header>
+
+<!-- Servicios -->
+<section class="container py-4">
+   <div class="row g-4">
+       {{#each services}}
+       <div class="col-md-6 col-lg-4">
+           <div class="service-card">
+               <div class="service-image" style="background-image: url('{{#if imagen_url}}{{imagen_url}}{{else}}/img/service-default.jpg{{/if}}');">
+                   <div class="service-icon">
+                       <i class="bi {{icono}}"></i>
+                   </div>
+                   {{#if precio}}
+                   <div class="service-price-tag">
+                       <span>{{precio}}</span>
+                   </div>
+                   {{/if}}
+               </div>
+               <div class="service-content text-left">
+                   <h3 class="service-title">{{titulo}}</h3>
+                   <p class="service-description text-left">{{descripcion_corta}}</p>
+                   <ul class="service-features">
+                       {{#if caracteristicas}}
+                           {{#each caracteristicas}}
+                           <li>{{this}}</li>
+                           {{/each}}
+                       {{else}}
+                           <li>Servicio profesional</li>
+                           <li>Personal capacitado</li>
+                           <li>Atención personalizada</li>
+                       {{/if}}
+                   </ul>
+                   <div class="service-footer">
+                       {{#if precio_desde}}
+                       <div class="service-price">
+                           <span class="price-label">Desde</span>
+                           <span class="price-value">{{precio_desde}}</span>
+                       </div>
+                       {{/if}}
+                       <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#serviceModal" data-service="{{titulo}}" data-details="{{descripcion_completa}}" data-price="{{precio}}" data-price-desde="{{precio_desde}}">Más Información</button>
+                   </div>
+               </div>
+           </div>
+       </div>
+       {{/each}}
+   </div>
+</section>
+
+<!-- Modal para detalles del servicio -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title" id="serviceModalLabel">Detalles del Servicio</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+           </div>
+           <div class="modal-body">
+               <div class="service-modal-price">
+                   <span id="serviceModalPrice"></span>
+               </div>
+               <p id="serviceDescription"></p>
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+               <a href="/contacto" class="btn btn-custom">Solicitar Cotización</a>
+           </div>
+       </div>
+   </div>
+</div>
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+       var serviceModal = document.getElementById('serviceModal');
+       serviceModal.addEventListener('show.bs.modal', function (event) {
+           var button = event.relatedTarget;
+           var service = button.getAttribute('data-service');
+           var details = button.getAttribute('data-details');
+           var price = button.getAttribute('data-price');
+           var priceDesde = button.getAttribute('data-price-desde');
+           
+           var modalTitle = serviceModal.querySelector('.modal-title');
+           var modalBodyInput = serviceModal.querySelector('.modal-body p');
+           var modalPrice = serviceModal.querySelector('#serviceModalPrice');
+
+           modalTitle.textContent = service;
+           modalBodyInput.textContent = details;
+           
+           // Mostrar precio si existe
+           if (price) {
+               modalPrice.textContent = price;
+               modalPrice.parentElement.style.display = 'block';
+           } else if (priceDesde) {
+               modalPrice.textContent = 'Desde ' + priceDesde;
+               modalPrice.parentElement.style.display = 'block';
+           } else {
+               modalPrice.parentElement.style.display = 'none';
+           }
+       });
+       
+       // Animación para las tarjetas de servicios
+       const serviceCards = document.querySelectorAll('.service-card');
+       const observer = new IntersectionObserver((entries) => {
+           entries.forEach(entry => {
+               if (entry.isIntersecting) {
+                   entry.target.classList.add('animate-fade-in');
+                   observer.unobserve(entry.target);
+               }
+           });
+       }, { threshold: 0.1 });
+
+       serviceCards.forEach((card, index) => {
+           card.classList.add('service-card-hidden');
+           card.style.animationDelay = `${index * 0.1}s`;
+           observer.observe(card);
+       });
+   });
+</script>
+
+<style>
+   /* Estilos para la etiqueta de precio */
+   .service-price-tag {
+       position: absolute;
+       top: 15px;
+       right: 15px;
+       background-color: var(--gold);
+       color: var(--black);
+       padding: 5px 10px;
+       border-radius: 20px;
+       font-weight: 600;
+       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+       z-index: 2;
+   }
+   
+   /* Estilos para el precio en el footer de la tarjeta */
+   .service-footer {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-top: 15px;
+   }
+   
+   .service-price {
+       display: flex;
+       flex-direction: column;
+   }
+   
+   .price-label {
+       font-size: 0.8rem;
+       color: var(--gray);
+   }
+   
+   .price-value {
+       font-size: 1.2rem;
+       font-weight: 600;
+       color: var(--gold);
+   }
+   
+   /* Estilos para el precio en el modal */
+   .service-modal-price {
+       background-color: var(--gold);
+       color: var(--black);
+       display: inline-block;
+       padding: 5px 15px;
+       border-radius: 20px;
+       font-weight: 600;
+       margin-bottom: 15px;
+   }
+   
+   /* Animaciones */
+   .service-card-hidden {
+       opacity: 0;
+       transform: translateY(20px);
+   }
+   
+   .animate-fade-in {
+       animation: fadeIn 0.6s ease forwards;
+   }
+   
+   @keyframes fadeIn {
+       from {
+           opacity: 0;
+           transform: translateY(20px);
+       }
+       to {
+           opacity: 1;
+           transform: translateY(0);
+       }
+   }
+</style>
+

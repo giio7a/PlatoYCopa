@@ -1,0 +1,164 @@
+<!-- Header -->
+<header class="header">
+    <div class="header-content">
+        <h1 class="gradient-text">Nuestra Galería</h1>
+        <p class="header-subtitle">Momentos inolvidables capturados en cada evento</p>
+    </div>
+</header>
+
+<!-- Featured Gallery -->
+<section class="container featured-gallery">
+    <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {{#each featuredImages}}
+            <div class="carousel-item {{#if @first}}active{{/if}}">
+                <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>{{titulo}}</h5>
+                    <p>{{descripcion}}</p>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+</section>
+
+<!-- Gallery Categories -->
+<section class="container">
+   <div class="gallery-categories">
+       <button class="gallery-category active" data-category="all">Todos</button>
+       {{#each popularEventTypes}}
+       <button class="gallery-category" data-category="{{id}}">{{nombre}} <span class="event-count">({{count}})</span></button>
+       {{/each}}
+   </div>
+
+   <!-- Gallery Grid -->
+   <div class="row gallery-items-container">
+       {{#each galleryItems}}
+       <div class="col-lg-4 col-md-6 col-sm-12 gallery-item-container" data-category="{{tipo_evento_id}}">
+           <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#galleryModal{{id}}">
+               <img src="{{url_imagen}}" alt="{{titulo}}">
+               <div class="gallery-overlay">
+                   <h5 class="gallery-title">{{titulo}}</h5>
+                   <p class="gallery-description">{{descripcion}}</p>
+               </div>
+           </div>
+       </div>
+       {{/each}}
+   </div>
+</section>
+
+<!-- Pagination -->
+<nav aria-label="Navegación de galería" class="mt-5">
+    <ul class="pagination gallery-pagination justify-content-center">
+        {{#each pages}}
+        <li class="page-item {{#if active}}active{{/if}}">
+            <a class="page-link" href="?page={{number}}">{{number}}</a>
+        </li>
+        {{/each}}
+        {{#if hasNextPage}}
+        <li class="page-item">
+            <a class="page-link" href="?page={{nextPage}}" aria-label="Siguiente">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {{/if}}
+    </ul>
+</nav>
+
+<!-- Gallery Modals -->
+{{#each galleryItems}}
+<div class="modal fade gallery-modal" id="galleryModal{{id}}" tabindex="-1" aria-labelledby="galleryModal{{id}}Label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="galleryModal{{id}}Label">{{titulo}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="{{url_imagen_completa}}" alt="{{titulo}}" class="img-fluid">
+                <p class="mt-3 text-white">{{descripcion}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{/each}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryButtons = document.querySelectorAll('.gallery-category');
+        const galleryItems = document.querySelectorAll('.gallery-item-container');
+        
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const category = this.getAttribute('data-category');
+                
+                // Update active button
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter gallery items
+                if (category === 'all') {
+                    galleryItems.forEach(item => item.style.display = 'block');
+                } else {
+                    galleryItems.forEach(item => {
+                        if (item.getAttribute('data-category') === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Añadir animación de entrada a las imágenes
+        const galleryItemsContainer = document.querySelector('.gallery-items-container');
+        if (galleryItemsContainer) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            galleryItems.forEach(item => {
+                item.classList.add('gallery-item-hidden');
+                observer.observe(item);
+            });
+        }
+    });
+</script>
+
+<style>
+    .gallery-item-hidden {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
