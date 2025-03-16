@@ -23,26 +23,25 @@ export async function initializeDatabase() {
   }
 
   try {
-    // Eliminar la base de datos existente si existe
-    const dbPath = path.join(dbDir, "platoycopa.db")
-    if (fs.existsSync(dbPath)) {
-      console.log("Eliminando base de datos existente...")
-      fs.unlinkSync(dbPath)
-      console.log("Base de datos eliminada correctamente")
-    }
-
     // Abrir la conexión a la base de datos
     dbConnection = await open({
-      filename: dbPath,
+      filename: path.join(dbDir, "platoycopa.db"),
       driver: sqlite3.Database,
     })
 
-    console.log("Creando esquema de la base de datos...")
-    // Ejecutar el esquema SQL para crear las tablas
-    const schemaPath = path.join(__dirname, "schema.sql")
-    const schema = fs.readFileSync(schemaPath, "utf8")
-    await dbConnection.exec(schema)
-    console.log("Esquema de la base de datos creado correctamente")
+    // Verificar si la base de datos ya tiene tablas
+    const tableCheck = await dbConnection.get("SELECT name FROM sqlite_master WHERE type='table' AND name='servicios'")
+
+    if (!tableCheck) {
+      console.log("Creando esquema de la base de datos...")
+      // Ejecutar el esquema SQL para crear las tablas
+      const schemaPath = path.join(__dirname, "schema.sql")
+      const schema = fs.readFileSync(schemaPath, "utf8")
+      await dbConnection.exec(schema)
+      console.log("Esquema de la base de datos creado correctamente")
+    } else {
+      console.log("La base de datos ya está inicializada")
+    }
 
     console.log("Base de datos inicializada correctamente")
     return dbConnection
@@ -102,7 +101,7 @@ export const tiposEventosRepo = {
   async getAll() {
     const db = await getDb()
     try {
-      const tipos = await db.all("SELECT * FROM tipos_eventos ORDER BY orden")
+      const tipos = await db.all("SELECT * FROM tipos_eventos")
       console.log(`Obtenidos ${tipos.length} tipos de eventos`)
       return tipos
     } catch (error) {
@@ -179,57 +178,6 @@ export const galeriaRepo = {
     } catch (error) {
       console.error(`Error al obtener imágenes por tipo de evento ${tipoEventoId}:`, error)
       return []
-    }
-  },
-}
-
-// Repositorio de contratos
-export const contratosRepo = {
-  async getAll() {
-    const db = await getDb()
-    try {
-      const contratos = await db.all(`
-        SELECT c.*, t.nombre as tipo_evento 
-        FROM contratos c
-        LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
-        ORDER BY c.fecha_creacion DESC
-      `)
-      console.log(`Obtenidos ${contratos.length} contratos`)
-      return contratos
-    } catch (error) {
-      console.error("Error al obtener contratos:", error)
-      return []
-    }
-  },
-
-  async getByNumeroContrato(numeroContrato) {
-    const db = await getDb()
-    try {
-      const contrato = await db.get(
-        `
-        SELECT c.*, t.nombre as tipo_evento 
-        FROM contratos c
-        LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
-        WHERE c.numero_contrato = ?
-      `,
-        numeroContrato,
-      )
-      return contrato
-    } catch (error) {
-      console.error(`Error al obtener contrato ${numeroContrato}:`, error)
-      return null
-    }
-  },
-
-  async verificarContrato(numeroContrato) {
-    const db = await getDb()
-    try {
-      const result = await db.get("SELECT COUNT(*) as count FROM contratos WHERE numero_contrato = ?", numeroContrato)
-      console.log(`Verificación de contrato ${numeroContrato}: ${result.count > 0 ? "Existe" : "No existe"}`)
-      return result.count > 0
-    } catch (error) {
-      console.error(`Error al verificar contrato ${numeroContrato}:`, error)
-      return false
     }
   },
 }
@@ -321,7 +269,7 @@ export const estadisticasRepo = {
   async getAll() {
     const db = await getDb()
     try {
-      const stats = await db.all("SELECT * FROM estadisticas ORDER BY orden")
+      const stats = await db.all("SELECT * FROM estadisticas")
       console.log(`Obtenidas ${stats.length} estadísticas`)
       return stats
     } catch (error) {
@@ -336,7 +284,7 @@ export const equipoRepo = {
   async getAll() {
     const db = await getDb()
     try {
-      const team = await db.all("SELECT * FROM equipo ORDER BY orden")
+      const team = await db.all("SELECT * FROM equipo")
       console.log(`Obtenidos ${team.length} miembros del equipo`)
       return team
     } catch (error) {
@@ -402,6 +350,8 @@ export const contactoRepo = {
   },
 }
 
+// Añadir al final del archivo, antes de export default
+
 // Repositorio de cotizaciones
 export const cotizacionesRepo = {
   async guardarCotizacion(cotizacion) {
@@ -446,8 +396,8 @@ export const cotizacionesRepo = {
           cotizacion.additionalServicesCost,
           cotizacion.locationCharge,
           cotizacion.totalCost,
-          cotizacion.status || "pendiente",
-          cotizacion.createdAt || new Date().toISOString(),
+          cotizacion.status,
+          cotizacion.createdAt,
         ],
       )
 
@@ -493,12 +443,63 @@ export const cotizacionesRepo = {
   },
 }
 
+// Repositorio de contratos
+export const contratosRepo = {
+  async getAll() {
+    const db = await getDb()
+    try {
+      const contratos = await db.all(`
+        SELECT c.*, t.nombre as tipo_evento 
+        FROM contratos c
+        LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
+        ORDER BY c.fecha_creacion DESC
+      `)
+      console.log(`Obtenidos ${contratos.length} contratos`)
+      return contratos
+    } catch (error) {
+      console.error("Error al obtener contratos:", error)
+      return []
+    }
+  },
+
+  async getByNumeroContrato(numeroContrato) {
+    const db = await getDb()
+    try {
+      const contrato = await db.get(
+        `
+        SELECT c.*, t.nombre as tipo_evento 
+        FROM contratos c
+        LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
+        WHERE c.numero_contrato = ?
+      `,
+        numeroContrato,
+      )
+      return contrato
+    } catch (error) {
+      console.error(`Error al obtener contrato ${numeroContrato}:`, error)
+      return null
+    }
+  },
+
+  async verificarContrato(numeroContrato) {
+    const db = await getDb()
+    try {
+      const result = await db.get("SELECT COUNT(*) as count FROM contratos WHERE numero_contrato = ?", numeroContrato)
+      console.log(`Verificación de contrato ${numeroContrato}: ${result.count > 0 ? "Existe" : "No existe"}`)
+      return result.count > 0
+    } catch (error) {
+      console.error(`Error al verificar contrato ${numeroContrato}:`, error)
+      return false
+    }
+  },
+}
+
 // Inicializar la base de datos al importar este módulo
 initializeDatabase().catch((err) => {
   console.error("Error al inicializar la base de datos:", err)
 })
 
-// Exportar todos los repositorios
+// Actualizar el export default para incluir el nuevo repositorio
 export default {
   initializeDatabase,
   getDb,
