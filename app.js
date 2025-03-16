@@ -4,7 +4,7 @@ import path from "path"
 import { fileURLToPath } from "url"
 import fs from "fs"
 import Handlebars from "handlebars"
-import db from "./database/db.js"
+import db from "./database/postgress-db.js"
 import * as validation from "./utils/validation.js"
 import {
   sanitizeCompletely,
@@ -28,7 +28,9 @@ const __dirname = path.dirname(__filename)
 
 // Initialize Express app
 const app = express()
+// Use process.env.PORT for cloud deployment compatibility or 0.0.0.0 to listen on all network interfaces
 const PORT = process.env.PORT || 3000
+const HOST = process.env.HOST || "0.0.0.0"
 
 // Setup Handlebars as the view engine
 app.engine(
@@ -126,8 +128,6 @@ app.get("/servicios", async (req, res) => {
     res.status(500).send("Error al cargar la página")
   }
 })
-
-
 
 app.get("/contacto", async (req, res) => {
   try {
@@ -329,7 +329,6 @@ app.get("/resenas", async (req, res) => {
   }
 })
 
-
 // Ruta para procesar el formulario de reseñas
 app.post("/submit-review", async (req, res) => {
   try {
@@ -478,7 +477,6 @@ app.get("/galeria", async (req, res) => {
     res.status(500).send("Error al cargar la página")
   }
 })
-
 
 // Actualizar la ruta para el formulario de contacto
 app.post("/contact-form", async (req, res) => {
@@ -791,9 +789,11 @@ async function startServer() {
     const services = await db.serviciosRepo.getAll()
     console.log(`La base de datos contiene ${services.length} servicios`)
 
-    // Iniciar el servidor
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`)
+    // Iniciar el servidor en todas las interfaces de red (0.0.0.0)
+    app.listen(PORT, HOST, () => {
+      console.log(`Server is running on http://${HOST}:${PORT}`)
+      console.log(`For local access: http://localhost:${PORT}`)
+      console.log(`For network access: https://192.168.1.138:${PORT}`)
       console.log("Project structure created successfully!")
       console.log("Base de datos SQLite configurada correctamente.")
     })

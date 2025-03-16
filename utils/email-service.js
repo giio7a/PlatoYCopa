@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"
-import db from "../database/db.js" // Se importa la BD para obtener el nombre del tipo de evento
+import db from "../database/postgress-db.js" // Se importa la BD para obtener el nombre del tipo de evento
 import path from "path"
 import { fileURLToPath } from "url"
 import fs from "fs"

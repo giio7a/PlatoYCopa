@@ -169,8 +169,8 @@ INSERT OR IGNORE INTO resenas (numero_contrato, nombre_cliente, fecha, tipo_even
 
 -- Imágenes de galería
 INSERT OR IGNORE INTO imagenes_galeria (titulo, descripcion, url_imagen, url_imagen_completa, tipo_evento_id, destacada, orden) VALUES
-('Boda Elegante', 'Servicio de meseros para una boda elegante en Puebla', '/img/gallery/boda1.jpg', '/img/gallery/boda1_full.jpg', 1, 1, 1),
-('Evento Corporativo', 'Servicio completo para evento empresarial', '/img/gallery/corporativo1.jpg', '/img/gallery/corporativo1_full.jpg', 2, 1, 2),
+('Boda Elegante', 'Servicio de meseros para una boda elegante en Puebla', '/img/Evento-1.jpg', '/img/gallery/boda1_full.jpg', 1, 1, 1),
+('Evento Corporativo', 'Servicio completo para evento empresarial', '/img/Evento-2.jpg', '/img/gallery/corporativo1_full.jpg', 2, 1, 2),
 ('Fiesta de Cumpleaños', 'Celebración de cumpleaños con servicio premium', '/img/gallery/cumpleanos1.jpg', '/img/gallery/cumpleanos1_full.jpg', 3, 1, 3),
 ('Graduación Universitaria', 'Servicio para ceremonia de graduación', '/img/gallery/graduacion1.jpg', '/img/gallery/graduacion1_full.jpg', 4, 0, 4);
 
