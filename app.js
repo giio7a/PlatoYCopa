@@ -110,6 +110,7 @@ app.get("/", async (req, res) => {
   }
 })
 
+
 // Actualizar la ruta de servicios para incluir información de precios
 app.get("/servicios", async (req, res) => {
   try {
@@ -326,6 +327,75 @@ app.get("/resenas", async (req, res) => {
   } catch (error) {
     console.error("Error al cargar la página de reseñas:", error)
     res.status(500).send("Error al cargar la página")
+  }
+})
+
+
+// Ruta para servicios individuales
+app.get("/servicios/:id", async (req, res) => {
+  try {
+    const serviceId = req.params.id
+
+    // Obtener todos los servicios
+    const services = await db.serviciosRepo.getAll()
+
+    // Redirigir a la página de servicios con el ID como parámetro de consulta
+    res.redirect(`/servicios?id=${serviceId}`)
+  } catch (error) {
+    console.error(`Error al redirigir al servicio con ID ${req.params.id}:`, error)
+    res.redirect("/servicios")
+  }
+})
+
+// Ruta para reseñas filtradas por tipo de evento
+app.get("/resenas/tipo/:id", async (req, res) => {
+  try {
+    const eventTypeId = req.params.id
+
+    // Redirigir a la página de reseñas con el tipo como parámetro de consulta
+    res.redirect(`/resenas?tipo=${eventTypeId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a reseñas para el tipo de evento ${req.params.id}:`, error)
+    res.redirect("/resenas")
+  }
+})
+
+// Ruta para galería filtrada por tipo de evento
+app.get("/galeria/tipo/:id", async (req, res) => {
+  try {
+    const eventTypeId = req.params.id
+
+    // Redirigir a la página de galería con el tipo como parámetro de consulta
+    res.redirect(`/galeria?tipo=${eventTypeId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a galería para el tipo de evento ${req.params.id}:`, error)
+    res.redirect("/galeria")
+  }
+})
+
+// Ruta para reseñas individuales
+app.get("/resenas/:id", async (req, res) => {
+  try {
+    const reviewId = req.params.id
+
+    // Redirigir a la página de reseñas con el ID como parámetro de consulta
+    res.redirect(`/resenas?id=${reviewId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a la reseña con ID ${req.params.id}:`, error)
+    res.redirect("/resenas")
+  }
+})
+
+// Ruta para imágenes individuales de la galería
+app.get("/galeria/:id", async (req, res) => {
+  try {
+    const galleryId = req.params.id
+
+    // Redirigir a la página de galería con el ID como parámetro de consulta
+    res.redirect(`/galeria?id=${galleryId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a la imagen con ID ${req.params.id}:`, error)
+    res.redirect("/galeria")
   }
 })
 

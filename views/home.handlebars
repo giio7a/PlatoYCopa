@@ -43,13 +43,19 @@
            </div>
        </div>
 
-       <div class="btn-container animate-fadeIn delay-4">
-           <a href="https://wa.me/5212223780903" class="btn btn-gold">Reservar ahora</a>
-           <a href="#servicios" class="btn btn-outline-gold">Nuestros servicios</a>
-       </div>
+       <div class="hero-buttons">
+            <a href="https://wa.me/5212223780903" class="btn btn-gold btn-lg">
+                <i class="bi bi-calendar-check me-2"></i>Reservar
+            </a>
+            <a href="#cotizacion" class="btn btn-outline-gold btn-lg">
+                <i class="bi bi-calculator me-2"></i>Cotizar
+            </a>
+        </div>
+        <a href="#servicios" class="scroll-down-btn">
+            <i class="bi bi-chevron-down"></i>
+        </a>
    </div>
 </section>
-
 <!-- Servicios -->
 <section id="servicios" class="services-section">
    <div class="container">
@@ -60,7 +66,7 @@
            {{#each services}}
                <div class="col-lg-3 col-md-6 mb-4">
                    <a href="/servicios/{{id}}" class="text-decoration-none service-link">
-                       <div class="service-card">
+                       <div class="service-card interactive-card">
                            <div class="service-icon">
                                <i class="bi {{icono}}"></i>
                            </div>
@@ -83,8 +89,8 @@
        <div class="row">
            {{#each reviews}}
            <div class="col-lg-4 col-md-6 mb-4">
-               <a href="/resenas" class="text-decoration-none review-link">
-                   <div class="review-card">
+               <a href="/resenas/{{id}}" class="text-decoration-none review-link">
+                   <div class="review-card interactive-card">
                        <div class="review-header">
                            <div class="reviewer-info">
                                <h5>{{nombre_cliente}}</h5>
@@ -134,7 +140,6 @@
        </div>
    </div>
 </section>
-
 <!-- Galería -->
 <section class="gallery-section" id="galeria">
    <div class="container">
@@ -145,11 +150,17 @@
            <div class="carousel-inner">
                {{#each galleryImages}}
                <div class="carousel-item {{#if @first}}active{{/if}}">
-                   <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
+                   <a href="/galeria/{{id}}" class="gallery-carousel-link">
+                       <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
+                       <div class="carousel-caption d-none d-md-block">
+                           <h5>{{titulo}}</h5>
+                           <p>{{descripcion}}</p>
+                       </div>
+                   </a>
                </div>
                {{/each}}
            </div>
-<button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+           <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                <span class="visually-hidden">Anterior</span>
            </button>
@@ -459,3 +470,118 @@
 </div>
 {{/if}}
 
+
+
+
+
+<style>
+/* Estilos para el botón de scroll hacia abajo */
+.scroll-down-btn {
+    position: absolute;
+    bottom: -75px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    animation: bounce 2s infinite;
+    z-index: 2;
+}
+
+.scroll-down-btn:hover {
+    background: var(--gold);
+    color: var(--black);
+    transform: translateX(-50%) scale(1.1);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+/* Estilos para elementos resaltados */
+.highlighted {
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+    border: 2px solid var(--gold);
+}
+
+.highlighted::before {
+    content: "Seleccionado";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--black);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 3;
+}
+
+.highlighted-service {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    position: relative;
+    z-index: 2;
+}
+
+.highlighted-service::before {
+    content: "Servicio seleccionado";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--black);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 3;
+}
+
+.highlighted-review {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    position: relative;
+    z-index: 2;
+}
+
+.highlighted-review::before {
+    content: "Reseña seleccionada";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--black);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 3;
+}
+</style>
