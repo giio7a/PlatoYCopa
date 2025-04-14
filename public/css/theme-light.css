@@ -1242,7 +1242,7 @@
 }
 
 .light-mode .mobile-search-close{
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.25);
   box-shadow: var(--card-shadow);
 }
 
