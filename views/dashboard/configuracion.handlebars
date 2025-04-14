@@ -1,0 +1,841 @@
+<div class="configuracion-container">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-wrapper">
+        <h2 class="card-title">Configuración de la aplicación</h2>
+        <p class="card-subtitle">Personaliza tu experiencia en el dashboard</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="settingsAlert" class="settings-alert" style="display: none;">
+        <i class="bi bi-info-circle"></i>
+        <span id="settingsAlertMessage"></span>
+      </div>
+      
+      <form id="settingsForm">
+        <!-- Sección de Apariencia -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">
+            <i class="bi bi-palette"></i>
+            Apariencia
+          </h3>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="lightMode">Modo claro</label>
+                <span class="setting-description">Activa el modo claro para una mejor visibilidad en entornos luminosos</span>
+              </div>
+              <div class="setting-control">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="lightMode" name="lightMode" {{#if settings.lightMode}}checked{{/if}}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="fontSize">Tamaño de fuente</label>
+                <span class="setting-description">Ajusta el tamaño del texto en toda la aplicación</span>
+              </div>
+              <div class="setting-control">
+                <select id="fontSize" name="fontSize" class="select-control">
+                  <option value="small" {{#if (eq settings.fontSize "small")}}selected{{/if}}>Pequeño</option>
+                  <option value="medium" {{#if (eq settings.fontSize "medium")}}selected{{/if}}>Mediano</option>
+                  <option value="large" {{#if (eq settings.fontSize "large")}}selected{{/if}}>Grande</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="compactView">Vista compacta</label>
+                <span class="setting-description">Reduce el espaciado para mostrar más contenido</span>
+              </div>
+              <div class="setting-control">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="compactView" name="compactView" {{#if settings.compactView}}checked{{/if}}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Sección de Mensajes -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">
+            <i class="bi bi-envelope"></i>
+            Mensajes
+          </h3>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="autoRefresh">Actualización automática</label>
+                <span class="setting-description">Actualiza automáticamente la lista de mensajes</span>
+              </div>
+              <div class="setting-control">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="autoRefresh" name="autoRefresh" {{#if settings.autoRefresh}}checked{{/if}}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="setting-item" id="refreshIntervalContainer" {{#unless settings.autoRefresh}}style="opacity: 0.5;"{{/unless}}>
+              <div class="setting-label">
+                <label for="refreshInterval">Intervalo de actualización (segundos)</label>
+                <span class="setting-description">Tiempo entre actualizaciones automáticas</span>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="refreshInterval" name="refreshInterval" class="input-control" min="10" max="300" value="{{settings.refreshInterval}}" {{#unless settings.autoRefresh}}disabled{{/unless}}>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="replyTemplate">Plantilla de respuesta</label>
+                <span class="setting-description">Texto predeterminado para respuestas a mensajes</span>
+              </div>
+              <div class="setting-control full-width">
+                <textarea id="replyTemplate" name="replyTemplate" class="textarea-control" rows="4" placeholder="Escribe aquí tu plantilla de respuesta...">{{settings.replyTemplate}}</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Sección de Notificaciones -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">
+            <i class="bi bi-bell"></i>
+            Notificaciones
+          </h3>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="notificationsEnabled">Notificaciones en el navegador</label>
+                <span class="setting-description">Recibe notificaciones de nuevos mensajes</span>
+              </div>
+              <div class="setting-control">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notificationsEnabled" name="notificationsEnabled" {{#if settings.notificationsEnabled}}checked{{/if}}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-label">
+                <label for="emailNotifications">Notificaciones por correo</label>
+                <span class="setting-description">Recibe notificaciones por correo electrónico</span>
+              </div>
+              <div class="setting-control">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="emailNotifications" name="emailNotifications" {{#if settings.emailNotifications}}checked{{/if}}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="settings-actions">
+          <button type="button" id="resetSettings" class="btn-secondary">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Restablecer valores predeterminados
+          </button>
+          <button type="submit" id="saveSettings" class="btn-primary">
+            <i class="bi bi-save"></i>
+            Guardar configuración
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Estilos para la página de configuración */
+  .configuracion-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .settings-section {
+    margin-bottom: 30px;
+  }
+  
+  .settings-section-title {
+    color: var(--text-accent);
+    font-size: 1.3rem;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .settings-section-title i {
+    font-size: 1.2rem;
+    color: var(--text-accent);
+  }
+  
+  .settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .setting-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow);
+  }
+  
+  .setting-item:hover {
+    background-color: rgba(229, 199, 107, 0.1);
+    transform: translateY(-2px);
+    box-shadow: var(--gold-glow), var(--neo-shadow);
+  }
+  
+  .setting-label {
+    flex: 1;
+    padding-right: 20px;
+  }
+  
+  .setting-label label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+  }
+  
+  .setting-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .setting-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 120px;
+  }
+  
+  .setting-control.full-width {
+    width: 100%;
+    min-width: 100%;
+    margin-top: 10px;
+  }
+  
+  /* Estilos para el toggle switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    cursor: pointer;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow-inset);
+  }
+  
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 3px;
+    background: var(--gold-gradient);
+    border-radius: 50%;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+  }
+  
+  input:checked + .toggle-slider {
+    background-color: rgba(229, 199, 107, 0.2);
+  }
+  
+  input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+  }
+  
+  input:focus + .toggle-slider {
+    box-shadow: 0 0 0 3px rgba(229, 199, 107, 0.25), var(--neo-shadow-inset);
+  }
+  
+  /* Estilos para los controles de formulario */
+  .select-control {
+    background-color: var(--bg-input);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    padding: 8px 12px;
+    color: var(--input-text);
+    width: 100%;
+    min-width: 150px;
+    font-family: inherit;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow-inset);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e5c76b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+  }
+  
+  .select-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(229, 199, 107, 0.25), var(--neo-shadow-inset);
+  }
+  
+  .input-control {
+    background-color: var(--bg-input);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    padding: 8px 12px;
+    color: var(--input-text);
+    width: 100%;
+    min-width: 150px;
+    font-family: inherit;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow-inset);
+  }
+  
+  .input-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(229, 199, 107, 0.25), var(--neo-shadow-inset);
+  }
+  
+  .textarea-control {
+    background-color: var(--bg-input);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-md);
+    padding: 12px;
+    color: var(--input-text);
+    width: 100%;
+    font-family: inherit;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow-inset);
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .textarea-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(229, 199, 107, 0.25), var(--neo-shadow-inset);
+  }
+  
+  /* Estilos para los botones de acción */
+  .settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .btn-primary, .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  
+  .btn-primary {
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--gold-glow), var(--shadow-md);
+  }
+  
+  .btn-secondary {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: 1px solid var(--button-secondary-border);
+    box-shadow: var(--neo-shadow);
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(229, 199, 107, 0.15);
+    color: var(--text-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--gold-glow), var(--neo-shadow);
+  }
+  
+  /* Estilos para el mensaje de alerta */
+  .settings-alert {
+    background-color: rgba(229, 199, 107, 0.2);
+    border: 1px solid var(--gold-border);
+    border-radius: var(--border-radius-md);
+    padding: 15px;
+    margin-bottom: 20px;
+    color: var(--text-accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.3s ease forwards;
+  }
+  
+  .settings-alert.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: rgba(40, 167, 69, 0.5);
+    color: #28a745;
+  }
+  
+  .settings-alert.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.5);
+    color: #dc3545;
+  }
+  
+  .settings-alert i {
+    font-size: 1.2rem;
+  }
+  
+  /* Animación de aparición */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Animación de desaparición */
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* Estilos responsivos */
+  @media (max-width: 768px) {
+    .setting-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .setting-label {
+      padding-right: 0;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    
+    .setting-control {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    
+    .settings-actions {
+      flex-direction: column-reverse;
+      gap: 10px;
+    }
+    
+    .btn-primary, .btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Elementos del DOM
+    const settingsForm = document.getElementById('settingsForm');
+    const lightModeToggle = document.getElementById('lightMode');
+    const fontSizeSelect = document.getElementById('fontSize');
+    const compactViewToggle = document.getElementById('compactView');
+    const autoRefreshToggle = document.getElementById('autoRefresh');
+    const refreshIntervalInput = document.getElementById('refreshInterval');
+    const refreshIntervalContainer = document.getElementById('refreshIntervalContainer');
+    const replyTemplateTextarea = document.getElementById('replyTemplate');
+    const notificationsEnabledToggle = document.getElementById('notificationsEnabled');
+    const emailNotificationsToggle = document.getElementById('emailNotifications');
+    const resetSettingsButton = document.getElementById('resetSettings');
+    const saveSettingsButton = document.getElementById('saveSettings');
+    const settingsAlert = document.getElementById('settingsAlert');
+    const settingsAlertMessage = document.getElementById('settingsAlertMessage');
+    
+    // Función para mostrar alerta
+    function showAlert(message, type = 'success') {
+      settingsAlert.className = 'settings-alert ' + type;
+      settingsAlertMessage.textContent = message;
+      settingsAlert.style.display = 'flex';
+      
+      // Ocultar la alerta después de 5 segundos
+      setTimeout(() => {
+        settingsAlert.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => {
+          settingsAlert.style.display = 'none';
+          settingsAlert.style.animation = '';
+        }, 300);
+      }, 5000);
+    }
+    
+    // Función para mostrar notificación toast
+    function showToast(message, type = 'success') {
+      // Verificar si Toastify está disponible
+      if (typeof Toastify === 'function') {
+        Toastify({
+          text: message,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: type === 'success' ? "linear-gradient(to right, #28a745, #218838)" : "linear-gradient(to right, #dc3545, #c82333)",
+          className: "toast-notification",
+          stopOnFocus: true,
+        }).showToast();
+      } else {
+        // Fallback si Toastify no está disponible
+        showAlert(message, type);
+      }
+    }
+    
+    // Manejar cambio en el toggle de actualización automática
+    autoRefreshToggle.addEventListener('change', function() {
+      refreshIntervalInput.disabled = !this.checked;
+      refreshIntervalContainer.style.opacity = this.checked ? '1' : '0.5';
+    });
+    
+    // Manejar cambio en el toggle de notificaciones
+    notificationsEnabledToggle.addEventListener('change', function() {
+      if (this.checked) {
+        requestNotificationPermission();
+      }
+    });
+    
+    // Función para solicitar permisos de notificación
+    async function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        showToast("Este navegador no soporta notificaciones de escritorio", "error");
+        notificationsEnabledToggle.checked = false;
+        return false;
+      }
+      
+      if (Notification.permission === "granted") {
+        return true;
+      }
+      
+      if (Notification.permission !== "denied") {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          showToast("Permisos de notificación concedidos", "success");
+          return true;
+        } else {
+          showToast("Permisos de notificación denegados", "error");
+          notificationsEnabledToggle.checked = false;
+          return false;
+        }
+      } else {
+        showToast("Los permisos de notificación fueron denegados anteriormente", "error");
+        notificationsEnabledToggle.checked = false;
+        return false;
+      }
+    }
+    
+    // Validación del intervalo de actualización
+    refreshIntervalInput.addEventListener('input', function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 10) {
+        this.value = 10;
+      } else if (value > 300) {
+        this.value = 300;
+      }
+    });
+    
+    // Manejar envío del formulario
+    settingsForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Recopilar datos del formulario
+      const formData = {
+        lightMode: lightModeToggle.checked,
+        fontSize: fontSizeSelect.value,
+        compactView: compactViewToggle.checked,
+        autoRefresh: autoRefreshToggle.checked,
+        refreshInterval: parseInt(refreshIntervalInput.value) || 60,
+        replyTemplate: replyTemplateTextarea.value,
+        notificationsEnabled: notificationsEnabledToggle.checked,
+        emailNotifications: emailNotificationsToggle.checked
+      };
+      
+      try {
+        // Enviar datos al servidor
+        const response = await fetch('/api/configuracion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Mostrar mensaje de éxito
+          showAlert(data.message || "Configuración guardada correctamente", "success");
+          
+          // Aplicar configuraciones a través del sistema global
+          if (window.PlatoYCopa && typeof window.PlatoYCopa.applySettings === 'function') {
+            window.PlatoYCopa.applySettings(formData);
+            
+            // Mostrar efecto visual para confirmar el cambio
+            const settingsForm = document.getElementById('settingsForm');
+            settingsForm.classList.add('settings-saved');
+            setTimeout(() => {
+              settingsForm.classList.remove('settings-saved');
+            }, 1000);
+          } else {
+            // Si el sistema global no está disponible, recargar la página
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        } else {
+          // Mostrar mensaje de error
+          showAlert(data.message || "Error al guardar la configuración", "error");
+        }
+      } catch (error) {
+        console.error("Error al guardar configuración:", error);
+        showAlert("Error al guardar la configuración", "error");
+      }
+    });
+    
+    // Manejar clic en el botón de restablecer
+    resetSettingsButton.addEventListener('click', async function() {
+      try {
+        // Confirmar antes de restablecer
+        if (!confirm("¿Estás seguro de que deseas restablecer todas las configuraciones a sus valores predeterminados?")) {
+          return;
+        }
+        
+        // Enviar solicitud al servidor
+        const response = await fetch('/api/configuracion/reset', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Actualizar valores en el formulario
+          lightModeToggle.checked = data.settings.lightMode;
+          fontSizeSelect.value = data.settings.fontSize;
+          compactViewToggle.checked = data.settings.compactView;
+          autoRefreshToggle.checked = data.settings.autoRefresh;
+          refreshIntervalInput.value = data.settings.refreshInterval;
+          refreshIntervalInput.disabled = !data.settings.autoRefresh;
+          refreshIntervalContainer.style.opacity = data.settings.autoRefresh ? '1' : '0.5';
+          replyTemplateTextarea.value = data.settings.replyTemplate;
+          notificationsEnabledToggle.checked = data.settings.notificationsEnabled;
+          emailNotificationsToggle.checked = data.settings.emailNotifications;
+          
+          // Aplicar configuraciones a través del sistema global
+          if (window.PlatoYCopa && typeof window.PlatoYCopa.applySettings === 'function') {
+            window.PlatoYCopa.applySettings(data.settings);
+            
+            // Mostrar efecto visual para confirmar el restablecimiento
+            const settingsForm = document.getElementById('settingsForm');
+            settingsForm.classList.add('settings-reset');
+            setTimeout(() => {
+              settingsForm.classList.remove('settings-reset');
+            }, 1000);
+          } else {
+            // Si el sistema global no está disponible, recargar la página
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+          
+          // Mostrar mensaje de éxito
+          showAlert(data.message || "Configuración restablecida correctamente", "success");
+        } else {
+          // Mostrar mensaje de error
+          showAlert(data.message || "Error al restablecer la configuración", "error");
+        }
+      } catch (error) {
+        console.error("Error al restablecer configuración:", error);
+        showAlert("Error al restablecer la configuración", "error");
+      }
+    });
+    
+    // Añadir efectos visuales para la interacción
+    document.querySelectorAll('.setting-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        item.style.transform = 'translateY(-3px)';
+        item.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.1), 0 0 10px rgba(229, 199, 107, 0.3)';
+      });
+      
+      item.addEventListener('mouseleave', () => {
+        item.style.transform = '';
+        item.style.boxShadow = '';
+      });
+    });
+    
+    // Añadir efectos visuales para los botones
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
+      button.addEventListener('mousedown', () => {
+        button.style.transform = 'scale(0.98)';
+      });
+      
+      button.addEventListener('mouseup', () => {
+        button.style.transform = '';
+      });
+      
+      button.addEventListener('mouseleave', () => {
+        button.style.transform = '';
+      });
+    });
+    
+    // Añadir estilos para efectos visuales de guardado y restablecimiento
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      @keyframes settingsSaved {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+      }
+      
+      @keyframes settingsReset {
+        0% { box-shadow: 0 0 0 0 rgba(229, 199, 107, 0.5); }
+        70% { box-shadow: 0 0 0 10px rgba(229, 199, 107, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(229, 199, 107, 0); }
+      }
+      
+      .settings-saved {
+        animation: settingsSaved 1s ease-in-out;
+      }
+      
+      .settings-reset {
+        animation: settingsReset 1s ease-in-out;
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    // Añadir botón de modo claro/oscuro rápido en la esquina superior derecha
+    const quickThemeToggle = document.createElement('button');
+    quickThemeToggle.className = 'quick-theme-toggle';
+    quickThemeToggle.innerHTML = lightModeToggle.checked ? 
+      '<i class="bi bi-moon-stars"></i>' : 
+      '<i class="bi bi-brightness-high"></i>';
+    quickThemeToggle.title = lightModeToggle.checked ? 
+      'Cambiar a modo oscuro' : 
+      'Cambiar a modo claro';
+    
+    
+    quickThemeToggle.addEventListener('click', function() {
+      if (window.PlatoYCopa && typeof window.PlatoYCopa.toggleLightMode === 'function') {
+        const isLightMode = window.PlatoYCopa.toggleLightMode();
+        lightModeToggle.checked = isLightMode;
+        
+        // Actualizar el icono y el título
+        this.innerHTML = isLightMode ? 
+          '<i class="bi bi-moon-stars"></i>' : 
+          '<i class="bi bi-brightness-high"></i>';
+        this.title = isLightMode ? 
+          'Cambiar a modo oscuro' : 
+          'Cambiar a modo claro';
+      }
+    });
+    
+    // Estilos para el botón de cambio rápido de tema
+    const quickThemeToggleStyle = document.createElement('style');
+    quickThemeToggleStyle.textContent = `
+      .quick-theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--button-secondary-bg);
+        border: 1px solid var(--button-secondary-border);
+        color: var(--text-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-normal);
+      }
+      
+      .quick-theme-toggle:hover {
+        transform: rotate(30deg);
+        background-color: rgba(229, 199, 107, 0.2);
+        box-shadow: var(--gold-glow), var(--shadow-md);
+      }
+      
+      .quick-theme-toggle i {
+        font-size: 1.2rem;
+      }
+      
+      @media (max-width: 768px) {
+        .quick-theme-toggle {
+          top: 10px;
+          right: 10px;
+          width: 36px;
+          height: 36px;
+        }
+      }
+    `;
+    document.head.appendChild(quickThemeToggleStyle);
+    
+    // Añadir el botón al cuerpo del documento
+    document.body.appendChild(quickThemeToggle);
+  });
+</script>

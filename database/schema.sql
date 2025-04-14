@@ -22,7 +22,9 @@ CREATE TABLE IF NOT EXISTS servicios (
   icono TEXT DEFAULT 'bi-star',
   caracteristicas TEXT, -- JSON array
   destacado INTEGER DEFAULT 0,
-  orden INTEGER DEFAULT 0
+  orden INTEGER DEFAULT 0,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de imágenes de galería
@@ -47,7 +49,7 @@ CREATE TABLE IF NOT EXISTS estadisticas (
   orden INTEGER DEFAULT 0
 );
 
--- Tabla de equipo
+-- Tabla de equipo  
 CREATE TABLE IF NOT EXISTS equipo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nombre TEXT NOT NULL,
@@ -132,6 +134,21 @@ CREATE TABLE IF NOT EXISTS resenas (
 
 -- Insertar datos iniciales
 
+-- Añadir al final del archivo schema.sql
+
+-- Tabla de usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  nombre TEXT,
+  rol TEXT DEFAULT 'admin',
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ultimo_acceso TIMESTAMP
+);
+
+-- Insertar usuario administrador
+
 -- Tipos de eventos
 INSERT OR IGNORE INTO tipos_eventos (id, nombre, descripcion, icono, orden) VALUES
 (1, 'Boda', 'Celebraciones matrimoniales', 'bi-heart', 1),
@@ -169,8 +186,11 @@ INSERT OR IGNORE INTO resenas (numero_contrato, nombre_cliente, fecha, tipo_even
 
 -- Imágenes de galería
 INSERT OR IGNORE INTO imagenes_galeria (titulo, descripcion, url_imagen, url_imagen_completa, tipo_evento_id, destacada, orden) VALUES
-('Boda Elegante', 'Servicio de meseros para una boda elegante en Puebla', '/img/Evento-1.jpg', '/img/gallery/boda1_full.jpg', 1, 1, 1),
+('Boda Elegante', 'Servicio de meseros para una boda elegante en Puebla', '/img/Evento-1.jpg', 'platoycopa/public/img/Evento-1.jpg', 1, 1, 1),
 ('Evento Corporativo', 'Servicio completo para evento empresarial', '/img/Evento-2.jpg', '/img/gallery/corporativo1_full.jpg', 2, 1, 2),
 ('Fiesta de Cumpleaños', 'Celebración de cumpleaños con servicio premium', '/img/gallery/cumpleanos1.jpg', '/img/gallery/cumpleanos1_full.jpg', 3, 1, 3),
 ('Graduación Universitaria', 'Servicio para ceremonia de graduación', '/img/gallery/graduacion1.jpg', '/img/gallery/graduacion1_full.jpg', 4, 0, 4);
 
+ALTER TABLE resenas ADD COLUMN likes INTEGER DEFAULT 0;
+
+ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 0;

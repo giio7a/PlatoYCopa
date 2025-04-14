@@ -1,0 +1,322 @@
+<div class="verify-code-container">
+    <div class="verify-code-card">
+        <div class="auth-logo">
+            <img src="/img/Plato_y_copa_logo.jpg" alt="Plato y Copa Logo">
+        </div>
+        <h2 class="verify-code-title">Verificar Código</h2>
+        
+        {{#if error}}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {{/if}}
+        
+        {{#if success}}
+        <div class="alert alert-success" role="alert">
+            {{success}}
+        </div>
+        {{/if}}
+        
+        <p class="verify-code-subtitle">Hemos enviado un código de verificación a tu correo electrónico. Por favor, ingrésalo a continuación.</p>
+        <form id="verifyCodeForm" action="/verify-recovery-code" method="POST">
+            <input type="hidden" name="email" value="{{email}}">
+            <div class="form-group">
+                <i class="bi bi-shield-lock form-icon"></i>
+                <input type="text" class="form-control" id="recoveryCode" name="recoveryCode" 
+                    placeholder="Código de verificación" required maxlength="6" pattern="[0-9]{6}">
+                <div class="invalid-feedback">
+                    Por favor, ingresa el código de 6 dígitos.
+                </div>
+            </div>
+            <button type="submit" class="btn btn-verify">Verificar Código</button>
+        </form>
+        <div class="back-to-recovery">
+            <a href="/password-recovery">Volver a recuperación de contraseña</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Error -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="errorModalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para la página de verificación de código */
+.verify-code-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+}
+
+.verify-code-card {
+    width: 100%;
+    max-width: 450px;
+    background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(0, 0, 0, 0.95));
+    border-radius: var(--border-radius);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    padding: 40px 30px;
+    border: 1px solid var(--gold-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.verify-code-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, var(--gold), var(--gold-dark));
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo img {
+    height: 80px;
+    border-radius: 10px;
+    border: 2px solid var(--gold-border);
+    transition: all 0.3s ease;
+}
+
+.auth-logo img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(229, 199, 107, 0.4);
+}
+
+.verify-code-title {
+    color: var(--gold);
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.verify-code-subtitle {
+    color: var(--white-dim);
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.form-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1.2rem;
+}
+
+.form-control {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--gold-border);
+    border-radius: 30px;
+    color: var(--white);
+    padding: 12px 15px 12px 45px;
+    width: 100%;
+    transition: all 0.3s ease;
+    text-align: center;
+    letter-spacing: 5px;
+    font-size: 1.2rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-verify {
+    background: linear-gradient(to right, var(--gold), var(--gold-dark));
+    color: var(--black);
+    border: none;
+    border-radius: 30px;
+    padding: 12px 20px;
+    width: 100%;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-verify:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(229, 199, 107, 0.4);
+}
+
+.back-to-recovery {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-to-recovery a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back-to-recovery a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    border-radius: var(--border-radius);
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff6b6b;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #51cf66;
+    border-left: 4px solid #28a745;
+}
+
+/* Estilos para el modal */
+.modal-content {
+    background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(0, 0, 0, 0.95));
+    border: 1px solid var(--gold-border);
+    color: var(--white);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--gold-border);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--gold-border);
+}
+
+.modal-title {
+    color: var(--gold);
+}
+
+.btn-secondary {
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+}
+
+.btn-secondary:hover {
+    background: var(--gold-dark);
+    color: var(--black);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verify-code-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .verify-code-card {
+        padding: 30px 20px;
+    }
+    
+    .verify-code-title {
+        font-size: 1.5rem;
+    }
+    
+    .auth-logo img {
+        height: 60px;
+    }
+    
+    .verify-code-subtitle {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+{{#section 'scripts'}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const verifyCodeForm = document.getElementById('verifyCodeForm');
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        const errorModalMessage = document.getElementById('errorModalMessage');
+
+        // Validación del formulario
+        verifyCodeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const recoveryCode = document.getElementById('recoveryCode').value;
+            
+            // Validar que el código no esté vacío
+            if (!recoveryCode) {
+                showError('Por favor, ingresa el código de verificación');
+                return;
+            }
+            
+            // Validar formato del código (6 dígitos)
+            const codeRegex = /^[0-9]{6}$/;
+            if (!codeRegex.test(recoveryCode)) {
+                showError('El código debe contener exactamente 6 dígitos');
+                return;
+            }
+            
+            // Si todo está correcto, enviar el formulario
+            this.submit();
+        });
+
+        function showError(message) {
+            errorModalMessage.textContent = message;
+            errorModal.show();
+        }
+
+        // Mostrar mensaje de error si existe
+        {{#if error}}
+        showError('{{error}}');
+        {{/if}}
+    });
+</script>
+{{/section}}

@@ -1,0 +1,1737 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Servicios</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="addServiceModal">
+      <i class="bi bi-plus-lg"></i> <span class="btn-text">Nuevo Servicio</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Servicios</h3>
+    <div class="card-tools">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" class="table-search" placeholder="Buscar servicio...">
+      </div>
+      <div class="view-toggle">
+        <button id="compactViewBtn" class="btn-view-toggle active" title="Vista compacta">
+          <i class="bi bi-list"></i>
+        </button>
+        <button id="fullViewBtn" class="btn-view-toggle" title="Vista completa">
+          <i class="bi bi-grid-3x3-gap"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-container">
+      <table class="data-table responsive-table" id="serviciosTable">
+        <thead>
+          <tr>
+            <th data-sort="orden" class="always-visible">#</th>
+            <th data-sort="titulo" class="always-visible">Nombre</th>
+            <th data-sort="descripcion" class="always-visible">Descripción</th>
+            <th data-sort="precio" class="always-visible">Precio</th>
+            <th data-sort="imagen" class="always-visible">Imagen</th>
+            <th data-sort="destacado" class="always-visible">Destacado</th>
+            <th data-sort="icono" class="full-view-only">Icono</th>
+            <th data-sort="caracteristicas" class="full-view-only">Características</th>
+            <th data-sort="fecha_creacion" class="full-view-only">Fecha Creación</th>
+            <th data-sort="fecha_actualizacion" class="full-view-only">Última Actualización</th>
+            <th class="actions-column always-visible">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each servicios}}
+          <tr data-id="{{this.id}}">
+            <td data-label="Orden" data-column="orden" class="always-visible">{{this.orden}}</td>
+            <td data-label="Nombre" data-column="titulo" class="always-visible">{{this.titulo}}</td>
+            <td data-label="Descripción" data-column="descripcion" class="always-visible">{{truncate this.descripcion_corta 100}}</td>
+            <td data-label="Precio" data-column="precio" class="always-visible">
+              {{#if this.precio}}
+                {{this.precio}}
+              {{else if this.precio_desde}}
+                Desde {{this.precio_desde}}
+              {{else}}
+                -
+              {{/if}}
+            </td>
+            <td data-label="Imagen" data-column="imagen" class="always-visible">
+              <img src="{{this.imagen_url}}" alt="{{this.titulo}}" class="table-thumbnail">
+            </td>
+            <td data-label="Destacado" data-column="destacado" class="always-visible">
+              {{#if this.destacado}}
+              <span class="badge-status confirmada">Sí</span>
+              {{else}}
+              <span class="badge-status pendiente">No</span>
+              {{/if}}
+            </td>
+            <td data-label="Icono" data-column="icono" class="full-view-only">
+              <i class="bi {{this.icono}}"></i> {{this.icono}}
+            </td>
+            <td data-label="Características" data-column="caracteristicas" class="full-view-only">
+              <div class="caracteristicas-container">
+                {{#if this.caracteristicas}}
+                  <ul class="caracteristicas-list">
+                    {{#each (caracteristicasArray this.caracteristicas)}}
+                      <li>{{this}}</li>
+                    {{/each}}
+                  </ul>
+                {{else}}
+                  <span class="text-muted">Sin características</span>
+                {{/if}}
+              </div>
+            </td>
+            <td data-label="Fecha Creación" data-column="fecha_creacion" class="full-view-only">
+              {{#if this.fecha_creacion}}
+                {{formatDate this.fecha_creacion}}
+              {{else}}
+                -
+              {{/if}}
+            </td>
+            <td data-label="Última Actualización" data-column="fecha_actualizacion" class="full-view-only">
+              {{#if this.fecha_actualizacion}}
+                {{formatDate this.fecha_actualizacion}}
+              {{else}}
+                -
+              {{/if}}
+            </td>
+            <td data-label="Acciones" class="actions-column always-visible">
+              <div class="actions">
+                <button class="btn-table-action view" title="Ver detalles" data-toggle="modal" data-target="viewServiceModal" data-id="{{this.id}}">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn-table-action edit" title="Editar" data-toggle="modal" data-target="editServiceModal" data-id="{{this.id}}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-table-action delete btn-delete" title="Eliminar" data-id="{{this.id}}" data-type="servicios" data-name="{{this.titulo}}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td colspan="11" class="text-center">No hay servicios registrados</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Ver Detalles del Servicio -->
+<div class="modal" id="viewServiceModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Detalles del Servicio</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="service-details">
+          <div class="service-image-container">
+            <img id="view_image" src="/placeholder.svg" alt="Imagen del servicio" class="service-image">
+            <div class="service-badge" id="view_destacado_badge"></div>
+          </div>
+          <div class="service-info">
+            <h2 id="view_titulo" class="service-title"></h2>
+            <div class="service-meta">
+              <span class="service-icon"><i id="view_icono" class="bi"></i></span>
+              <span class="service-order">Orden: <span id="view_orden"></span></span>
+            </div>
+            <div class="service-price" id="view_precio_container">
+              <span id="view_precio"></span>
+            </div>
+            <div class="service-description">
+              <h4>Descripción Corta</h4>
+              <p id="view_descripcion_corta"></p>
+            </div>
+            <div class="service-full-description">
+              <h4>Descripción Completa</h4>
+              <div id="view_descripcion_completa"></div>
+            </div>
+            <div class="service-features">
+              <h4>Características</h4>
+              <ul id="view_caracteristicas"></ul>
+            </div>
+            <div class="service-dates">
+              <div class="date-item">
+                <span class="date-label">Creado:</span>
+                <span id="view_fecha_creacion"></span>
+              </div>
+              <div class="date-item">
+                <span class="date-label">Actualizado:</span>
+                <span id="view_fecha_actualizacion"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="viewEditBtn">Editar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Servicio -->
+<div class="modal" id="addServiceModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agregar Nuevo Servicio</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addServiceForm" class="crud-form needs-validation" enctype="multipart/form-data" novalidate>
+          <div class="form-group">
+            <label for="titulo" class="form-label">Nombre del Servicio</label>
+            <input type="text" class="form-control" id="titulo" name="titulo" required>
+            <div class="invalid-feedback">Por favor ingresa un nombre para el servicio.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion_corta" class="form-label">Descripción Corta</label>
+            <textarea class="form-control" id="descripcion_corta" name="descripcion_corta" rows="2" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa una descripción corta.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion_completa" class="form-label">Descripción Completa</label>
+            <textarea class="form-control" id="descripcion_completa" name="descripcion_completa" rows="5"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="precio" class="form-label">Precio (opcional)</label>
+                <input type="text" class="form-control" id="precio" name="precio" placeholder="$500">
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="precio_desde" class="form-label">Precio Desde (opcional)</label>
+                <input type="text" class="form-control" id="precio_desde" name="precio_desde" placeholder="$350 por mesero">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="orden" name="orden" min="1" value="1" required>
+                <div class="invalid-feedback">Por favor ingresa un número de orden.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="destacado" class="form-label">Destacado</label>
+                <select class="form-control" id="destacado" name="destacado">
+                  <option value="0">No</option>
+                  <option value="1">Sí</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="imagen" class="form-label">Imagen</label>
+            <div class="image-preview-container">
+              <div class="image-preview">
+                <img id="add_image_preview" src="/placeholder.svg" alt="Vista previa">
+              </div>
+              <div class="image-input">
+                <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                <div class="form-text">Tamaño recomendado: 800x600px. Formato: JPG, PNG.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="icono" class="form-label">Icono (Opcional)</label>
+            <div class="icon-selector">
+              <input type="text" class="form-control" id="icono" name="icono" placeholder="bi-star" value="bi-star">
+              <div class="icon-preview">
+                <i class="bi bi-star" id="icon_preview"></i>
+              </div>
+            </div>
+            <div class="form-text">Nombre del icono de Bootstrap Icons (con el prefijo bi-).</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="caracteristicas" class="form-label">Características (Opcional)</label>
+            <div class="caracteristicas-input-container">
+              <textarea class="form-control" id="caracteristicas" name="caracteristicas" rows="3" placeholder="Una característica por línea"></textarea>
+              <button type="button" class="btn btn-sm btn-outline-primary add-caracteristica-btn">
+                <i class="bi bi-plus"></i> Agregar
+              </button>
+            </div>
+            <div class="caracteristicas-tags" id="caracteristicas_tags"></div>
+            <div class="form-text">Ingresa una característica por línea. Se mostrarán como lista en la página de servicios.</div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Servicio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Servicio -->
+<div class="modal" id="editServiceModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Servicio</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editServiceForm" class="crud-form needs-validation" enctype="multipart/form-data" novalidate>
+          <input type="hidden" id="edit_id" name="id">
+          
+          <div class="form-group">
+            <label for="edit_titulo" class="form-label">Nombre del Servicio</label>
+            <input type="text" class="form-control" id="edit_titulo" name="titulo" required>
+            <div class="invalid-feedback">Por favor ingresa un nombre para el servicio.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_descripcion_corta" class="form-label">Descripción Corta</label>
+            <textarea class="form-control" id="edit_descripcion_corta" name="descripcion_corta" rows="2" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa una descripción corta.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_descripcion_completa" class="form-label">Descripción Completa</label>
+            <textarea class="form-control" id="edit_descripcion_completa" name="descripcion_completa" rows="5"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_precio" class="form-label">Precio (opcional)</label>
+                <input type="text" class="form-control" id="edit_precio" name="precio" placeholder="$500">
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_precio_desde" class="form-label">Precio Desde (opcional)</label>
+                <input type="text" class="form-control" id="edit_precio_desde" name="precio_desde" placeholder="$350 por mesero">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="edit_orden" name="orden" min="1" required>
+                <div class="invalid-feedback">Por favor ingresa un número de orden.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_destacado" class="form-label">Destacado</label>
+                <select class="form-control" id="edit_destacado" name="destacado">
+                  <option value="0">No</option>
+                  <option value="1">Sí</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_imagen" class="form-label">Imagen</label>
+            <div class="image-preview-container">
+              <div class="image-preview">
+                <img id="edit_image_preview" src="/placeholder.svg" alt="Vista previa">
+              </div>
+              <div class="image-input">
+                <input type="file" class="form-control" id="edit_imagen" name="imagen" accept="image/*">
+                <div class="form-text">Deja en blanco para mantener la imagen actual.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_icono" class="form-label">Icono (Opcional)</label>
+            <div class="icon-selector">
+              <input type="text" class="form-control" id="edit_icono" name="icono" placeholder="bi-star">
+              <div class="icon-preview">
+                <i class="bi bi-star" id="edit_icon_preview"></i>
+              </div>
+            </div>
+            <div class="form-text">Nombre del icono de Bootstrap Icons (con el prefijo bi-).</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_caracteristicas" class="form-label">Características (Opcional)</label>
+            <div class="caracteristicas-input-container">
+              <textarea class="form-control" id="edit_caracteristicas" name="caracteristicas" rows="3" placeholder="Una característica por línea"></textarea>
+              <button type="button" class="btn btn-sm btn-outline-primary edit-add-caracteristica-btn">
+                <i class="bi bi-plus"></i> Agregar
+              </button>
+            </div>
+            <div class="caracteristicas-tags" id="edit_caracteristicas_tags"></div>
+            <div class="form-text">Ingresa una característica por línea. Se mostrarán como lista en la página de servicios.</div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Actualizar Servicio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal" id="confirmDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Eliminación</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el servicio <strong id="deleteServiceName"></strong>?</p>
+        <p>Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="toast-container"></div>
+
+{{#section 'scripts'}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Referencias a elementos DOM
+  const searchInput = document.getElementById('searchInput');
+  const serviciosTable = document.getElementById('serviciosTable');
+  const addServiceForm = document.getElementById('addServiceForm');
+  const editServiceForm = document.getElementById('editServiceForm');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  const compactViewBtn = document.getElementById('compactViewBtn');
+  const fullViewBtn = document.getElementById('fullViewBtn');
+  const viewEditBtn = document.getElementById('viewEditBtn');
+
+  // Variables para almacenar el ID del servicio a eliminar
+  let serviceIdToDelete = null;
+  let currentServiceId = null;
+
+  // Inicializar vista (compacta por defecto)
+  let currentView = 'compact';
+  updateTableView();
+
+  // Cambiar entre vistas compacta y completa
+  compactViewBtn.addEventListener('click', function() {
+    currentView = 'compact';
+    compactViewBtn.classList.add('active');
+    fullViewBtn.classList.remove('active');
+    updateTableView();
+  });
+
+  fullViewBtn.addEventListener('click', function() {
+    currentView = 'full';
+    fullViewBtn.classList.add('active');
+    compactViewBtn.classList.remove('active');
+    updateTableView();
+  });
+
+  function updateTableView() {
+    const table = document.getElementById('serviciosTable');
+    if (currentView === 'compact') {
+      table.classList.add('compact-view');
+      table.classList.remove('full-view');
+      document.querySelectorAll('.full-view-only').forEach(el => {
+        el.style.display = 'none';
+      });
+    } else {
+      table.classList.add('full-view');
+      table.classList.remove('compact-view');
+      document.querySelectorAll('.full-view-only').forEach(el => {
+        el.style.display = '';
+      });
+    }
+  }
+
+  // Función para abrir modales
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.classList.add('modal-open');
+    }
+  }
+
+  // Función para cerrar modales
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  // Función para mostrar notificaciones toast
+  function showToast(message, type = 'info') {
+    const toastContainer = document.querySelector('.toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : 'bi-info-circle'}"></i>
+        <span>${message}</span>
+      </div>
+      <button class="toast-close"><i class="bi bi-x"></i></button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Mostrar el toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    // Configurar el botón de cierre
+    const closeButton = toast.querySelector('.toast-close');
+    closeButton.addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    });
+    
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 5000);
+  }
+
+  // Abrir modal al hacer clic en botones con data-toggle="modal"
+  const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const targetModal = this.getAttribute('data-target');
+      openModal(targetModal);
+      
+      // Si es el botón de editar, cargar los datos del servicio
+      if (this.classList.contains('edit')) {
+        const serviceId = this.getAttribute('data-id');
+        loadServiceData(serviceId, 'edit');
+      }
+      
+      // Si es el botón de ver, cargar los datos del servicio
+      if (this.classList.contains('view')) {
+        const serviceId = this.getAttribute('data-id');
+        loadServiceData(serviceId, 'view');
+      }
+    });
+  });
+
+  // Botón para ir de vista a edición
+  viewEditBtn.addEventListener('click', function() {
+    closeModal('viewServiceModal');
+    loadServiceData(currentServiceId, 'edit');
+    openModal('editServiceModal');
+  });
+
+  // Cerrar modal al hacer clic en botones con data-dismiss="modal"
+  const modalClosers = document.querySelectorAll('[data-dismiss="modal"]');
+  modalClosers.forEach(closer => {
+    closer.addEventListener('click', function() {
+      const modal = this.closest('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    });
+  });
+
+  // Cerrar modal al hacer clic fuera del contenido
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+      event.target.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  });
+
+  // Función para ajustar elementos según el tamaño de pantalla
+  function adjustResponsiveElements() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    
+    // Ajustar altura de modales en landscape
+    if (isLandscape && width <= 992) {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = (height - 150) + 'px';
+      });
+    } else {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = '';
+      });
+    }
+  }
+
+  // Ejecutar al cargar
+  adjustResponsiveElements();
+
+  // Ejecutar al cambiar tamaño o orientación
+  window.addEventListener('resize', adjustResponsiveElements);
+  window.addEventListener('orientationchange', adjustResponsiveElements);
+
+  // Función para filtrar la tabla
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const rows = serviciosTable.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        if (row.querySelector('td[colspan]')) return; // Ignorar fila de "No hay servicios"
+        
+        const titulo = row.querySelector('td[data-column="titulo"]').textContent.toLowerCase();
+        const descripcion = row.querySelector('td[data-column="descripcion"]').textContent.toLowerCase();
+        
+        if (titulo.includes(searchTerm) || descripcion.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Validación de formularios
+  function validateForm(form) {
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return false;
+    }
+    return true;
+  }
+
+  // Previsualización de imágenes
+  document.getElementById('imagen').addEventListener('change', function(e) {
+    previewImage(this, 'add_image_preview');
+  });
+
+  document.getElementById('edit_imagen').addEventListener('change', function(e) {
+    previewImage(this, 'edit_image_preview');
+  });
+
+  function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Previsualización de iconos
+  document.getElementById('icono').addEventListener('input', function() {
+    updateIconPreview(this.value, 'icon_preview');
+  });
+
+  document.getElementById('edit_icono').addEventListener('input', function() {
+    updateIconPreview(this.value, 'edit_icon_preview');
+  });
+
+  function updateIconPreview(iconClass, previewId) {
+    const preview = document.getElementById(previewId);
+    preview.className = '';
+    preview.classList.add('bi', iconClass);
+  }
+
+  // Gestión de características como etiquetas
+  function setupCaracteristicasTags(inputId, tagsContainerId, addBtnClass) {
+    const input = document.getElementById(inputId);
+    const tagsContainer = document.getElementById(tagsContainerId);
+    const addBtn = document.querySelector('.' + addBtnClass);
+    
+    function updateTags() {
+      tagsContainer.innerHTML = '';
+      const lines = input.value.split('\n').filter(line => line.trim() !== '');
+      
+      lines.forEach((line, index) => {
+        const tag = document.createElement('div');
+        tag.className = 'caracteristica-tag';
+        tag.innerHTML = `
+          <span>${line}</span>
+          <button type="button" class="tag-remove" data-index="${index}">
+            <i class="bi bi-x"></i>
+          </button>
+        `;
+        tagsContainer.appendChild(tag);
+      });
+      
+      // Agregar event listeners a los botones de eliminar
+      document.querySelectorAll('.tag-remove').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          const lines = input.value.split('\n').filter(line => line.trim() !== '');
+          lines.splice(index, 1);
+          input.value = lines.join('\n');
+          updateTags();
+        });
+      });
+    }
+    
+    // Inicializar tags si hay valor
+    if (input.value) {
+      updateTags();
+    }
+    
+    // Actualizar tags cuando cambia el input
+    input.addEventListener('input', updateTags);
+    
+    // Agregar característica desde el botón
+    addBtn.addEventListener('click', function() {
+      const newCaracteristica = prompt('Ingrese una nueva característica:');
+      if (newCaracteristica && newCaracteristica.trim() !== '') {
+        const currentValue = input.value;
+        input.value = currentValue ? currentValue + '\n' + newCaracteristica : newCaracteristica;
+        updateTags();
+      }
+    });
+  }
+
+  // Configurar gestión de características para ambos formularios
+  setupCaracteristicasTags('caracteristicas', 'caracteristicas_tags', 'add-caracteristica-btn');
+  setupCaracteristicasTags('edit_caracteristicas', 'edit_caracteristicas_tags', 'edit-add-caracteristica-btn');
+
+  // Función para cargar datos de un servicio
+  function loadServiceData(serviceId, mode) {
+    currentServiceId = serviceId;
+    
+    fetch(`/api/servicios/${serviceId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const service = data.servicio;
+          
+          if (mode === 'edit') {
+            // Llenar formulario de edición
+            document.getElementById('edit_id').value = service.id;
+            document.getElementById('edit_titulo').value = service.titulo;
+            document.getElementById('edit_descripcion_corta').value = service.descripcion_corta;
+            document.getElementById('edit_descripcion_completa').value = service.descripcion_completa || '';
+            document.getElementById('edit_precio').value = service.precio || '';
+            document.getElementById('edit_precio_desde').value = service.precio_desde || '';
+            document.getElementById('edit_orden').value = service.orden;
+            document.getElementById('edit_destacado').value = service.destacado ? '1' : '0';
+            document.getElementById('edit_icono').value = service.icono || 'bi-star';
+            updateIconPreview(service.icono || 'bi-star', 'edit_icon_preview');
+            
+            // Mostrar imagen actual
+            const imagePreview = document.getElementById('edit_image_preview');
+            if (service.imagen_url) {
+              imagePreview.src = service.imagen_url;
+            } else {
+              imagePreview.src = '/placeholder.svg';
+            }
+            
+            // Manejar características
+            let caracteristicas = [];
+            try {
+              if (service.caracteristicas) {
+                caracteristicas = JSON.parse(service.caracteristicas);
+              }
+            } catch (e) {
+              console.error('Error al parsear características:', e);
+            }
+            
+            document.getElementById('edit_caracteristicas').value = Array.isArray(caracteristicas) 
+              ? caracteristicas.join('\n') 
+              : '';
+              
+            // Actualizar tags de características
+            setupCaracteristicasTags('edit_caracteristicas', 'edit_caracteristicas_tags', 'edit-add-caracteristica-btn');
+          } else if (mode === 'view') {
+            // Llenar modal de vista detallada
+            document.getElementById('view_titulo').textContent = service.titulo;
+            document.getElementById('view_descripcion_corta').textContent = service.descripcion_corta;
+            document.getElementById('view_descripcion_completa').innerHTML = service.descripcion_completa || '<em>Sin descripción completa</em>';
+            
+            // Mostrar precio
+            const precioContainer = document.getElementById('view_precio_container');
+            const precioElement = document.getElementById('view_precio');
+            if (service.precio) {
+              precioElement.textContent = service.precio;
+              precioContainer.classList.add('has-price');
+            } else if (service.precio_desde) {
+              precioElement.textContent = 'Desde ' + service.precio_desde;
+              precioContainer.classList.add('has-price');
+            } else {
+              precioElement.textContent = 'Precio no especificado';
+              precioContainer.classList.remove('has-price');
+            }
+            
+            // Mostrar orden e icono
+            document.getElementById('view_orden').textContent = service.orden;
+            const iconoElement = document.getElementById('view_icono');
+            iconoElement.className = '';
+            iconoElement.classList.add('bi', service.icono || 'bi-star');
+            
+            // Mostrar imagen
+            const imageElement = document.getElementById('view_image');
+            if (service.imagen_url) {
+              imageElement.src = service.imagen_url;
+            } else {
+              imageElement.src = '/placeholder.svg';
+            }
+            
+            // Mostrar badge de destacado
+            const destacadoBadge = document.getElementById('view_destacado_badge');
+            if (service.destacado) {
+              destacadoBadge.textContent = 'Destacado';
+              destacadoBadge.classList.add('show');
+            } else {
+              destacadoBadge.classList.remove('show');
+            }
+            
+            // Mostrar características
+            const caracteristicasList = document.getElementById('view_caracteristicas');
+            caracteristicasList.innerHTML = '';
+            let caracteristicas = [];
+            try {
+              if (service.caracteristicas) {
+                caracteristicas = JSON.parse(service.caracteristicas);
+              }
+            } catch (e) {
+              console.error('Error al parsear características:', e);
+            }
+            
+            if (Array.isArray(caracteristicas) && caracteristicas.length > 0) {
+              caracteristicas.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                caracteristicasList.appendChild(li);
+              });
+            } else {
+              const li = document.createElement('li');
+              li.innerHTML = '<em>Sin características</em>';
+              caracteristicasList.appendChild(li);
+            }
+            
+            // Mostrar fechas
+            document.getElementById('view_fecha_creacion').textContent = service.fecha_creacion ? formatDate(service.fecha_creacion) : 'No disponible';
+            document.getElementById('view_fecha_actualizacion').textContent = service.fecha_actualizacion ? formatDate(service.fecha_actualizacion) : 'No disponible';
+          }
+          
+          // Ajustar modal después de cargar datos
+          adjustResponsiveElements();
+        } else {
+          showToast(data.message || 'No se pudo cargar la información del servicio.', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Ocurrió un error al cargar la información del servicio.', 'error');
+      });
+  }
+
+  // Función para formatear fechas
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  // Manejar envío del formulario de agregar servicio
+  if (addServiceForm) {
+    addServiceForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm(this)) return;
+      
+      const formData = new FormData(this);
+      
+      // Convertir características de texto a array
+      const caracteristicas = formData.get('caracteristicas');
+      if (caracteristicas) {
+        const caracteristicasArray = caracteristicas.split('\n')
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+        
+        formData.set('caracteristicas', JSON.stringify(caracteristicasArray));
+      }
+      
+      // Enviar datos al servidor
+      fetch('/api/servicios', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Servicio creado correctamente', 'success');
+          closeModal('addServiceModal');
+          
+          // Recargar la página para mostrar el nuevo servicio
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast(data.message || 'Error al crear el servicio', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al crear el servicio', 'error');
+      });
+    });
+  }
+
+  // Manejar envío del formulario de editar servicio
+  if (editServiceForm) {
+    editServiceForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm(this)) return;
+      
+      const formData = new FormData(this);
+      const serviceId = formData.get('id');
+      
+      // Convertir características de texto a array
+      const caracteristicas = formData.get('caracteristicas');
+      if (caracteristicas) {
+        const caracteristicasArray = caracteristicas.split('\n')
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+        
+        formData.set('caracteristicas', JSON.stringify(caracteristicasArray));
+      }
+      
+      // Enviar datos al servidor
+      fetch(`/api/servicios/${serviceId}`, {
+        method: 'PUT',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Servicio actualizado correctamente', 'success');
+          closeModal('editServiceModal');
+          
+          // Recargar la página para mostrar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast(data.message || 'Error al actualizar el servicio', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al actualizar el servicio', 'error');
+      });
+    });
+  }
+
+  // Configurar modal de confirmación para eliminar
+  const deleteButtons = document.querySelectorAll('.btn-delete');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      serviceIdToDelete = this.getAttribute('data-id');
+      const serviceName = this.getAttribute('data-name');
+      
+      // Actualizar el modal con el nombre del servicio
+      document.getElementById('deleteServiceName').textContent = serviceName;
+      
+      // Abrir el modal de confirmación
+      openModal('confirmDeleteModal');
+    });
+  });
+
+  // Manejar confirmación de eliminación
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', function() {
+      if (!serviceIdToDelete) return;
+      
+      // Enviar solicitud de eliminación
+      fetch(`/api/servicios/${serviceIdToDelete}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Servicio eliminado correctamente', 'success');
+          closeModal('confirmDeleteModal');
+          
+          // Eliminar la fila de la tabla
+          const row = document.querySelector(`tr[data-id="${serviceIdToDelete}"]`);
+          if (row) {
+            row.remove();
+          }
+          
+          // Si no quedan servicios, mostrar mensaje
+          const rows = serviciosTable.querySelectorAll('tbody tr');
+          if (rows.length === 0) {
+            const tbody = serviciosTable.querySelector('tbody');
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = '<td colspan="11" class="text-center">No hay servicios registrados</td>';
+            tbody.appendChild(emptyRow);
+          }
+        } else {
+          showToast(data.message || 'Error al eliminar el servicio', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al eliminar el servicio', 'error');
+      })
+      .finally(() => {
+        serviceIdToDelete = null;
+      });
+    });
+  }
+
+  // Mejorar experiencia en dispositivos táctiles
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.btn-table-action').forEach(btn => {
+      btn.style.padding = '10px';  // Aumentar área táctil
+    });
+  }
+});
+</script>
+{{/section}}
+
+{{#section 'styles'}}
+<style>
+/* Estilos para el encabezado de página */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.page-title {
+  color: var(--gold);
+  font-weight: 300;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Estilos para la tabla */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table-thumbnail {
+  width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--gold-border);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Estilos para los controles de vista */
+.view-toggle {
+  display: flex;
+  margin-left: 10px;
+}
+
+.btn-view-toggle {
+  background: none;
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-view-toggle:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.btn-view-toggle:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.btn-view-toggle.active {
+  background-color: var(--gold);
+  color: var(--black);
+}
+
+/* Estilos para la vista compacta/completa */
+.data-table.compact-view .full-view-only {
+  display: none;
+}
+
+.card-tools {
+  display: flex;
+  align-items: center;
+}
+
+/* Estilos responsive para la tabla */
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.responsive-table th {
+  text-align: left;
+  padding: 12px 15px;
+  background-color: var(--gold-light);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.responsive-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.responsive-table tr:hover {
+  background-color: var(--gold-lighter);
+}
+
+.actions-column {
+  width: 120px;
+  text-align: center;
+}
+
+/* Estilos para modales */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  background-color: var(--black-light);
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  transform: translateY(-20px);
+  transition: transform 0.3s ease-out;
+}
+
+.modal-dialog.modal-lg {
+  max-width: 800px;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.modal-title {
+  color: var(--gold);
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: var(--gold);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--gold-border);
+}
+
+/* Estilos para vista detallada del servicio */
+.service-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.service-image-container {
+  flex: 0 0 300px;
+  position: relative;
+}
+
+.service-image {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  border: 1px solid var(--gold-border);
+}
+
+.service-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--gold);
+  color: var(--black);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  display: none;
+}
+
+.service-badge.show {
+  display: block;
+}
+
+.service-info {
+  flex: 1;
+  min-width: 300px;
+}
+
+.service-title {
+  color: var(--gold);
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+.service-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  color: var(--white-dimmer);
+}
+
+.service-icon {
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+.service-price {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: rgba(229, 199, 107, 0.1);
+  border-left: 3px solid var(--gold);
+  border-radius: 3px;
+}
+
+.service-description h4,
+.service-full-description h4,
+.service-features h4 {
+  color: var(--gold);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.service-description p {
+  margin-bottom: 15px;
+}
+
+.service-features ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.service-features li {
+  margin-bottom: 5px;
+}
+
+.service-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--gold-border);
+  font-size: 0.9rem;
+  color: var(--white-dimmer);
+}
+
+.date-label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* Estilos para previsualización de imágenes */
+.image-preview-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.image-preview {
+  width: 100px;
+  height: 100px;
+  border: 1px solid var(--gold-border);
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Estilos para selector de iconos */
+.icon-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-preview {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gold-lighter);
+  border-radius: 5px;
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+/* Estilos para características como etiquetas */
+.caracteristicas-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.caracteristicas-input-container textarea {
+  flex: 1;
+}
+
+.caracteristicas-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.caracteristica-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--gold-lighter);
+  color: var(--gold);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.9rem;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.tag-remove:hover {
+  color: var(--danger);
+}
+
+.caracteristicas-container {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.caracteristicas-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* Estilos para toast */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 250px;
+  max-width: 350px;
+  background-color: var(--black-light);
+  color: var(--white);
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  border-left: 4px solid var(--gold);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  border-left-color: var(--success);
+}
+
+.toast.error {
+  border-left-color: var(--danger);
+}
+
+.toast.info {
+  border-left-color: var(--info);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-content i {
+  font-size: 1.5rem;
+}
+
+.toast-content i.bi-check-circle {
+  color: var(--success);
+}
+
+.toast-content i.bi-x-circle {
+  color: var(--danger);
+}
+
+.toast-content i.bi-info-circle {
+  color: var(--info);
+}
+
+.toast-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.toast-close:hover {
+  color: var(--white);
+}
+
+/* Estilos para móvil */
+@media screen and (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-text {
+    display: none;
+  }
+
+  .btn-primary {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .responsive-table thead {
+    display: none;
+  }
+
+  .responsive-table, 
+  .responsive-table tbody, 
+  .responsive-table tr, 
+  .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table tr {
+    margin-bottom: 15px;
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .responsive-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    text-align: right;
+    border-bottom: 1px solid var(--gold-border);
+  }
+
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--gold);
+    text-align: left;
+    padding-right: 10px;
+  }
+
+  .responsive-table td .actions {
+    justify-content: flex-end;
+  }
+
+  /* Ajustes para modales en móvil */
+  .modal-dialog {
+    margin: 10px auto;
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-col {
+    width: 100%;
+    padding: 0;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+
+  .toast-container {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .service-details {
+    flex-direction: column;
+  }
+
+  .service-image-container {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
+/* Ajustes para orientación landscape */
+@media (max-width: 992px) and (orientation: landscape) {
+  .modal-dialog {
+    max-width: 600px;
+    margin: 20px auto;
+  }
+
+  .modal-body {
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+  .form-row {
+    flex-direction: row;
+  }
+
+  .form-col {
+    width: 50%;
+    padding: 0 10px;
+  }
+
+  .form-col:first-child {
+    padding-left: 0;
+  }
+
+  .form-col:last-child {
+    padding-right: 0;
+  }
+
+  .modal-footer {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .modal-footer button {
+    width: auto;
+  }
+
+  /* Ajustes para tablas en landscape */
+  .responsive-table thead {
+    display: table-header-group;
+  }
+
+  .responsive-table tbody {
+    display: table-row-group;
+  }
+
+  .responsive-table tr {
+    display: table-row;
+    margin-bottom: 0;
+    border: none;
+  }
+
+  .responsive-table td {
+    display: table-cell;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .responsive-table td::before {
+    content: none;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-tools {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+}
+</style>
+{{/section}}

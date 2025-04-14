@@ -1,315 +1,533 @@
 <!-- Header -->
 <header class="header">
-<div class="header-content">
-    <h1 class="gradient-text">Reseñas de Nuestros Clientes</h1>
-    <p class="header-subtitle">Descubre lo que nuestros clientes dicen sobre nuestro servicio</p>
-</div>
+  <div class="header-content">
+      <h1 class="gradient-text">Reseñas de Nuestros Clientes</h1>
+      <p class="header-subtitle">Descubre lo que nuestros clientes dicen sobre nuestro servicio</p>
+  </div>
 </header>
 
 <!-- Contenido Principal -->
 <main class="main-container">
-<!-- Resumen de Reseñas -->
-<section class="reviews-summary">
-    <div class="row align-items-center">
-        <div class="col-md-4 text-center mb-4 mb-md-0">
-            <div class="rating-overview">
-                <div class="rating-value gradient-text">{{ratingAverage}}</div>
-                <div class="rating-stars">
-                    {{#times fullStars}}
-                    <i class="bi bi-star-fill"></i>
-                    {{/times}}
-                    {{#if halfStar}}
-                    <i class="bi bi-star-half"></i>
-                    {{/if}}
-                    {{#times emptyStars}}
-                    <i class="bi bi-star"></i>
-                    {{/times}}
-                </div>
-                <div class="rating-count">Basado en {{totalReviews}} reseñas</div>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="rating-bars">
-                {{#each ratingDistribution}}
-                <div class="rating-bar">
-                    <span class="bar-label">{{stars}}</span>
-                    <div class="bar-container">
-                        <div class="bar" style="width: {{percentage}}%;"></div>
-                    </div>
-                    <span class="bar-percentage">{{percentage}}%</span>
-                </div>
-                {{/each}}
-            </div>
-        </div>
-    </div>
-</section>
+  <!-- Resumen de Reseñas -->
+  <section class="reviews-summary">
+      <div class="row align-items-center">
+          <div class="col-md-4 text-center mb-4 mb-md-0">
+              <div class="rating-overview">
+                  <div class="rating-value gradient-text">{{ratingAverage}}</div>
+                  <div class="rating-stars">
+                      {{#times fullStars}}
+                      <i class="bi bi-star-fill"></i>
+                      {{/times}}
+                      {{#if halfStar}}
+                      <i class="bi bi-star-half"></i>
+                      {{/if}}
+                      {{#times emptyStars}}
+                      <i class="bi bi-star"></i>
+                      {{/times}}
+                  </div>
+                  <div class="rating-count">Basado en {{totalReviews}} reseñas</div>
+              </div>
+          </div>
+          <div class="col-md-8">
+              <div class="rating-bars">
+                  {{#each ratingDistribution}}
+                  <div class="rating-bar">
+                      <span class="bar-label">{{stars}}</span>
+                      <div class="bar-container">
+                          <div class="bar" style="width: {{percentage}}%;"></div>
+                      </div>
+                      <span class="bar-percentage">{{percentage}}%</span>
+                  </div>
+                  {{/each}}
+              </div>
+          </div>
+      </div>
+  </section>
 
-<!-- Filtros y Ordenamiento -->
-<section class="filter-container">
-   <div class="filter-scroll-wrapper">
-       <button class="filter-btn" data-filter="all">
-           <span class="filter-icon"><i class="bi bi-grid-3x3-gap"></i></span>
-           <span class="filter-text">Todas</span>
-       </button>
-       {{#each popularEventTypes}}
-       <button class="filter-btn" data-filter="{{id}}">
-           <span class="filter-icon"><i class="bi {{#if icono}}{{icono}}{{else}}bi-calendar-event{{/if}}"></i></span>
-           <span class="filter-text">{{nombre}} <span class="review-count">({{count}})</span></span>
-       </button>
-       {{/each}}
-   </div>
-   <div class="filter-gradient-overlay"></div>
-   
-   <div class="sort-container">
-       <select class="sort-select" id="sortReviews">
-           <option value="recent">Más recientes</option>
-           <option value="highest">Mayor calificación</option>
-           <option value="lowest">Menor calificación</option>
-       </select>
-   </div>
-</section>
+  <!-- Filtros y Ordenamiento -->
+  <section class="filter-container">
+      <div class="filter-scroll-wrapper">
+          <button class="filter-btn active" data-filter="all">
+              <span class="filter-icon"><i class="bi bi-grid-3x3-gap"></i></span>
+              <span class="filter-text">Todas</span>
+          </button>
+          {{#each popularEventTypes}}
+          <button class="filter-btn" data-filter="{{id}}">
+              <span class="filter-icon"><i class="bi {{#if icono}}{{icono}}{{else}}bi-calendar-event{{/if}}"></i></span>
+              <span class="filter-text">{{nombre}} <span class="review-count">({{count}})</span></span>
+          </button>
+          {{/each}}
+      </div>
+      <div class="filter-gradient-overlay"></div>
+      
+      <div class="sort-container">
+          <select class="sort-select" id="sortReviews">
+              <option value="recent">Más recientes</option>
+              <option value="highest">Mayor calificación</option>
+              <option value="lowest">Menor calificación</option>
+              <option value="popular">Más populares</option>
+          </select>
+      </div>
+  </section>
 
-<!-- Estado vacío para cuando no hay reseñas -->
-<div class="empty-state" id="emptyReviewsState" style="display: none;">
-    <div class="empty-state-content">
-        <i class="bi bi-chat-square-text"></i>
-        <h4>No se encontraron reseñas</h4>
-        <p>No hay reseñas disponibles para la categoría seleccionada.</p>
-        <button class="btn btn-gold reset-filter-btn">Ver todas las reseñas</button>
-    </div>
-</div>
+  <!-- Estado vacío para cuando no hay reseñas -->
+  <div class="empty-state" id="emptyReviewsState" style="display: none;">
+      <div class="empty-state-content">
+          <i class="bi bi-chat-square-text"></i>
+          <h4>No se encontraron reseñas</h4>
+          <p>No hay reseñas disponibles para la categoría seleccionada.</p>
+          <button class="btn btn-gold reset-filter-btn">Ver todas las reseñas</button>
+      </div>
+  </div>
 
-<!-- Lista de Reseñas -->
-<section class="reviews-grid py-5">
-    {{#each reviews}}
-    <div class="review-card interactive-card" data-category="{{tipo_evento_id}}" data-rating="{{calificacion}}" data-date="{{fecha_timestamp}}" data-review-id="{{id}}">
-        <div class="review-header">
-            <div class="reviewer-info">
-                <div class="reviewer-avatar">
-                    <i class="bi bi-person-circle"></i>
-                </div>
-                <div class="reviewer-details">
-                    <h5 class="reviewer-name">{{nombre_cliente}}</h5>
-                    <span class="review-date">{{fecha}}</span>
-                    <div class="verified-badge">
-                        {{#if verificado}}
-                        <i class="bi bi-patch-check-fill"></i> Verificado
-                        {{/if}}
-                    </div>
-                </div>
-            </div>
-            <div class="review-rating">
-                {{#times calificacion}}
-                <i class="bi bi-star-fill"></i>
-                {{/times}}
-                {{#times (subtract 5 calificacion)}}
-                <i class="bi bi-star"></i>
-                {{/times}}
-            </div>
-        </div>
-        <div class="review-content">
-            <p class="review-text">
-                {{comentario}}
-            </p>
-            <div class="review-footer">
-                <span class="event-type">
-                    <i class="bi {{eventIcon}}"></i> {{tipo_evento}}
-                </span>
-                {{#if imagenes}}
-                <div class="review-images">
-                    {{#each imagenes}}
-                    <img src="{{this}}" alt="Foto del evento" class="review-image">
-                    {{/each}}
-                </div>
-                {{/if}}
-            </div>
-        </div>
-        <div class="review-actions">
-            <button class="action-btn view-details-btn" title="Ver detalles">
-                <i class="bi bi-eye"></i>
-            </button>
-            <button class="action-btn share-btn" data-review-id="{{id}}" title="Compartir">
-                <i class="bi bi-share"></i>
-            </button>
-        </div>
-    </div>
-    {{/each}}
-</section>
+  <!-- Lista de Reseñas -->
+  <section class="reviews-grid py-5">
+      {{#each reviews}}
+      <div class="review-card interactive-card {{#unless imagenes}}no-images{{/unless}}" data-category="{{tipo_evento_id}}" data-rating="{{calificacion}}" data-date="{{fecha_timestamp}}" data-review-id="{{id}}">
+          <div class="review-header">
+              <div class="reviewer-info">
+                  <div class="reviewer-avatar">
+                      <i class="bi bi-person-circle"></i>
+                  </div>
+                  <div class="reviewer-details">
+                      <h5 class="reviewer-name">{{nombre_cliente}}</h5>
+                      <span class="review-date">{{fecha}}</span>
+                      <div class="verified-badge">
+                          {{#if verificado}}
+                          <i class="bi bi-patch-check-fill"></i> Verificado
+                          {{/if}}
+                      </div>
+                  </div>
+              </div>
+              <div class="review-rating">
+                  {{#times calificacion}}
+                  <i class="bi bi-star-fill"></i>
+                  {{/times}}
+                  {{#times (subtract 5 calificacion)}}
+                  <i class="bi bi-star"></i>
+                  {{/times}}
+              </div>
+          </div>
+          <div class="review-content">
+              <p class="review-text">
+                  {{comentario}}
+              </p>
+              {{#if imagenes}}
+              <div class="review-footer">
+                  <span class="event-type">
+                      <i class="bi {{eventIcon}}"></i> {{tipo_evento}}
+                  </span>
+                  <div class="review-images">
+                      {{#each imagenes}}
+                      <img src="{{this}}" alt="Foto del evento" class="review-image">
+                      {{/each}}
+                  </div>
+              </div>
+              {{else}}
+              <div class="review-footer">
+                  <span class="event-type">
+                      <i class="bi {{eventIcon}}"></i> {{tipo_evento}}
+                  </span>
+                  <div class="no-images-indicator">
+                      <i class="bi bi-card-text"></i>
+                      <span>Solo texto</span>
+                  </div>
+              </div>
+              {{/if}}
+          </div>
+          <div class="review-actions">
+              <button class="action-btn view-details-btn" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+              </button>
+              <button class="action-btn edit-btn" data-review-id="{{id}}" title="Editar reseña">
+                  <i class="bi bi-pencil"></i>
+              </button>
+              <button class="action-btn like-btn" data-review-id="{{id}}" data-likes="{{likes}}" title="Me gusta">
+                  <i class="bi bi-heart"></i>
+                  <span class="like-count">{{#if likes}}{{likes}}{{/if}}</span>
+              </button>
+              <button class="action-btn share-btn" data-review-id="{{id}}" title="Compartir">
+                  <i class="bi bi-share"></i>
+              </button>
+          </div>
+          <div class="review-likes-indicator">
+              <i class="bi bi-heart-fill"></i> <span class="likes-count">{{#if likes}}{{likes}}{{else}}0{{/if}}</span>
+          </div>
+      </div>
+      {{/each}}
+  </section>
 
-<!-- Paginación -->
-<div class="pagination-container">
-    <ul class="pagination">
-        <li class="page-item {{#unless hasPrevPage}}disabled{{/unless}}">
-            <a class="page-link" href="?page={{prevPage}}{{#if currentCategory}}&tipo={{currentCategory}}{{/if}}" aria-label="Anterior">
-                <i class="bi bi-chevron-left"></i>
-            </a>
-        </li>
-        {{#each pages}}
-        <li class="page-item {{#if active}}active{{/if}}">
-            <a class="page-link" href="?page={{number}}{{#if ../currentCategory}}&tipo={{../currentCategory}}{{/if}}">{{number}}</a>
-        </li>
-        {{/each}}
-        <li class="page-item {{#unless hasNextPage}}disabled{{/unless}}">
-            <a class="page-link" href="?page={{nextPage}}{{#if currentCategory}}&tipo={{currentCategory}}{{/if}}" aria-label="Siguiente">
-                <i class="bi bi-chevron-right"></i>
-            </a>
-        </li>
-    </ul>
-</div>
+  <!-- Paginación -->
+  <div class="pagination-container">
+      <ul class="pagination">
+          <li class="page-item {{#unless hasPrevPage}}disabled{{/unless}}">
+              <a class="page-link" href="?page={{prevPage}}{{#if currentCategory}}&tipo={{currentCategory}}{{/if}}" aria-label="Anterior">
+                  <i class="bi bi-chevron-left"></i>
+              </a>
+          </li>
+          {{#each pages}}
+          <li class="page-item {{#if active}}active{{/if}}">
+              <a class="page-link" href="?page={{number}}{{#if ../currentCategory}}&tipo={{../currentCategory}}{{/if}}">{{number}}</a>
+          </li>
+          {{/each}}
+          <li class="page-item {{#unless hasNextPage}}disabled{{/unless}}">
+              <a class="page-link" href="?page={{nextPage}}{{#if currentCategory}}&tipo={{currentCategory}}{{/if}}" aria-label="Siguiente">
+                  <i class="bi bi-chevron-right"></i>
+              </a>
+          </li>
+      </ul>
+  </div>
 </main>
 
 <!-- Botón flotante para agregar reseña -->
 <button class="add-review-btn" data-bs-toggle="modal" data-bs-target="#addReviewModal">
-<i class="bi bi-plus-circle"></i> Agregar Reseña
+  <i class="bi bi-plus-circle"></i> <span class="btn-text">Agregar Reseña</span>
 </button>
 
 <!-- Modal para Agregar Reseña -->
 <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered">
-  <div class="modal-content">
-      <div class="modal-header">
-          <h5 class="modal-title" id="addReviewModalLabel">
-              <i class="bi bi-pencil-square"></i> Agregar Reseña
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addReviewModalLabel">
+                  <i class="bi bi-pencil-square"></i> Agregar Reseña
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="reviewForm" action="/submit-review" method="POST" novalidate>
+                  <div class="form-group">
+                      <label for="orderNumber" class="form-label">
+                          <i class="bi bi-hash"></i> Número de Contrato *
+                      </label>
+                      <input type="text" class="form-control" id="orderNumber" name="orderNumber" required data-validate="contractNumber">
+                      <small class="form-text">Ingrese el número de contrato para verificar que es un cliente real. Solo clientes con contratos pueden dejar reseñas.</small>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label for="reviewerName" class="form-label">
+                          <i class="bi bi-person"></i> Nombre *
+                      </label>
+                      <input type="text" class="form-control" id="reviewerName" name="reviewerName" required data-validate="name">
+                  </div>
+                  
+                  <div class="form-group">
+                      <label for="eventType" class="form-label">
+                          <i class="bi bi-calendar-event"></i> Tipo de Evento *
+                      </label>
+                      <select class="form-select" id="eventType" name="eventType" required>
+                          <option value="" selected disabled>Selecciona el tipo de evento</option>
+                          {{#each tiposEventos}}
+                          <option value="{{id}}">{{nombre}}</option>
+                          {{/each}}
+                      </select>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label class="form-label">
+                          <i class="bi bi-star"></i> Calificación *
+                      </label>
+                      <div class="rating-container">
+                          <div class="star-rating">
+                              <input type="radio" id="star5" name="calificacion" value="5" required>
+                              <label for="star5" title="5 estrellas">★</label>
+                              <input type="radio" id="star4" name="calificacion" value="4">
+                              <label for="star4" title="4 estrellas">★</label>
+                              <input type="radio" id="star3" name="calificacion" value="3">
+                              <label for="star3" title="3 estrellas">★</label>
+                              <input type="radio" id="star2" name="calificacion" value="2">
+                              <label for="star2" title="2 estrellas">★</label>
+                              <input type="radio" id="star1" name="calificacion" value="1">
+                              <label for="star1" title="1 estrella">★</label>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label for="reviewText" class="form-label">
+                          <i class="bi bi-chat-quote"></i> Tu Reseña *
+                      </label>
+                      <textarea class="form-control" id="reviewText" name="comentario" rows="3" required data-validate="message"></textarea>
+                  </div>
+                  
+                  <div class="form-group file-upload">
+                      <label for="reviewImages" class="form-label">
+                          <i class="bi bi-image"></i> Subir Fotos (opcional)
+                      </label>
+                      <div class="file-upload-wrapper">
+                          <i class="bi bi-upload"></i>
+                          <span class="file-upload-text">Seleccionar imágenes</span>
+                          <input type="file" class="form-control" id="reviewImages" name="imagenes" multiple accept="image/*">
+                      </div>
+                      <div id="imagePreviewContainer" class="image-preview-container"></div>
+                      <small class="form-text mt-2">Puedes subir hasta 5 imágenes (máx. 5MB cada una)</small>
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" form="reviewForm" class="btn btn-submit-review">
+                  <i class="bi bi-send"></i> Enviar Reseña
+              </button>
+          </div>
       </div>
-      <div class="modal-body">
-          <form id="reviewForm" action="/submit-review" method="POST" novalidate>
-              <div class="form-group">
-                  <label for="orderNumber" class="form-label">
-                      <i class="bi bi-hash"></i> Número de Contrato *
-                  </label>
-                  <input type="text" class="form-control" id="orderNumber" name="orderNumber" required data-validate="contractNumber">
-                  <small class="form-text">Ingrese el número de contrato para verificar que es un cliente real. Solo clientes con contratos pueden dejar reseñas.</small>
-              </div>
-              
-              <div class="form-group">
-                  <label for="reviewerName" class="form-label">
-                      <i class="bi bi-person"></i> Nombre *
-                  </label>
-                  <input type="text" class="form-control" id="reviewerName" name="reviewerName" required data-validate="name">
-              </div>
-              
-              <div class="form-group">
-                  <label for="eventType" class="form-label">
-                      <i class="bi bi-calendar-event"></i> Tipo de Evento *
-                  </label>
-                  <select class="form-select" id="eventType" name="eventType" required>
-                      <option value="" selected disabled>Selecciona el tipo de evento</option>
-                      {{#each tiposEventos}}
-                      <option value="{{id}}">{{nombre}}</option>
-                      {{/each}}
-                  </select>
-              </div>
-              
-              <div class="form-group">
-                  <label class="form-label">
-                      <i class="bi bi-star"></i> Calificación *
-                  </label>
-                  <div class="rating-container">
-                      <div class="star-rating">
-                          <input type="radio" id="star5" name="calificacion" value="5" required>
-                          <label for="star5" title="5 estrellas">★</label>
-                          <input type="radio" id="star4" name="calificacion" value="4">
-                          <label for="star4" title="4 estrellas">★</label>
-                          <input type="radio" id="star3" name="calificacion" value="3">
-                          <label for="star3" title="3 estrellas">★</label>
-                          <input type="radio" id="star2" name="calificacion" value="2">
-                          <label for="star2" title="2 estrellas">★</label>
-                          <input type="radio" id="star1" name="calificacion" value="1">
-                          <label for="star1" title="1 estrella">★</label>
+  </div>
+</div>
+
+<!-- Modal para verificar contrato antes de editar -->
+<div class="modal fade" id="verifyContractModal" tabindex="-1" aria-labelledby="verifyContractModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="verifyContractModalLabel">
+                  <i class="bi bi-shield-lock"></i> Verificar Identidad
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="verifyContractForm">
+                  <input type="hidden" id="edit-review-id" name="reviewId">
+                  <div class="form-group">
+                      <label for="contractNumber" class="form-label">
+                          <i class="bi bi-hash"></i> Número de Contrato *
+                      </label>
+                      <input type="text" class="form-control" id="contractNumber" name="contractNumber" required>
+                      <small class="form-text">Por favor, ingrese el número de contrato asociado a esta reseña para verificar que es el autor.</small>
+                  </div>
+              </form>
+              <div id="verifyMessage" class="mt-3 text-center" style="display: none;"></div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" id="verifyContractBtn" class="btn btn-gold">
+                  <i class="bi bi-check-circle"></i> Verificar
+              </button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal para editar reseña -->
+<div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="editReviewModalLabel">
+                  <i class="bi bi-pencil-square"></i> Editar Reseña
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="editReviewForm" action="/api/reviews/edit" method="POST" novalidate>
+                  <input type="hidden" id="editReviewId" name="reviewId">
+                  <input type="hidden" id="editContractNumber" name="contractNumber">
+                  
+                  <div class="form-group">
+                      <label for="editReviewerName" class="form-label">
+                          <i class="bi bi-person"></i> Nombre *
+                      </label>
+                      <input type="text" class="form-control" id="editReviewerName" name="reviewerName" required>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label for="editEventType" class="form-label">
+                          <i class="bi bi-calendar-event"></i> Tipo de Evento *
+                      </label>
+                      <select class="form-select" id="editEventType" name="eventType" required>
+                          <option value="" selected disabled>Selecciona el tipo de evento</option>
+                          {{#each tiposEventos}}
+                          <option value="{{id}}">{{nombre}}</option>
+                          {{/each}}
+                      </select>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label class="form-label">
+                          <i class="bi bi-star"></i> Calificación *
+                      </label>
+                      <div class="rating-container">
+                          <div class="star-rating edit-star-rating">
+                              <input type="radio" id="editStar5" name="editCalificacion" value="5" required>
+                              <label for="editStar5" title="5 estrellas">★</label>
+                              <input type="radio" id="editStar4" name="editCalificacion" value="4">
+                              <label for="editStar4" title="4 estrellas">★</label>
+                              <input type="radio" id="editStar3" name="editCalificacion" value="3">
+                              <label for="editStar3" title="3 estrellas">★</label>
+                              <input type="radio" id="editStar2" name="editCalificacion" value="2">
+                              <label for="editStar2" title="2 estrellas">★</label>
+                              <input type="radio" id="editStar1" name="editCalificacion" value="1">
+                              <label for="editStar1" title="1 estrella">★</label>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label for="editReviewText" class="form-label">
+                          <i class="bi bi-chat-quote"></i> Tu Reseña *
+                      </label>
+                      <textarea class="form-control" id="editReviewText" name="comentario" rows="3" required></textarea>
+                  </div>
+                  
+                  <div class="form-group file-upload">
+                      <label for="editReviewImages" class="form-label">
+                          <i class="bi bi-image"></i> Subir Fotos Adicionales (opcional)
+                      </label>
+                      <div class="file-upload-wrapper">
+                          <i class="bi bi-upload"></i>
+                          <span class="file-upload-text">Seleccionar imágenes</span>
+                          <input type="file" class="form-control" id="editReviewImages" name="imagenes" multiple accept="image/*">
+                      </div>
+                      <div id="editImagePreviewContainer" class="image-preview-container"></div>
+                      <div id="existingImagesContainer" class="existing-images-container mt-3">
+                          <p class="form-text mb-2">Imágenes existentes:</p>
+                          <div class="existing-images-grid" id="existingImagesGrid"></div>
+                      </div>
+                      <small class="form-text mt-2">Puedes subir hasta 5 imágenes adicionales (máx. 5MB cada una)</small>
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" id="updateReviewBtn" class="btn btn-submit-review">
+                  <i class="bi bi-save"></i> Guardar Cambios
+              </button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal para ver detalles de reseña - Versión optimizada -->
+<div class="modal fade review-modal" id="reviewDetailModal" tabindex="-1" aria-labelledby="reviewDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="reviewDetailModalLabel">
+                  <i class="bi bi-chat-quote"></i> <span id="reviewModalTitle">Detalle de Reseña</span>
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+              <div class="review-detail-container">
+                  <!-- Sección de imágenes (si hay) -->
+                  <div class="review-detail-media" id="reviewDetailMedia">
+                      <div id="reviewHasImages">
+                          <div class="review-image-carousel" id="reviewImageCarousel">
+                              <!-- Carrusel de imágenes -->
+                              <div class="carousel-inner" id="carouselInner">
+                                  <!-- Las imágenes se agregarán dinámicamente -->
+                              </div>
+                              <!-- Controles de navegación -->
+                              <button class="carousel-control prev" id="carouselPrev">
+                                  <i class="bi bi-chevron-left"></i>
+                              </button>
+                              <button class="carousel-control next" id="carouselNext">
+                                  <i class="bi bi-chevron-right"></i>
+                              </button>
+                          </div>
+                          <!-- Miniaturas de imágenes -->
+                          <div class="carousel-thumbnails" id="carouselThumbnails"></div>
+                      </div>
+                      <div id="reviewNoImages" class="no-images-detail">
+                          <div class="no-images-content">
+                              <i class="bi bi-card-text"></i>
+                              <p>Esta reseña no contiene imágenes</p>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <!-- Información de la reseña -->
+                  <div class="review-detail-info">
+                      <!-- Cabecera con información del cliente -->
+                      <div class="review-detail-header">
+                          <div class="reviewer-avatar-detail">
+                              <i class="bi bi-person-circle"></i>
+                          </div>
+                          <div class="reviewer-info-detail">
+                              <h4 id="reviewDetailName"></h4>
+                              <div class="review-detail-rating" id="reviewDetailRating"></div>
+                              <div class="review-detail-meta">
+                                  <span class="review-detail-date" id="reviewDetailDate"></span>
+                                  <span class="review-detail-event" id="reviewDetailEvent"></span>
+                                  <span class="review-verified-badge" id="reviewVerifiedBadge">
+                                      <i class="bi bi-patch-check-fill"></i> Verificado
+                                  </span>
+                              </div>
+                          </div>
+                          <div class="review-detail-likes" id="reviewDetailLikes">
+                              <i class="bi bi-heart-fill"></i>
+                              <span class="detail-likes-count">0</span>
+                          </div>
+                      </div>
+                      
+                      <!-- Contenido de la reseña -->
+                      <div class="review-detail-content">
+                          <p id="reviewDetailText"></p>
+                      </div>
+                      
+                      <!-- Acciones para la reseña -->
+                      <div class="review-detail-actions">
+                          <button type="button" class="action-card-btn edit-detail-btn" id="editDetailBtn">
+                              <i class="bi bi-pencil"></i> Editar
+                          </button>
+                          <button type="button" class="action-card-btn like-detail-btn" id="likeDetailBtn">
+                              <i class="bi bi-heart"></i> Me gusta
+                          </button>
+                          <button type="button" class="action-card-btn share-detail-btn" id="shareDetailBtn">
+                              <i class="bi bi-share"></i> Compartir
+                          </button>
                       </div>
                   </div>
               </div>
-              
-              <div class="form-group">
-                  <label for="reviewText" class="form-label">
-                      <i class="bi bi-chat-quote"></i> Tu Reseña *
-                  </label>
-                  <textarea class="form-control" id="reviewText" name="comentario" rows="3" required data-validate="message"></textarea>
+          </div>
+          <div class="modal-footer">
+              <div class="modal-footer-info">
+                  <span class="image-counter" id="reviewImageCounter">Imagen <span class="current-image">1</span> de <span class="total-images">0</span></span>
               </div>
-              
-              <div class="form-group file-upload">
-                  <label for="reviewImages" class="form-label">
-                      <i class="bi bi-image"></i> Subir Fotos (opcional)
-                   </label>
-                   <div class="file-upload-wrapper">
-                       <i class="bi bi-upload"></i>
-                       <span class="file-upload-text">Seleccionar imágenes</span>
-                       <input type="file" class="form-control" id="reviewImages" name="imagenes" multiple accept="image/*">
-                   </div>
-                   <div id="imagePreviewContainer" class="image-preview-container"></div>
-                   <small class="form-text mt-2">Puedes subir hasta 5 imágenes (máx. 5MB cada una)</small>
-               </div>
-           </form>
-       </div>
-       <div class="modal-footer">
-           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-           <button type="submit" form="reviewForm" class="btn btn-submit-review">
-               <i class="bi bi-send"></i> Enviar Reseña
-           </button>
-       </div>
-   </div>
-</div>
-</div>
-
-<!-- Modal para ver detalles de reseña -->
-<div class="modal fade" id="reviewDetailModal" tabindex="-1" aria-labelledby="reviewDetailModalLabel" aria-hidden="true">
- <div class="modal-dialog modal-lg">
-   <div class="modal-content">
-     <div class="modal-header">
-       <h5 class="modal-title" id="reviewDetailModalLabel">Detalle de Reseña</h5>
-       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     </div>
-     <div class="modal-body">
-       <div class="review-detail-content">
-         <div class="review-detail-header">
-           <div class="reviewer-info">
-             <div class="reviewer-avatar-large">
-               <i class="bi bi-person-circle"></i>
-             </div>
-             <div class="reviewer-details">
-               <h4 id="reviewDetailName"></h4>
-               <div class="review-detail-meta">
-                 <span id="reviewDetailDate"></span>
-                 <span class="review-detail-event" id="reviewDetailEvent"></span>
-               </div>
-             </div>
-           </div>
-           <div class="review-detail-rating" id="reviewDetailRating"></div>
-         </div>
-         
-         <div class="review-detail-body">
-           <p id="reviewDetailText"></p>
-         </div>
-         
-         <div class="review-detail-images" id="reviewDetailImages">
-           <!-- Las imágenes se agregarán dinámicamente -->
-         </div>
-       </div>
-     </div>
-     <div class="modal-footer">
-       <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-       <a href="#" class="btn btn-gold" id="reviewDetailShare">
-         <i class="bi bi-share"></i> Compartir
-       </a>
-     </div>
-   </div>
- </div>
+              <div class="modal-footer-actions">
+                  <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cerrar</button>
+                  <button type="button" class="btn btn-gold" id="reviewAddBtn" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                      <i class="bi bi-plus-circle"></i> Agregar mi reseña
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
 </div>
 
 <!-- Toast para notificaciones -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-   <div id="shareToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-       <div class="toast-header">
-           <i class="bi bi-check-circle-fill me-2 text-success"></i>
-           <strong class="me-auto">Enlace copiado</strong>
-           <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-       </div>
-       <div class="toast-body">
-           El enlace ha sido copiado al portapapeles.
-       </div>
-   </div>
+  <div id="shareToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+          <i class="bi bi-check-circle-fill me-2 text-success"></i>
+          <strong class="me-auto">Enlace copiado</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+          El enlace ha sido copiado al portapapeles.
+      </div>
+  </div>
+  
+  <div id="likeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+          <i class="bi bi-heart-fill me-2 text-danger"></i>
+          <strong class="me-auto">Me gusta</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="likeToastMessage">
+          ¡Gracias por tu me gusta!
+      </div>
+  </div>
+  
+  <div id="editToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+          <i class="bi bi-check-circle-fill me-2 text-success"></i>
+          <strong class="me-auto">Reseña actualizada</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+          Tu reseña ha sido actualizada correctamente.
+      </div>
+  </div>
 </div>
 
 {{#if success}}
@@ -326,1461 +544,2542 @@
 </div>
 {{/if}}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-   // Inicializar toast
-   const shareToast = new bootstrap.Toast(document.getElementById('shareToast'));
-   
-   // Verificar si hay un ID de tipo de evento o reseña en la URL
-   const urlParams = new URLSearchParams(window.location.search);
-   const eventTypeId = urlParams.get('tipo');
-   const reviewId = urlParams.get('id');
-   
-   // Establecer el filtro activo basado en la URL
-   if (eventTypeId) {
-       const filterButtons = document.querySelectorAll('.filter-btn');
-       filterButtons.forEach(button => {
-           button.classList.remove('active');
-           if (button.getAttribute('data-filter') === eventTypeId) {
-               button.classList.add('active');
-           }
-       });
-       
-       // Filtrar las reseñas
-       filterReviews(eventTypeId);
-   } else {
-       // Si no hay filtro, activar "Todas"
-       document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
-   }
-   
-   // Si hay un ID de reseña específico, resaltar esa reseña
-   if (reviewId) {
-       const reviewCards = document.querySelectorAll('.review-card');
-       let targetReview = null;
-       
-       reviewCards.forEach(card => {
-           if (card.getAttribute('data-review-id') === reviewId) {
-               targetReview = card;
-               card.classList.add('highlighted-review');
-           }
-       });
-       
-       // Desplazarse a la reseña seleccionada
-       if (targetReview) {
-           setTimeout(() => {
-               targetReview.scrollIntoView({ behavior: 'smooth', block: 'center' });
-               
-               // Opcional: Abrir automáticamente el modal con los detalles
-               setTimeout(() => {
-                   openReviewDetail(targetReview);
-               }, 800);
-           }, 500);
-       }
-   }
-    
-   // Animación para las barras de calificación
-   setTimeout(() => {
-       document.querySelectorAll('.bar').forEach(bar => {
-           const width = bar.style.width;
-           bar.style.width = '0';
-           setTimeout(() => {
-               bar.style.width = width;
-           }, 300);
-       });
-   }, 500);
-    
-   // Función para filtrar reseñas
-   function filterReviews(category) {
-       const reviewCards = document.querySelectorAll('.review-card');
-       const emptyState = document.getElementById('emptyReviewsState');
-       let visibleCount = 0;
-       
-       reviewCards.forEach(card => {
-           if (category === 'all' || card.getAttribute('data-category') === category) {
-               card.style.display = 'block';
-               setTimeout(() => {
-                   card.style.opacity = '1';
-                   card.style.transform = 'translateY(0)';
-               }, 50);
-               visibleCount++;
-           } else {
-               card.style.opacity = '0';
-               card.style.transform = 'translateY(20px)';
-               setTimeout(() => {
-                   card.style.display = 'none';
-               }, 300);
-           }
-       });
-       
-       // Mostrar mensaje de estado vacío si no hay elementos
-       if (visibleCount === 0) {
-           emptyState.style.display = 'flex';
-       } else {
-           emptyState.style.display = 'none';
-       }
-       
-       // Actualizar URL para compartir
-       const shareUrl = new URL(window.location.href);
-       if (category !== 'all') {
-           shareUrl.searchParams.set('tipo', category);
-       } else {
-           shareUrl.searchParams.delete('tipo');
-       }
-       window.history.replaceState({}, '', shareUrl);
-   }
-    
-   // Funcionalidad para los filtros
-   const filterButtons = document.querySelectorAll('.filter-btn');
-   
-   filterButtons.forEach(button => {
-       button.addEventListener('click', function() {
-           // Remover clase active de todos los botones
-           filterButtons.forEach(btn => btn.classList.remove('active'));
-           // Agregar clase active al botón clickeado
-           this.classList.add('active');
-           
-           // Obtener el filtro seleccionado
-           const filter = this.getAttribute('data-filter');
-           
-           // Filtrar las reseñas
-           filterReviews(filter);
-       });
-   });
-
-   // Botón para resetear filtros
-   const resetFilterBtn = document.querySelector('.reset-filter-btn');
-   if (resetFilterBtn) {
-       resetFilterBtn.addEventListener('click', function() {
-           const allCategoryBtn = document.querySelector('.filter-btn[data-filter="all"]');
-           allCategoryBtn.click();
-       });
-   }
-
-   // Funcionalidad para ordenar
-   const sortSelect = document.getElementById('sortReviews');
-   sortSelect.addEventListener('change', function() {
-       const sortValue = this.value;
-       const reviewsContainer = document.querySelector('.reviews-grid');
-       const reviewCards = document.querySelectorAll('.review-card');
-       const reviewsArray = Array.from(reviewCards);
-       
-       // Ordenar las reseñas según la opción seleccionada
-       reviewsArray.sort((a, b) => {
-           if (sortValue === 'recent') {
-               return b.getAttribute('data-date') - a.getAttribute('data-date');
-           } else if (sortValue === 'highest') {
-               return b.getAttribute('data-rating') - a.getAttribute('data-rating');
-           } else if (sortValue === 'lowest') {
-               return a.getAttribute('data-rating') - b.getAttribute('data-rating');
-           }
-       });
-       
-       // Reordenar las reseñas en el DOM
-       reviewsArray.forEach(review => {
-           reviewsContainer.appendChild(review);
-       });
-   });
-   
-   // Abrir modal de detalle al hacer clic en una reseña o en el botón de detalles
-   const reviewCards = document.querySelectorAll('.review-card');
-   reviewCards.forEach(card => {
-       card.addEventListener('click', function(e) {
-           // No abrir el modal si se hizo clic en el botón de compartir
-           if (e.target.closest('.share-btn')) {
-               return;
-           }
-           openReviewDetail(this);
-       });
-       
-       // Botón de ver detalles
-       const viewDetailsBtn = card.querySelector('.view-details-btn');
-       if (viewDetailsBtn) {
-           viewDetailsBtn.addEventListener('click', function(e) {
-               e.stopPropagation(); // Evitar que se propague al card
-               openReviewDetail(card);
-           });
-       }
-       
-       // Botón de compartir
-       const shareBtn = card.querySelector('.share-btn');
-       if (shareBtn) {
-           shareBtn.addEventListener('click', function(e) {
-               e.stopPropagation(); // Evitar que se propague al card
-               const reviewId = this.getAttribute('data-review-id');
-               shareReview(reviewId);
-           });
-       }
-   });
-   
-   // Función para abrir el modal de detalle de reseña
-   function openReviewDetail(reviewCard) {
-       const modal = document.getElementById('reviewDetailModal');
-       const modalName = document.getElementById('reviewDetailName');
-       const modalDate = document.getElementById('reviewDetailDate');
-       const modalEvent = document.getElementById('reviewDetailEvent');
-       const modalRating = document.getElementById('reviewDetailRating');
-       const modalText = document.getElementById('reviewDetailText');
-       const modalImages = document.getElementById('reviewDetailImages');
-       const modalShare = document.getElementById('reviewDetailShare');
-       
-       // Obtener datos de la reseña
-       const name = reviewCard.querySelector('.reviewer-name').textContent;
-       const date = reviewCard.querySelector('.review-date').textContent;
-       const event = reviewCard.querySelector('.event-type').textContent;
-       const rating = reviewCard.getAttribute('data-rating');
-       const text = reviewCard.querySelector('.review-text').textContent;
-       const reviewId = reviewCard.getAttribute('data-review-id');
-       
-       // Actualizar el modal
-       modalName.textContent = name;
-       modalDate.textContent = date;
-       modalEvent.textContent = event;
-       modalText.textContent = text;
-       
-       // Actualizar estrellas
-       modalRating.innerHTML = '';
-       for (let i = 0; i < 5; i++) {
-           const star = document.createElement('i');
-           star.className = i < rating ? 'bi bi-star-fill' : 'bi bi-star';
-           modalRating.appendChild(star);
-       }
-       
-       // Actualizar imágenes
-       modalImages.innerHTML = '';
-       const reviewImages = reviewCard.querySelectorAll('.review-image');
-       if (reviewImages.length > 0) {
-           const imageGallery = document.createElement('div');
-           imageGallery.className = 'image-gallery';
-           
-           reviewImages.forEach((img, index) => {
-               const imgContainer = document.createElement('div');
-               imgContainer.className = 'gallery-image-container';
-               
-               const imgClone = document.createElement('img');
-               imgClone.src = img.src;
-               imgClone.alt = 'Foto del evento';
-               imgClone.className = 'gallery-image';
-               imgClone.setAttribute('data-index', index);
-               
-               imgClone.addEventListener('click', function() {
-                   openImageViewer(this.src, index, Array.from(reviewImages).map(img => img.src));
-               });
-               
-               imgContainer.appendChild(imgClone);
-               imageGallery.appendChild(imgContainer);
-           });
-           
-           modalImages.appendChild(imageGallery);
-           modalImages.style.display = 'block';
-       } else {
-           modalImages.style.display = 'none';
-       }
-       
-       // Actualizar enlace para compartir
-       const shareUrl = new URL(window.location.href);
-       shareUrl.searchParams.set('id', reviewId);
-       modalShare.setAttribute('data-url', shareUrl.toString());
-       
-       // Abrir el modal
-       const bsModal = new bootstrap.Modal(modal);
-       bsModal.show();
-   }
-   
-   // Función para abrir el visor de imágenes
-   function openImageViewer(src, index, images) {
-       // Crear el visor de imágenes
-       const viewer = document.createElement('div');
-       viewer.className = 'image-viewer';
-       
-       // Crear el contenedor de la imagen
-       const imageContainer = document.createElement('div');
-       imageContainer.className = 'viewer-image-container';
-       
-       // Crear la imagen
-       const img = document.createElement('img');
-       img.src = src;
-       img.className = 'viewer-image';
-       
-       // Crear los botones de navegación
-       const prevBtn = document.createElement('button');
-       prevBtn.className = 'viewer-nav-btn prev-btn';
-       prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
-       
-       const nextBtn = document.createElement('button');
-       nextBtn.className = 'viewer-nav-btn next-btn';
-       nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
-       
-       // Crear el botón de cerrar
-       const closeBtn = document.createElement('button');
-       closeBtn.className = 'viewer-close-btn';
-       closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-       
-       // Crear el contador de imágenes
-       const counter = document.createElement('div');
-       counter.className = 'viewer-counter';
-       counter.textContent = `${index + 1} / ${images.length}`;
-       
-       // Agregar elementos al visor
-       imageContainer.appendChild(img);
-       viewer.appendChild(imageContainer);
-       viewer.appendChild(prevBtn);
-       viewer.appendChild(nextBtn);
-       viewer.appendChild(closeBtn);
-       viewer.appendChild(counter);
-       
-       // Agregar el visor al body
-       document.body.appendChild(viewer);
-       document.body.style.overflow = 'hidden'; // Evitar scroll
-       
-       // Funcionalidad de navegación
-       let currentIndex = index;
-       
-       function updateImage() {
-           img.src = images[currentIndex];
-           counter.textContent = `${currentIndex + 1} / ${images.length}`;
-       }
-       
-       prevBtn.addEventListener('click', function() {
-           currentIndex = (currentIndex - 1 + images.length) % images.length;
-           updateImage();
-       });
-       
-       nextBtn.addEventListener('click', function() {
-           currentIndex = (currentIndex + 1) % images.length;
-           updateImage();
-       });
-       
-       // Navegación con teclado
-       document.addEventListener('keydown', function(e) {
-           if (e.key === 'ArrowLeft') {
-               prevBtn.click();
-           } else if (e.key === 'ArrowRight') {
-               nextBtn.click();
-           } else if (e.key === 'Escape') {
-               closeBtn.click();
-           }
-       });
-       
-       // Cerrar el visor
-       closeBtn.addEventListener('click', function() {
-           viewer.remove();
-           document.body.style.overflow = ''; // Restaurar scroll
-       });
-       
-       // Cerrar al hacer clic fuera de la imagen
-       viewer.addEventListener('click', function(e) {
-           if (e.target === viewer) {
-               closeBtn.click();
-           }
-       });
-   }
-   
-   // Función para compartir reseña
-   function shareReview(reviewId) {
-       const shareUrl = new URL(window.location.href);
-       shareUrl.searchParams.set('id', reviewId);
-       
-       if (navigator.share) {
-           navigator.share({
-               title: 'Reseña de Plato y Copa',
-               text: 'Mira esta reseña de Plato y Copa',
-               url: shareUrl.toString()
-           })
-           .catch(console.error);
-       } else {
-           // Fallback para navegadores que no soportan Web Share API
-           navigator.clipboard.writeText(shareUrl.toString())
-               .then(() => {
-                   shareToast.show();
-               })
-               .catch(err => {
-                   console.error('Error al copiar: ', err);
-               });
-       }
-   }
-   
-   // Compartir reseña desde el modal
-   document.getElementById('reviewDetailShare').addEventListener('click', function(e) {
-       e.preventDefault();
-       const url = this.getAttribute('data-url');
-       
-       if (navigator.share) {
-           navigator.share({
-               title: 'Reseña de Plato y Copa',
-               text: 'Mira esta reseña de Plato y Copa',
-               url: url
-           })
-           .catch(console.error);
-       } else {
-           // Fallback para navegadores que no soportan Web Share API
-           navigator.clipboard.writeText(url)
-               .then(() => {
-                   shareToast.show();
-               })
-               .catch(err => {
-                   console.error('Error al copiar: ', err);
-               });
-       }
-   });
-    
-   // Validación adicional para el formulario de reseñas
-   const ratingInputs = document.querySelectorAll('input[name="calificacion"]');
-   const reviewForm = document.getElementById('reviewForm');
-   
-   reviewForm.addEventListener('submit', function(e) {
-       // Verificar si se ha seleccionado una calificación
-       let ratingSelected = false;
-       ratingInputs.forEach(input => {
-           if (input.checked) {
-               ratingSelected = true;
-           }
-       });
-       
-       if (!ratingSelected) {
-           e.preventDefault();
-           alert('Por favor, selecciona una calificación');
-       }
-   });
-   
-   // Previsualización de imágenes
-   const imageInput = document.getElementById('reviewImages');
-   const previewContainer = document.getElementById('imagePreviewContainer');
-   
-   if (imageInput) {
-       imageInput.addEventListener('change', function() {
-           previewContainer.innerHTML = '';
-           
-           if (this.files) {
-               const fileCount = Math.min(this.files.length, 5); // Limitar a 5 imágenes
-               
-               for (let i = 0; i < fileCount; i++) {
-                   const file = this.files[i];
-                   if (file.type.startsWith('image/')) {
-                       const reader = new FileReader();
-                       
-                       reader.onload = function(e) {
-                           const previewWrapper = document.createElement('div');
-                           previewWrapper.className = 'image-preview-item';
-                           
-                           const img = document.createElement('img');
-                           img.src = e.target.result;
-                           img.className = 'preview-image';
-                           
-                           const removeBtn = document.createElement('button');
-                           removeBtn.className = 'remove-image-btn';
-                           removeBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
-                           removeBtn.addEventListener('click', function(e) {
-                               e.preventDefault();
-                               previewWrapper.remove();
-                           });
-                           
-                           previewWrapper.appendChild(img);
-                           previewWrapper.appendChild(removeBtn);
-                           previewContainer.appendChild(previewWrapper);
-                       };
-                       
-                       reader.readAsDataURL(file);
-                   }
-               }
-           }
-       });
-   }
-   
-   // Detectar scroll horizontal en filtros
-   const filterContainer = document.querySelector('.filter-scroll-wrapper');
-   if (filterContainer) {
-       filterContainer.addEventListener('scroll', function() {
-           const isScrollEnd = this.scrollLeft + this.offsetWidth >= this.scrollWidth - 20;
-           const gradientOverlay = document.querySelector('.filter-gradient-overlay');
-           
-           if (isScrollEnd) {
-               gradientOverlay.style.opacity = '0';
-           } else {
-               gradientOverlay.style.opacity = '1';
-           }
-       });
-   }
-   
-   // Animación para las tarjetas de reseñas
-   const reviewItems = document.querySelectorAll('.review-card');
-   const observer = new IntersectionObserver((entries) => {
-       entries.forEach(entry => {
-           if (entry.isIntersecting) {
-               entry.target.classList.add('animate-fadeIn');
-               observer.unobserve(entry.target);
-           }
-       });
-   }, { threshold: 0.1 });
-
-   reviewItems.forEach((item, index) => {
-       item.style.animationDelay = `${index * 0.1}s`;
-       observer.observe(item);
-   });
-});
-</script>
 
 <style>
-/* Estilos para la sección de reseñas */
-.filter-container {
-   position: relative;
-   margin: 2rem 0;
-   padding-bottom: 5px;
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   flex-wrap: wrap;
-   gap: 15px;
+/* Variables globales */
+:root {
+  --gold: #e5c76b;
+  --gold-dark: #d5b75b;
+  --gold-light: #f5d77b;
+  --gold-border: rgba(229, 199, 107, 0.3);
+  --gold-border-hover: rgba(229, 199, 107, 0.6);
+  --black: #000000;
+  --white: #ffffff;
+  --white-dim: rgba(255, 255, 255, 0.8);
+  --shadow-gold: 0 5px 15px rgba(229, 199, 107, 0.2);
+  --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.3);
+  --border-radius: 8px;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --heart-color: #ff4d6d;
 }
 
-.filter-scroll-wrapper {
-   display: flex;
-   gap: 10px;
-   overflow-x: auto;
-   padding: 10px 5px;
-   -webkit-overflow-scrolling: touch;
-   scrollbar-width: none; /* Firefox */
-   -ms-overflow-style: none; /* IE/Edge */
-   flex: 1;
-   max-width: calc(100% - 150px);
+/* Estilos generales */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
 }
 
-.filter-scroll-wrapper::-webkit-scrollbar {
-   display: none; /* Chrome/Safari/Opera */
-}
-
-.filter-gradient-overlay {
-   position: absolute;
-   top: 0;
-   right: 150px;
-   width: 60px;
-   height: 100%;
-   background: linear-gradient(to right, transparent, var(--black));
-   pointer-events: none;
-   opacity: 1;
-   transition: opacity 0.3s ease;
-}
-
-.filter-btn {
-   background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-   border: 1px solid var(--gold-border);
-   color: var(--white);
-   padding: 10px 16px;
-   border-radius: 50px;
-   font-size: 0.9rem;
-   transition: all 0.3s ease;
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   gap: 8px;
-   white-space: nowrap;
-   min-height: 44px;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.filter-icon {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: var(--gold);
-}
-
-.filter-btn.active,
-.filter-btn:hover {
-   background: linear-gradient(to right, var(--gold), var(--gold-dark));
-   color: var(--black);
-   border-color: var(--gold);
-   transform: translateY(-2px);
-   box-shadow: 0 4px 10px rgba(229, 199, 107, 0.3);
-}
-
-.filter-btn.active .filter-icon,
-.filter-btn:hover .filter-icon {
-   color: var(--black);
-}
-
-.review-count {
-   font-size: 0.8rem;
-   opacity: 0.8;
-}
-
-.sort-container {
-   flex-shrink: 0;
-   width: 140px;
-}
-
-.sort-select {
-   width: 100%;
-   padding: 10px 15px;
-   border-radius: 50px;
-   background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-   border: 1px solid var(--gold-border);
-   color: var(--white);
-   font-size: 0.9rem;
-   appearance: none;
-   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23E5C76B' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-   background-repeat: no-repeat;
-   background-position: right 15px center;
-   padding-right: 35px;
-   cursor: pointer;
-   transition: all 0.3s ease;
-}
-
-.sort-select:focus {
-   outline: none;
-   border-color: var(--gold);
-   box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
-}
-
-/* Estilos para las tarjetas de reseñas */
-.reviews-grid {
-   display: grid;
-   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-   gap: 25px;
-}
-
-.review-card {
-   background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   padding: 20px;
-   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-   box-shadow: var(--shadow-dark);
-   position: relative;
-   overflow: hidden;
-}
-
-.review-card:hover {
-   transform: translateY(-10px);
-   box-shadow: var(--shadow-gold), 0 15px 35px rgba(0, 0, 0, 0.3);
-   border-color: var(--gold-border-hover);
-}
-
-.review-card::before {
-   content: "";
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 5px;
-   background: linear-gradient(to right, var(--gold), var(--gold-dark));
-   opacity: 0;
-   transition: opacity 0.4s ease;
-}
-
-.review-card:hover::before {
-   opacity: 1;
-}
-
-.review-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: flex-start;
-   margin-bottom: 15px;
-   padding-bottom: 15px;
-   border-bottom: 1px solid rgba(229, 199, 107, 0.2);
-}
-
-.reviewer-info {
-   display: flex;
-   align-items: center;
-}
-
-.reviewer-avatar {
-   width: 50px;
-   height: 50px;
-   border-radius: 50%;
-   background: linear-gradient(145deg, rgba(229, 199, 107, 0.2), rgba(229, 199, 107, 0.1));
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 1.8rem;
-   color: var(--gold);
-   margin-right: 15px;
-   flex-shrink: 0;
-}
-
-.reviewer-details {
-   display: flex;
-   flex-direction: column;
-}
-
-.reviewer-name {
-   font-size: 1.1rem;
-   font-weight: 500;
-   color: var(--white);
-   margin-bottom: 5px;
-}
-
-.review-date {
-   font-size: 0.85rem;
-   color: var(--white-dim);
-}
-
-.verified-badge {
-   display: flex;
-   align-items: center;
-   gap: 5px;
-   font-size: 0.8rem;
-   color: var(--gold);
-   margin-top: 5px;
-}
-
-.review-rating {
-   color: var(--gold);
-   font-size: 1.2rem;
-}
-
-.review-content {
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-}
-
-.review-text {
-   color: var(--white-dim);
-   font-size: 0.95rem;
-   line-height: 1.6;
-   margin-bottom: 15px;
-   flex-grow: 1;
-}
-
-.review-footer {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-   margin-top: auto;
-}
-
-.event-type {
-   display: inline-flex;
-   align-items: center;
-   background: linear-gradient(145deg, rgba(229, 199, 107, 0.2), rgba(229, 199, 107, 0.1));
-   color: var(--gold);
-   font-size: 0.85rem;
-   padding: 5px 12px;
-   border-radius: 50px;
-   border: 1px solid var(--gold-border);
-   gap: 5px;
-   align-self: flex-start;
-}
-
-.review-images {
-   display: flex;
-   gap: 10px;
-   overflow-x: auto;
-   padding: 5px 0;
-   scrollbar-width: thin;
-   scrollbar-color: var(--gold) rgba(0, 0, 0, 0.2);
-}
-
-.review-images::-webkit-scrollbar {
-   height: 6px;
-}
-
-.review-images::-webkit-scrollbar-track {
-   background: rgba(0, 0, 0, 0.2);
-   border-radius: 10px;
-}
-
-.review-images::-webkit-scrollbar-thumb {
-   background-color: var(--gold);
-   border-radius: 10px;
-}
-
-.review-image {
-   width: 80px;
-   height: 80px;
-   object-fit: cover;
-   border-radius: 8px;
-   border: 1px solid var(--gold-border);
-   transition: all 0.3s ease;
-   flex-shrink: 0;
-}
-
-.review-image:hover {
-   transform: scale(1.05);
-   border-color: var(--gold);
-   box-shadow: 0 0 10px rgba(229, 199, 107, 0.4);
-}
-
-/* Botones de acción en las tarjetas */
-.review-actions {
-   position: absolute;
-   top: 15px;
-   right: 15px;
-   display: flex;
-   gap: 8px;
-   opacity: 0;
-   transform: translateY(-10px);
-   transition: all 0.3s ease;
-}
-
-.review-card:hover .review-actions {
-   opacity: 1;
-   transform: translateY(0);
-}
-
-.action-btn {
-   width: 36px;
-   height: 36px;
-   border-radius: 50%;
-   background: rgba(0, 0, 0, 0.6);
-   border: 1px solid var(--gold-border);
-   color: var(--gold);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   cursor: pointer;
-   transition: all 0.3s ease;
-}
-
-.action-btn:hover {
-   background: var(--gold);
-   color: var(--black);
-   transform: scale(1.1);
+.gradient-text {
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
 }
 
 /* Estilos para el resumen de reseñas */
 .reviews-summary {
-   background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   padding: 30px;
-   margin-top: 2rem;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  margin-top: 2rem;
 }
 
 .rating-overview {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .rating-value {
-   font-size: 3.5rem;
-   font-weight: 700;
-   line-height: 1;
-   margin-bottom: 10px;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 10px;
 }
 
 .rating-stars {
-   font-size: 1.5rem;
-   color: var(--gold);
-   margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 10px;
 }
 
 .rating-count {
-   font-size: 0.9rem;
-   color: var(--white-dim);
+  font-size: 0.9rem;
+  color: var(--white-dim);
 }
 
 .rating-bars {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .rating-bar {
-   display: flex;
-   align-items: center;
-   gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .bar-label {
-   width: 20px;
-   text-align: right;
-   font-size: 0.9rem;
-   color: var(--white-dim);
+  width: 20px;
+  text-align: right;
+  font-size: 0.9rem;
+  color: var(--white-dim);
 }
 
 .bar-container {
-   flex-grow: 1;
-   height: 10px;
-   background-color: rgba(255, 255, 255, 0.1);
-   border-radius: 5px;
-   overflow: hidden;
+  flex-grow: 1;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .bar {
-   height: 100%;
-   background: linear-gradient(to right, var(--gold), var(--gold-dark));
-   border-radius: 5px;
-   transition: width 1s ease;
+  height: 100%;
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  border-radius: 5px;
+  transition: width 1s ease;
 }
 
 .bar-percentage {
-   width: 40px;
-   font-size: 0.9rem;
-   color: var(--white-dim);
+  width: 40px;
+  font-size: 0.9rem;
+  color: var(--white-dim);
+}
+
+/* Filtros y ordenamiento */
+.filter-container {
+  position: relative;
+  margin: 2rem 0;
+  padding-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.filter-scroll-wrapper {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 5px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  flex: 1;
+  max-width: calc(100% - 150px);
+}
+
+.filter-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.filter-gradient-overlay {
+  position: absolute;
+  top: 0;
+  right: 150px;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, var(--black));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.filter-btn {
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  color: var(--white);
+  padding: 10px 16px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-height: 44px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.filter-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  color: var(--black);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(229, 199, 107, 0.3);
+}
+
+.filter-btn.active .filter-icon,
+.filter-btn:hover .filter-icon {
+  color: var(--black);
+}
+
+.review-count {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.sort-container {
+  flex-shrink: 0;
+  width: 140px;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 50px;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  color: var(--white);
+  font-size: 0.9rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23E5C76B' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 35px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
 }
 
 /* Estado vacío */
 .empty-state {
-   display: none;
-   justify-content: center;
-   align-items: center;
-   min-height: 300px;
-   margin: 2rem 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  margin: 2rem 0;
 }
 
 .empty-state-content {
-   text-align: center;
-   padding: 2rem;
-   background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   max-width: 500px;
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  max-width: 500px;
 }
 
 .empty-state-content i {
-   font-size: 3rem;
-   color: var(--gold);
-   margin-bottom: 1rem;
-   opacity: 0.5;
+  font-size: 3rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  opacity: 0.5;
 }
 
 .empty-state-content h4 {
-   color: var(--gold);
-   margin-bottom: 0.5rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
 }
 
 .empty-state-content p {
-   color: var(--white-dim);
-   margin-bottom: 1.5rem;
+  color: var(--white-dim);
+  margin-bottom: 1.5rem;
 }
 
-/* Estilos para el botón flotante */
+/* Tarjetas de reseñas mejoradas */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.review-card {
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-dark);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.review-card:hover {
+  transform: translateY(-12px);
+  box-shadow: var(--shadow-gold), 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--gold-border-hover);
+}
+
+.review-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.review-card:hover::before {
+  opacity: 1;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(229, 199, 107, 0.3);
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+}
+
+.reviewer-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(229, 199, 107, 0.3), rgba(229, 199, 107, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--gold);
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.reviewer-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewer-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 3px;
+}
+
+.review-date {
+  font-size: 0.9rem;
+  color: var(--white-dim);
+}
+
+.verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--gold);
+  margin-top: 5px;
+}
+
+.review-rating {
+  color: var(--gold);
+  font-size: 1.2rem;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.review-text {
+  color: var(--white-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.review-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.event-type {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(145deg, rgba(229, 199, 107, 0.2), rgba(229, 199, 107, 0.1));
+  color: var(--gold);
+  font-size: 0.85rem;
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1px solid var(--gold-border);
+  gap: 5px;
+  align-self: flex-start;
+}
+
+.review-images {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 5px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) rgba(0, 0, 0, 0.2);
+}
+
+.review-images::-webkit-scrollbar {
+  height: 6px;
+}
+
+.review-images::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.review-images::-webkit-scrollbar-thumb {
+  background-color: var(--gold);
+  border-radius: 10px;
+}
+
+.review-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--gold-border);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.review-image:hover {
+  transform: scale(1.05);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(229, 199, 107, 0.4);
+}
+
+/* Botones de acción en las tarjetas mejorados */
+.review-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.review-card:hover .review-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.action-btn:hover {
+  background: var(--gold);
+  color: var(--black);
+  transform: scale(1.1);
+}
+
+.action-btn.like-btn {
+  color: var(--heart-color);
+  border-color: rgba(255, 77, 109, 0.4);
+}
+
+.action-btn.like-btn:hover {
+  background: var(--heart-color);
+  color: white;
+  border-color: var(--heart-color);
+}
+
+.action-btn.liked {
+  background: var(--heart-color);
+  color: white;
+  border-color: var(--heart-color);
+}
+
+.action-btn.heart-animation {
+  animation: heart-pulse 1s ease;
+}
+
+.like-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--heart-color);
+  color: white;
+  font-size: 0.7rem;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.review-likes-indicator {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--heart-color);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 77, 109, 0.4);
+}
+
+/* Paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+}
+
+.pagination {
+  display: flex;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0 3px;
+}
+
+.page-link {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.page-item.active .page-link,
+.page-link:hover {
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  color: var(--black);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(229, 199, 107, 0.3);
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Botón flotante para agregar reseña */
 .add-review-btn {
-   position: fixed;
-   bottom: 30px;
-   right: 30px;
-   width: 60px;
-   height: 60px;
-   border-radius: 50%;
-   background: linear-gradient(to right, var(--gold), var(--gold-dark));
-   color: var(--black);
-   border: none;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 1.5rem;
-   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-   cursor: pointer;
-   transition: all 0.3s ease;
-   z-index: 10;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: auto;
+  height: 60px;
+  border-radius: 30px;
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  color: var(--black);
+  border: none;
+  box-shadow: 0 4px 15px rgba(229, 199, 107, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  z-index: 1000;
+  padding: 0 20px;
 }
 
 .add-review-btn:hover {
-   transform: scale(1.1) rotate(5deg);
-   box-shadow: 0 6px 20px rgba(229, 199, 107, 0.4);
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(229, 199, 107, 0.4);
 }
 
-/* Estilos para el modal de reseña */
+/* Modal para agregar reseña */
 .modal-content {
-   background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(0, 0, 0, 0.95));
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-   overflow: hidden;
+  background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(0, 0, 0, 0.95));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 
 .modal-header {
-   border-bottom: 1px solid var(--gold-border);
-   padding: 1.2rem 1.5rem;
-   background: linear-gradient(to right, rgba(229, 199, 107, 0.1), transparent);
+  border-bottom: 1px solid var(--gold-border);
+  padding: 1.2rem 1.5rem;
+  background: linear-gradient(to right, rgba(229, 199, 107, 0.1), transparent);
 }
 
 .modal-title {
-   color: var(--gold);
-   font-size: 1.5rem;
-   font-weight: 500;
+  color: var(--gold);
+  font-size: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .form-group {
-   margin-bottom: 20px;
-   position: relative;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .form-label {
-   display: block;
-   margin-bottom: 8px;
-   color: var(--white);
-   font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--white);
+  font-weight: 500;
 }
 
 .form-label i {
-   color: var(--gold);
-   margin-right: 5px;
+  color: var(--gold);
+  margin-right: 5px;
 }
 
 .form-control, .form-select {
-   background: rgba(0, 0, 0, 0.3);
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   color: var(--white);
-   padding: 12px 15px;
-   width: 100%;
-   transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  color: var(--white);
+  padding: 12px 15px;
+  width: 100%;
+  transition: all 0.3s ease;
 }
 
 .form-control:focus, .form-select:focus {
-   outline: none;
-   border-color: var(--gold);
-   box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
 }
 
 .form-text {
-   font-size: 0.8rem;
-   color: var(--white-dim);
-   margin-top: 5px;
+  font-size: 0.8rem;
+  color: var(--white-dim);
+  margin-top: 5px;
 }
 
+/* Estrellas para calificación */
+.rating-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  font-size: 2.5rem;
+  color: rgba(229, 199, 107, 0.3);
+  transition: all 0.3s ease;
+  padding: 0 5px;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+  color: var(--gold);
+}
+
+/* Carga de archivos */
 .file-upload-wrapper {
-   position: relative;
-   display: flex;
-   align-items: center;
-   padding: 12px 15px;
-   background: rgba(0, 0, 0, 0.3);
-   border: 1px solid var(--gold-border);
-   border-radius: var(--border-radius);
-   cursor: pointer;
-   transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .file-upload-wrapper:hover {
-   border-color: var(--gold);
+  border-color: var(--gold);
 }
 
 .file-upload-wrapper i {
-   color: var(--gold);
-   margin-right: 10px;
-   font-size: 1.2rem;
+  color: var(--gold);
+  margin-right: 10px;
+  font-size: 1.2rem;
 }
 
 .file-upload-text {
-   color: var(--white-dim);
+  color: var(--white-dim);
 }
 
 .file-upload input[type="file"] {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   opacity: 0;
-   cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .image-preview-container {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 10px;
-   margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .image-preview-item {
-   position: relative;
-   width: 80px;
-   height: 80px;
-   border-radius: 8px;
-   overflow: hidden;
-   border: 1px solid var(--gold-border);
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gold-border);
 }
 
 .preview-image {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .remove-image-btn {
-   position: absolute;
-   top: 5px;
-   right: 5px;
-   width: 20px;
-   height: 20px;
-   border-radius: 50%;
-   background: rgba(0, 0, 0, 0.7);
-   border: 1px solid var(--gold-border);
-   color: var(--gold);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 0.8rem;
-   cursor: pointer;
-   transition: all 0.3s ease;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .remove-image-btn:hover {
-   background: var(--gold);
-   color: var(--black);
+  background: var(--gold);
+  color: var(--black);
+}
+
+/* Imágenes existentes para el modal de edición */
+.existing-images-container {
+  margin-top: 20px;
+  border-top: 1px dashed var(--gold-border);
+  padding-top: 15px;
+}
+
+.existing-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.existing-image-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gold-border);
+}
+
+.existing-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-existing-image {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.remove-existing-image:hover {
+  background: var(--gold);
+  color: var(--black);
 }
 
 .btn-submit-review {
-   background: linear-gradient(to right, var(--gold), var(--gold-dark));
-   color: var(--black);
-   border: none;
-   padding: 10px 20px;
-   border-radius: 50px;
-   font-weight: 500;
-   display: flex;
-   align-items: center;
-   gap: 8px;
-   transition: all 0.3s ease;
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  color: var(--black);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
 .btn-submit-review:hover {
-   transform: translateY(-2px);
-   box-shadow: 0 4px 10px rgba(229, 199, 107, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(229, 199, 107, 0.3);
 }
 
-/* Estilos para el modal de detalle */
+/* Modal de detalle de reseña optimizado */
+.review-modal .modal-dialog {
+  max-width: 90%;
+  margin: 1.75rem auto;
+}
+
+.review-modal .modal-content {
+  background: linear-gradient(145deg, rgba(17, 17, 17, 0.98), rgba(0, 0, 0, 0.98));
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.review-modal .modal-header {
+  border-bottom: 1px solid rgba(229, 199, 107, 0.2);
+  padding: 1rem 1.5rem;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+}
+
+.review-modal .modal-title {
+  color: var(--gold);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-modal .btn-close-white {
+  filter: brightness(0) invert(1) sepia(100%) saturate(500%) hue-rotate(330deg);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.review-modal .btn-close-white:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+/* Nuevo diseño modal de detalle */
+.review-detail-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 60vh;
+}
+
+.review-detail-media {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-image-carousel {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.carousel-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-item.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.detail-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-thumbnails {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  justify-content: center;
+  overflow-x: auto;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.carousel-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.carousel-thumbnail.active {
+  border-color: var(--gold);
+  transform: scale(1.1);
+}
+
+.carousel-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.3s ease;
+}
+
+.carousel-control:hover {
+  background: var(--gold);
+  color: var(--black);
+}
+
+.carousel-control.prev {
+  left: 15px;
+}
+
+.carousel-control.next {
+  right: 15px;
+}
+
+.review-detail-info {
+  width: 40%;
+  max-width: 400px;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .review-detail-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: flex-start;
-   margin-bottom: 20px;
-   padding-bottom: 15px;
-   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  position: relative;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(229, 199, 107, 0.2);
 }
 
-.reviewer-avatar-large {
-   font-size: 3rem;
-   color: var(--gold);
-   margin-right: 15px;
+.reviewer-avatar-detail {
+  font-size: 2.5rem;
+  color: var(--gold);
+  margin-right: 15px;
 }
 
-.review-detail-meta {
-   display: flex;
-   gap: 15px;
-   color: rgba(255, 255, 255, 0.7);
-   font-size: 0.9rem;
+.reviewer-info-detail {
+  flex: 1;
 }
 
-.review-detail-event {
-   background-color: rgba(229, 199, 107, 0.1);
-   padding: 2px 10px;
-   border-radius: 20px;
-   display: inline-flex;
-   align-items: center;
+.reviewer-info-detail h4 {
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 10px;
 }
 
 .review-detail-rating {
-   color: var(--gold);
-   font-size: 1.5rem;
+  color: var(--gold);
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
-.review-detail-body {
-   font-size: 1.1rem;
-   line-height: 1.6;
-   margin-bottom: 20px;
-   padding: 15px;
-   background-color: rgba(255, 255, 255, 0.05);
-   border-radius: 10px;
-   font-style: italic;
+.review-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--white-dim);
 }
 
-.review-detail-images {
-   margin-top: 20px;
+.review-detail-date, .review-detail-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.image-gallery {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 10px;
+.review-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(145deg, rgba(229, 199, 107, 0.2), rgba(229, 199, 107, 0.1));
+  color: var(--gold);
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 50px;
+  border: 1px solid var(--gold-border);
 }
 
-.gallery-image-container {
-   width: 150px;
-   height: 150px;
-   border-radius: 8px;
-   overflow: hidden;
-   border: 1px solid var(--gold-border);
-   cursor: pointer;
-   transition: all 0.3s ease;
+.review-detail-likes {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1rem;
+  color: var(--heart-color);
 }
 
-.gallery-image-container:hover {
-   transform: scale(1.05);
-   border-color: var(--gold);
-   box-shadow: 0 0 15px rgba(229, 199, 107, 0.4);
+.review-detail-content {
+  flex: 1;
+  margin-bottom: 20px;
 }
 
-.gallery-image {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
+.review-detail-content p {
+  color: var(--white);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-/* Visor de imágenes */
-.image-viewer {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background-color: rgba(0, 0, 0, 0.9);
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   z-index: 9999;
+.review-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
 }
 
-.viewer-image-container {
-   position: relative;
-   max-width: 90%;
-   max-height: 90%;
+.action-card-btn {
+  flex: 1;
+  min-width: 0;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--gold-border);
+  border-radius: 50px;
+  color: var(--white);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.viewer-image {
-   max-width: 100%;
-   max-height: 90vh;
-   object-fit: contain;
-   border: 1px solid var(--gold-border);
-   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+.action-card-btn:hover {
+  background: linear-gradient(to right, var(--gold), var(--gold-dark));
+  color: var(--black);
+  transform: translateY(-3px);
 }
 
-.viewer-nav-btn {
-   position: absolute;
-   top: 50%;
-   transform: translateY(-50%);
-   width: 50px;
-   height: 50px;
-   border-radius: 50%;
-   background: rgba(0, 0, 0, 0.5);
-   border: 1px solid var(--gold-border);
-   color: var(--gold);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 1.5rem;
-   cursor: pointer;
-   transition: all 0.3s ease;
+.like-detail-btn {
+  color: var(--heart-color);
+  border-color: rgba(255, 77, 109, 0.4);
 }
 
-.viewer-nav-btn:hover {
-   background: var(--gold);
-   color: var(--black);
+.like-detail-btn:hover {
+  background: var(--heart-color);
+  color: white;
+  border-color: var(--heart-color);
 }
 
-.prev-btn {
-   left: 20px;
+.like-detail-btn.liked {
+  background: var(--heart-color);
+  color: white;
+  border-color: var(--heart-color);
 }
 
-.next-btn {
-   right: 20px;
+.like-detail-btn.heart-animation {
+  animation: heart-pulse 1s ease;
 }
 
-.viewer-close-btn {
-   position: absolute;
-   top: 20px;
-   right: 20px;
-   width: 40px;
-   height: 40px;
-   border-radius: 50%;
-   background: rgba(0, 0, 0, 0.5);
-   border: 1px solid var(--gold-border);
-   color: var(--gold);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 1.2rem;
-   cursor: pointer;
-   transition: all 0.3s ease;
-}
-
-.viewer-close-btn:hover {
-   background: var(--gold);
-   color: var(--black);
-}
-
-.viewer-counter {
-   position: absolute;
-   bottom: 20px;
-   left: 50%;
-   transform: translateX(-50%);
-   background: rgba(0, 0, 0, 0.5);
-   border: 1px solid var(--gold-border);
-   color: var(--white);
-   padding: 5px 15px;
-   border-radius: 20px;
-   font-size: 0.9rem;
-}
-
-/* Estilo para la reseña destacada */
-.highlighted-review {
-   border: 2px solid var(--gold);
-   box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
-   transform: scale(1.03);
-   position: relative;
-   z-index: 2;
-}
-
-.highlighted-review::before {
-   content: "Reseña seleccionada";
-   position: absolute;
-   top: -10px;
-   left: 50%;
-   transform: translateX(-50%);
-   background-color: var(--gold);
-   color: var(--black);
-   padding: 2px 10px;
-   border-radius: 20px;
-   font-size: 0.8rem;
-   font-weight: 600;
-   z-index: 3;
+/* Modal de verificación de contrato */
+#verifyMessage .alert {
+  margin-bottom: 0;
 }
 
 /* Animaciones */
+@keyframes heart-pulse {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.2);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
 @keyframes fadeIn {
-   from {
-       opacity: 0;
-       transform: translateY(30px);
-   }
-   to {
-       opacity: 1;
-       transform: translateY(0);
-   }
+  from {
+      opacity: 0;
+      transform: translateY(30px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {
-   animation: fadeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-   opacity: 0;
+  animation: fadeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  opacity: 0;
+}
+
+/* Validación de formulario */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.rating-container.is-invalid .star-rating label {
+  color: rgba(220, 53, 69, 0.5);
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .review-modal .modal-dialog {
+      max-width: 95%;
+  }
+  
+  .review-detail-container {
+      flex-direction: column;
+  }
+  
+  .review-detail-info {
+      width: 100%;
+      max-width: 100%;
+  }
+  
+  .review-detail-media {
+      min-height: 40vh;
+  }
+  
+  .detail-image {
+      max-height: 40vh;
+  }
+}
+
 @media (max-width: 991.98px) {
-   .reviews-grid {
-       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-   }
-   
-   .filter-container {
-       flex-direction: column;
-       align-items: stretch;
-   }
-   
-   .filter-scroll-wrapper {
-       max-width: 100%;
-   }
-   
-   .filter-gradient-overlay {
-       right: 0;
-   }
-   
-   .sort-container {
-       width: 100%;
-   }
-   
-   .review-detail-meta {
-       flex-direction: column;
-       gap: 5px;
-   }
-   
-   .viewer-nav-btn {
-       width: 40px;
-       height: 40px;
-       font-size: 1.2rem;
-   }
-   
-   .prev-btn {
-       left: 10px;
-   }
-   
-   .next-btn {
-       right: 10px;
-   }
+  .reviews-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  
+  .filter-container {
+      flex-direction: column;
+      align-items: stretch;
+  }
+  
+  .filter-scroll-wrapper {
+      max-width: 100%;
+  }
+  
+  .filter-gradient-overlay {
+      right: 0;
+  }
+  
+  .sort-container {
+      width: 100%;
+  }
+  
+  .review-detail-media {
+      min-height: 35vh;
+  }
+  
+  .detail-image {
+      max-height: 35vh;
+  }
+  
+  .add-review-btn .btn-text {
+      display: none;
+  }
+  
+  .add-review-btn {
+      width: 50px;
+      padding: 0;
+  }
 }
 
 @media (max-width: 767.98px) {
-   .reviews-grid {
-       grid-template-columns: 1fr;
-   }
-   
-   .reviews-summary {
-       padding: 20px;
-   }
-   
-   .rating-value {
-       font-size: 2.5rem;
-   }
-   
-   .rating-stars {
-       font-size: 1.2rem;
-   }
-   
-   .filter-btn {
-       padding: 8px 12px;
-       font-size: 0.85rem;
-   }
-   
-   .review-detail-images {
-       justify-content: center;
-   }
-   
-   .gallery-image-container {
-       width: 120px;
-       height: 120px;
-   }
+  .reviews-grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .reviews-summary {
+      padding: 20px;
+  }
+  
+  .rating-value {
+      font-size: 2.5rem;
+  }
+  
+  .rating-stars {
+      font-size: 1.2rem;
+  }
+  
+  .filter-btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+  }
+  
+  .review-detail-header {
+      flex-wrap: wrap;
+  }
+  
+  .review-detail-likes {
+      position: static;
+      margin-top: 10px;
+  }
+  
+  .action-card-btn {
+      font-size: 0.8rem;
+      padding: 8px;
+  }
+  
+  .carousel-control {
+      width: 35px;
+      height: 35px;
+  }
 }
 
 @media (max-width: 575.98px) {
-   .filter-btn {
-       padding: 8px 10px;
-       font-size: 0.8rem;
-   }
-   
-   .filter-text {
-       display: none;
-   }
-   
-   .filter-icon {
-       margin: 0;
-   }
-   
-   .filter-btn {
-       width: 40px;
-       height: 40px;
-       justify-content: center;
-       padding: 0;
-   }
-   
-   .filter-btn.active {
-       width: auto;
-       padding: 0 12px;
-   }
-   
-   .filter-btn.active .filter-text {
-       display: inline;
-       margin-left: 8px;
-   }
-   
-   .add-review-btn {
-       width: 50px;
-       height: 50px;
-       font-size: 1.2rem;
-       bottom: 20px;
-       right: 20px;
-   }
-   
-   .review-detail-img {
-       max-width: 100px;
-   }
-   
-   .gallery-image-container {
-       width: 100px;
-       height: 100px;
-   }
-   
-   .viewer-nav-btn {
-       width: 35px;
-       height: 35px;
-       font-size: 1rem;
-   }
-   
-   .viewer-close-btn {
-       width: 35px;
-       height: 35px;
-       font-size: 1rem;
-   }
+  .filter-btn {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+  }
+  
+  .filter-text {
+      display: none;
+  }
+  
+  .filter-icon {
+      margin: 0;
+  }
+  
+  .filter-btn {
+      width: 40px;
+      height: 40px;
+      justify-content: center;
+      padding: 0;
+  }
+  
+  .filter-btn.active {
+      width: auto;
+      padding: 0 12px;
+  }
+  
+  .filter-btn.active .filter-text {
+      display: inline;
+      margin-left: 8px;
+  }
+  
+  .review-detail-actions {
+      flex-direction: column;
+  }
+  
+  .action-card-btn {
+      width: 100%;
+  }
+  
+  .review-detail-media {
+      min-height: 30vh;
+  }
+  
+  .detail-image {
+      max-height: 30vh;
+  }
+  
+  .carousel-thumbnail {
+      width: 50px;
+      height: 50px;
+  }
+  
+  .add-review-btn {
+      width: 45px;
+      height: 45px;
+      font-size: 1.2rem;
+      bottom: 15px;
+      right: 15px;
+  }
+}
+
+/* Indicador de reseñas sin imágenes */
+.no-images-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+  color: var(--white-dim);
+  font-size: 0.85rem;
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
+.no-images-indicator i {
+  color: var(--white-dim);
+  font-size: 1rem;
+}
+
+.review-card.no-images {
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
+}
+
+.no-images-detail {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  min-height: 300px;
+}
+
+.no-images-content {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+  border-radius: var(--border-radius);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.no-images-content i {
+  font-size: 3rem;
+  color: var(--white-dim);
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.no-images-content p {
+  color: var(--white-dim);
+  font-size: 1.1rem;
+}
+
+/* Animación para el botón de me gusta */
+.action-btn.like-btn.liked i,
+.like-detail-btn.liked i {
+  animation: heart-beat 0.6s ease-in-out;
+}
+
+@keyframes heart-beat {
+  0% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.3);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.2);
+  }
+  60% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.highlighted-review {
+  box-shadow: 0 0 20px var(--gold);
+  border-color: var(--gold);
+  animation: highlight-pulse 2s infinite;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 15px var(--gold);
+  }
+  50% {
+    box-shadow: 0 0 25px var(--gold);
+  }
+  100% {
+    box-shadow: 0 0 15px var(--gold);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .no-images-content {
+      padding: 20px;
+  }
+  
+  .no-images-content i {
+      font-size: 2.5rem;
+  }
+  
+  .no-images-content p {
+      font-size: 1rem;
+  }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar toasts\
+  const shareToast = new bootstrap.Toast(document.getElementById('shareToast'));
+  const likeToast = new bootstrap.Toast(document.getElementById('likeToast'));
+  const editToast = new bootstrap.Toast(document.getElementById('editToast'));
+  
+  // Variables para el modal de detalle
+  let currentReviewId = null;
+  let currentImageIndex = 0;
+  let reviewImages = [];
+  
+  // Inicializar localStorage para los likes si no existe
+  if (!localStorage.getItem('likedReviews')) {
+      localStorage.setItem('likedReviews', JSON.stringify([]));
+  }
+  
+  // Función para verificar si una reseña ya tiene like
+  function hasLiked(reviewId) {
+      const likedReviews = JSON.parse(localStorage.getItem('likedReviews')) || [];
+      return likedReviews.includes(reviewId.toString());
+  }
+  
+  // Función para marcar una reseña como "me gusta"
+  function markAsLiked(reviewId) {
+      const likedReviews = JSON.parse(localStorage.getItem('likedReviews')) || [];
+      if (!likedReviews.includes(reviewId.toString())) {
+          likedReviews.push(reviewId.toString());
+          localStorage.setItem('likedReviews', JSON.stringify(likedReviews));
+      }
+  }
+  
+  // Función para quitar el "me gusta" de una reseña
+  function removeLike(reviewId) {
+      const likedReviews = JSON.parse(localStorage.getItem('likedReviews')) || [];
+      const index = likedReviews.indexOf(reviewId.toString());
+      if (index > -1) {
+          likedReviews.splice(index, 1);
+          localStorage.setItem('likedReviews', JSON.stringify(likedReviews));
+      }
+  }
+  
+  // Actualizar la apariencia de los botones de like según el estado
+  function updateLikeButtons() {
+      const likeButtons = document.querySelectorAll('.like-btn');
+      likeButtons.forEach(button => {
+          const reviewId = button.getAttribute('data-review-id');
+          if (hasLiked(reviewId)) {
+              button.classList.add('liked');
+              button.querySelector('i').classList.remove('bi-heart');
+              button.querySelector('i').classList.add('bi-heart-fill');
+          } else {
+              button.classList.remove('liked');
+              button.querySelector('i').classList.remove('bi-heart-fill');
+              button.querySelector('i').classList.add('bi-heart');
+          }
+      });
+      
+      // También actualizar el botón de like en el modal de detalle si está abierto
+      if (currentReviewId) {
+          const detailLikeBtn = document.getElementById('likeDetailBtn');
+          if (hasLiked(currentReviewId)) {
+              detailLikeBtn.classList.add('liked');
+              detailLikeBtn.querySelector('i').classList.remove('bi-heart');
+              detailLikeBtn.querySelector('i').classList.add('bi-heart-fill');
+              detailLikeBtn.innerHTML = '<i class="bi bi-heart-fill"></i> Me gusta';
+          } else {
+              detailLikeBtn.classList.remove('liked');
+              detailLikeBtn.querySelector('i').classList.remove('bi-heart-fill');
+              detailLikeBtn.querySelector('i').classList.add('bi-heart');
+              detailLikeBtn.innerHTML = '<i class="bi bi-heart"></i> Me gusta';
+          }
+      }
+  }
+  
+  // Verificar si hay un ID de tipo de evento o reseña en la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const eventTypeId = urlParams.get('tipo');
+  const reviewId = urlParams.get('id');
+  const page = urlParams.get('page') || 1;
+  
+  // Establecer el filtro activo basado en la URL
+  if (eventTypeId) {
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      filterButtons.forEach(button => {
+          button.classList.remove('active');
+          if (button.getAttribute('data-filter') === eventTypeId) {
+              button.classList.add('active');
+          }
+      });
+      
+      // Filtrar las reseñas
+      filterReviews(eventTypeId);
+  } else {
+      // Si no hay filtro, activar "Todas"
+      document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+  }
+  
+  // Si hay un ID de reseña específico, resaltar esa reseña
+  if (reviewId) {
+      const reviewCards = document.querySelectorAll('.review-card');
+      let targetReview = null;
+      
+      reviewCards.forEach(card => {
+          if (card.getAttribute('data-review-id') === reviewId) {
+              targetReview = card;
+              card.classList.add('highlighted-review');
+          }
+      });
+      
+      // Desplazarse a la reseña seleccionada
+      if (targetReview) {
+          setTimeout(() => {
+              targetReview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              
+              // Opcional: Abrir automáticamente el modal con los detalles
+              setTimeout(() => {
+                  openReviewDetail(targetReview);
+              }, 800);
+          }, 500);
+      }
+  }
+   
+  // Animación para las barras de calificación
+  setTimeout(() => {
+      document.querySelectorAll('.bar').forEach(bar => {
+          const width = bar.style.width;
+          bar.style.width = '0';
+          setTimeout(() => {
+              bar.style.width = width;
+          }, 300);
+      });
+  }, 500);
+   
+  // Función para filtrar reseñas
+  function filterReviews(category) {
+      const reviewCards = document.querySelectorAll('.review-card');
+      let emptyState = document.getElementById('emptyReviewsState');
+      let visibleCount = 0;
+      
+      reviewCards.forEach(card => {
+          if (category === 'all' || card.getAttribute('data-category') === category) {
+              card.style.display = 'block';
+              setTimeout(() => {
+                  card.style.opacity = '1';
+                  card.style.transform = 'translateY(0)';
+              }, 50);
+              visibleCount++;
+          } else {
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(20px)';
+              setTimeout(() => {
+                  card.style.display = 'none';
+              }, 300);
+          }
+      });
+      
+      // Mostrar mensaje de estado vacío si no hay elementos
+      if (visibleCount === 0) {
+          emptyState.style.display = 'flex';
+      } else {
+          emptyState.style.display = 'none';
+      }
+      
+      // Actualizar URL para compartir
+      let shareUrl = new URL(window.location.href);
+      if (category !== 'all') {
+          shareUrl.searchParams.set('tipo', category);
+      } else {
+          shareUrl.searchParams.delete('tipo');
+      }
+      window.history.replaceState({}, '', shareUrl);
+  }
+   
+  // Funcionalidad para los filtros
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  
+  filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          // Remover clase active de todos los botones
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          // Agregar clase active al botón clickeado
+          this.classList.add('active');
+          
+          // Obtener el filtro seleccionado
+          const filter = this.getAttribute('data-filter');
+          
+          // Filtrar las reseñas
+          filterReviews(filter);
+      });
+  });
+
+  // Botón para resetear filtros
+  const resetFilterBtn = document.querySelector('.reset-filter-btn');
+  if (resetFilterBtn) {
+      resetFilterBtn.addEventListener('click', () => {
+          const allCategoryBtn = document.querySelector('.filter-btn[data-filter="all"]');
+          allCategoryBtn.click();
+      });
+  }
+
+  // Funcionalidad para ordenar
+  const sortSelect = document.getElementById('sortReviews');
+  sortSelect.addEventListener('change', function() {
+      const sortValue = this.value;
+      const reviewsContainer = document.querySelector('.reviews-grid');
+      const reviewCards = document.querySelectorAll('.review-card');
+      const reviewsArray = Array.from(reviewCards);
+      
+      // Ordenar las reseñas según la opción seleccionada
+      reviewsArray.sort((a, b) => {
+          if (sortValue === 'recent') {
+              return b.getAttribute('data-date') - a.getAttribute('data-date');
+          } else if (sortValue === 'highest') {
+              return b.getAttribute('data-rating') - a.getAttribute('data-rating');
+          } else if (sortValue === 'lowest') {
+              return a.getAttribute('data-rating') - b.getAttribute('data-rating');
+          } else if (sortValue === 'popular') {
+              const likesA = parseInt(a.querySelector('.likes-count').textContent) || 0;
+              const likesB = parseInt(b.querySelector('.likes-count').textContent) || 0;
+              return likesB - likesA;
+          }
+      });
+      
+      // Reordenar las reseñas en el DOM
+      reviewsArray.forEach(review => {
+          reviewsContainer.appendChild(review);
+      });
+  });
+  
+  // Inicializar estado de los botones de like
+  updateLikeButtons();
+  
+  // Abrir modal de detalle al hacer clic en una reseña o en el botón de detalles
+  const reviewCards = document.querySelectorAll('.review-card');
+  reviewCards.forEach(card => {
+      card.addEventListener('click', function(e) {
+          // No abrir el modal si se hizo clic en un botón de acción
+          if (e.target.closest('.action-btn')) {
+              return;
+          }
+          openReviewDetail(this);
+      });
+      
+      // Botón de ver detalles
+      const viewDetailsBtn = card.querySelector('.view-details-btn');
+      if (viewDetailsBtn) {
+          viewDetailsBtn.addEventListener('click', (e) => {
+              e.stopPropagation(); // Evitar que se propague al card
+              openReviewDetail(card);
+          });
+      }
+      
+      // Botón de editar
+      const editBtn = card.querySelector('.edit-btn');
+      if (editBtn) {
+          editBtn.addEventListener('click', function(e) {
+              e.stopPropagation(); // Evitar que se propague al card
+              const reviewId = this.getAttribute('data-review-id');
+              openVerifyContractModal(reviewId);
+          });
+      }
+      
+      // Botón de me gusta
+      const likeBtn = card.querySelector('.like-btn');
+      if (likeBtn) {
+          likeBtn.addEventListener('click', function(e) {
+              e.stopPropagation(); // Evitar que se propague al card
+              const reviewId = this.getAttribute('data-review-id');
+              toggleLikeReview(reviewId, this);
+          });
+      }
+      
+      // Botón de compartir
+      const shareBtn = card.querySelector('.share-btn');
+      if (shareBtn) {
+          shareBtn.addEventListener('click', function(e) {
+              e.stopPropagation(); // Evitar que se propague al card
+              const reviewId = this.getAttribute('data-review-id');
+              shareReview(reviewId);
+          });
+      }
+  });
+  
+  // Función para abrir el modal de detalle de reseña
+  function openReviewDetail(reviewCard) {
+      const reviewId = reviewCard.getAttribute('data-review-id');
+      currentReviewId = reviewId;
+      
+      const modal = document.getElementById('reviewDetailModal');
+      const modalTitle = document.getElementById('reviewModalTitle');
+      const modalName = document.getElementById('reviewDetailName');
+      const modalDate = document.getElementById('reviewDetailDate');
+      const modalEvent = document.getElementById('reviewDetailEvent');
+      const modalRating = document.getElementById('reviewDetailRating');
+      const modalText = document.getElementById('reviewDetailText');
+      const modalVerifiedBadge = document.getElementById('reviewVerifiedBadge');
+      const modalLikes = document.getElementById('reviewDetailLikes');
+      const modalMedia = document.getElementById('reviewDetailMedia');
+      const carouselInner = document.getElementById('carouselInner');
+      const carouselThumbnails = document.getElementById('carouselThumbnails');
+      const imageCounter = document.getElementById('reviewImageCounter');
+      const editDetailBtn = document.getElementById('editDetailBtn');
+      const likeDetailBtn = document.getElementById('likeDetailBtn');
+      const shareDetailBtn = document.getElementById('shareDetailBtn');
+      
+      // Obtener datos de la reseña
+      const name = reviewCard.querySelector('.reviewer-name').textContent;
+      const date = reviewCard.querySelector('.review-date').textContent;
+      const event = reviewCard.querySelector('.event-type').textContent;
+      const rating = reviewCard.getAttribute('data-rating');
+      const text = reviewCard.querySelector('.review-text').textContent;
+      const categoryId = reviewCard.getAttribute('data-category');
+      const verified = reviewCard.querySelector('.verified-badge') !== null;
+      const likes = parseInt(reviewCard.querySelector('.likes-count').textContent) || 0;
+      
+      // Actualizar el modal
+      modalTitle.textContent = `Reseña de ${name}`;
+      modalName.textContent = name;
+      modalDate.textContent = date;
+      modalEvent.textContent = event;
+      modalText.textContent = text;
+      modalLikes.querySelector('.detail-likes-count').textContent = likes;
+      
+      // Mostrar/ocultar badge de verificado
+      if (verified) {
+          modalVerifiedBadge.style.display = 'inline-flex';
+      } else {
+          modalVerifiedBadge.style.display = 'none';
+      }
+      
+      // Actualizar estrellas
+      modalRating.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+          const star = document.createElement('i');
+          star.className = i < rating ? 'bi bi-star-fill' : 'bi bi-star';
+          modalRating.appendChild(star);
+      }
+      
+      // Obtener imágenes de la reseña
+      reviewImages = [];
+      const imageElements = reviewCard.querySelectorAll('.review-image');
+      
+      if (imageElements.length > 0) {
+          document.getElementById('reviewHasImages').style.display = 'block';
+          document.getElementById('reviewNoImages').style.display = 'none';
+          modalMedia.style.display = 'block';
+          imageElements.forEach(img => {
+              reviewImages.push(img.src);
+          });
+          
+          // Mostrar la primera imagen y configurar el carrusel
+          currentImageIndex = 0;
+          updateDetailCarousel();
+          
+          // Actualizar contador de imágenes
+          if (reviewImages.length > 1) {
+              imageCounter.style.display = 'block';
+              document.querySelector('.current-image').textContent = '1';
+              document.querySelector('.total-images').textContent = reviewImages.length;
+          } else {
+              imageCounter.style.display = 'none';
+          }
+      } else {
+          document.getElementById('reviewHasImages').style.display = 'none';
+          document.getElementById('reviewNoImages').style.display = 'flex';
+          modalMedia.style.display = 'block';
+          imageCounter.style.display = 'none';
+      }
+      
+      // Configurar botones de acción
+      editDetailBtn.setAttribute('data-review-id', reviewId);
+      likeDetailBtn.setAttribute('data-review-id', reviewId);
+      likeDetailBtn.setAttribute('data-likes', likes);
+      shareDetailBtn.setAttribute('data-review-id', reviewId);
+      
+      // Actualizar estado del botón de like
+      if (hasLiked(reviewId)) {
+          likeDetailBtn.classList.add('liked');
+          likeDetailBtn.querySelector('i').classList.remove('bi-heart');
+          likeDetailBtn.querySelector('i').classList.add('bi-heart-fill');
+          likeDetailBtn.innerHTML = '<i class="bi bi-heart-fill"></i> Me gusta';
+      } else {
+          likeDetailBtn.classList.remove('liked');
+          likeDetailBtn.querySelector('i').classList.remove('bi-heart-fill');
+          likeDetailBtn.querySelector('i').classList.add('bi-heart');
+          likeDetailBtn.innerHTML = '<i class="bi bi-heart"></i> Me gusta';
+      }
+      
+      // Abrir el modal
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+  }
+  
+  // Función para actualizar el carrusel de imágenes
+  function updateDetailCarousel() {
+      const carouselInner = document.getElementById('carouselInner');
+      const carouselThumbnails = document.getElementById('carouselThumbnails');
+      
+      // Limpiar carrusel y miniaturas
+      carouselInner.innerHTML = '';
+      carouselThumbnails.innerHTML = '';
+      
+      // Agregar imágenes al carrusel
+      reviewImages.forEach((src, index) => {
+          const slide = document.createElement('div');
+          slide.className = `carousel-item ${index === currentImageIndex ? 'active' : ''}`;
+          slide.innerHTML = `<img src="${src}" alt="Imagen ${index + 1}" class="detail-image">`;
+          carouselInner.appendChild(slide);
+          
+          // Agregar miniatura
+          if (reviewImages.length > 1) {
+              const thumb = document.createElement('div');
+              thumb.className = `carousel-thumbnail ${index === currentImageIndex ? 'active' : ''}`;
+              thumb.innerHTML = `<img src="${src}" alt="Miniatura ${index + 1}">`;
+              thumb.addEventListener('click', () => {
+                  currentImageIndex = index;
+                  updateDetailCarousel();
+                  document.querySelector('.current-image').textContent = index + 1;
+              });
+              carouselThumbnails.appendChild(thumb);
+          }
+      });
+      
+      // Mostrar/ocultar controles según número de imágenes
+      const prevBtn = document.getElementById('carouselPrev');
+      const nextBtn = document.getElementById('carouselNext');
+      
+      if (reviewImages.length > 1) {
+          prevBtn.style.display = 'flex';
+          nextBtn.style.display = 'flex';
+          carouselThumbnails.style.display = 'flex';
+      } else {
+          prevBtn.style.display = 'none';
+          nextBtn.style.display = 'none';
+          carouselThumbnails.style.display = 'none';
+      }
+  }
+  
+  // Navegación de carrusel
+  document.getElementById('carouselPrev').addEventListener('click', function() {
+      if (reviewImages.length > 1) {
+          currentImageIndex = (currentImageIndex - 1 + reviewImages.length) % reviewImages.length;
+          updateDetailCarousel();
+          document.querySelector('.current-image').textContent = currentImageIndex + 1;
+      }
+  });
+  
+  document.getElementById('carouselNext').addEventListener('click', function() {
+      if (reviewImages.length > 1) {
+          currentImageIndex = (currentImageIndex + 1) % reviewImages.length;
+          updateDetailCarousel();
+          document.querySelector('.current-image').textContent = currentImageIndex + 1;
+      }
+  });
+  
+  // Función para compartir reseña
+  function shareReview(reviewId) {
+      const shareUrl = new URL(window.location.href);
+      shareUrl.searchParams.set('id', reviewId);
+      
+      if (navigator.share) {
+          navigator.share({
+              title: 'Reseña de Plato y Copa',
+              text: 'Mira esta reseña de Plato y Copa',
+              url: shareUrl.toString()
+          })
+          .catch(console.error);
+      } else {
+          // Fallback para navegadores que no soportan Web Share API
+          navigator.clipboard.writeText(shareUrl.toString())
+              .then(() => {
+                  shareToast.show();
+              })
+              .catch(err => {
+                  console.error('Error al copiar: ', err);
+              });
+      }
+  }
+  
+  // Botón de compartir en el modal de detalle
+  document.getElementById('shareDetailBtn').addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-review-id');
+      shareReview(reviewId);
+  });
+  
+  // Función para alternar el "me gusta" de una reseña
+  function toggleLikeReview(reviewId, button) {
+      // Verificar si ya le dio like
+      if (hasLiked(reviewId)) {
+          // Si ya le dio like, mostrar mensaje
+          document.getElementById('likeToastMessage').textContent = 'Ya has dado me gusta a esta reseña';
+          likeToast.show();
+          return;
+      }
+      
+      // Animación inmediata para mejor UX
+      button.classList.add('liked');
+      button.querySelector('i').classList.remove('bi-heart');
+      button.querySelector('i').classList.add('bi-heart-fill');
+      
+      // Actualizar contador visualmente
+      const currentLikes = parseInt(button.getAttribute('data-likes')) || 0;
+      const newLikes = currentLikes + 1;
+      const likeCount = button.querySelector('.like-count');
+      likeCount.textContent = newLikes;
+      button.setAttribute('data-likes', newLikes);
+      
+      // Actualizar contador en la tarjeta
+      const reviewCard = button.closest('.review-card');
+      reviewCard.querySelector('.likes-count').textContent = newLikes;
+      
+      // Actualizar contador en el modal de detalle si está abierto
+      if (currentReviewId === reviewId) {
+          document.querySelector('#reviewDetailLikes .detail-likes-count').textContent = newLikes;
+          document.getElementById('likeDetailBtn').setAttribute('data-likes', newLikes);
+          document.getElementById('likeDetailBtn').classList.add('liked');
+          document.getElementById('likeDetailBtn').querySelector('i').classList.remove('bi-heart');
+          document.getElementById('likeDetailBtn').querySelector('i').classList.add('bi-heart-fill');
+          document.getElementById('likeDetailBtn').innerHTML = '<i class="bi bi-heart-fill"></i> Me gusta';
+      }
+      
+      // Hacer petición AJAX para dar me gusta
+      fetch('/api/reviews/like', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reviewId })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Marcar como "me gusta" en localStorage
+              markAsLiked(reviewId);
+              
+              // Mostrar toast de confirmación
+              document.getElementById('likeToastMessage').textContent = '¡Gracias por tu me gusta!';
+              likeToast.show();
+              
+              // Animación de corazón
+              button.classList.add('heart-animation');
+              setTimeout(() => {
+                  button.classList.remove('heart-animation');
+              }, 1000);
+          } else {
+              // Si hay error, revertir cambios visuales
+              button.classList.remove('liked');
+              button.querySelector('i').classList.remove('bi-heart-fill');
+              button.querySelector('i').classList.add('bi-heart');
+              likeCount.textContent = currentLikes;
+              button.setAttribute('data-likes', currentLikes);
+              reviewCard.querySelector('.likes-count').textContent = currentLikes;
+              
+              console.error('Error al dar me gusta:', data.message);
+          }
+      })
+      .catch(error => {
+          // Si hay error, revertir cambios visuales
+          button.classList.remove('liked');
+          button.querySelector('i').classList.remove('bi-heart-fill');
+          button.querySelector('i').classList.add('bi-heart');
+          likeCount.textContent = currentLikes;
+          button.setAttribute('data-likes', currentLikes);
+          reviewCard.querySelector('.likes-count').textContent = currentLikes;
+          
+          console.error('Error al dar me gusta:', error);
+      });
+  }
+  
+  // Botón de me gusta en el modal de detalle
+  document.getElementById('likeDetailBtn').addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-review-id');
+      
+      // Si ya le dio like, mostrar mensaje
+      if (hasLiked(reviewId)) {
+          document.getElementById('likeToastMessage').textContent = 'Ya has dado me gusta a esta reseña';
+          likeToast.show();
+          return;
+      }
+      
+      // Animación inmediata para mejor UX
+      this.classList.add('liked');
+      this.querySelector('i').classList.remove('bi-heart');
+      this.querySelector('i').classList.add('bi-heart-fill');
+      this.innerHTML = '<i class="bi bi-heart-fill"></i> Me gusta';
+      
+      // Actualizar contador visualmente
+      const currentLikes = parseInt(this.getAttribute('data-likes')) || 0;
+      const newLikes = currentLikes + 1;
+      document.querySelector('#reviewDetailLikes .detail-likes-count').textContent = newLikes;
+      this.setAttribute('data-likes', newLikes);
+      
+      // Actualizar contador en la tarjeta correspondiente
+      const reviewCard = document.querySelector(`.review-card[data-review-id="${reviewId}"]`);
+      if (reviewCard) {
+          reviewCard.querySelector('.likes-count').textContent = newLikes;
+          const cardLikeBtn = reviewCard.querySelector('.like-btn');
+          cardLikeBtn.setAttribute('data-likes', newLikes);
+          cardLikeBtn.querySelector('.like-count').textContent = newLikes;
+          cardLikeBtn.classList.add('liked');
+          cardLikeBtn.querySelector('i').classList.remove('bi-heart');
+          cardLikeBtn.querySelector('i').classList.add('bi-heart-fill');
+      }
+      
+      // Hacer petición AJAX para dar me gusta
+      fetch('/api/reviews/like', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reviewId })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Marcar como "me gusta" en localStorage
+              markAsLiked(reviewId);
+              
+              // Mostrar toast de confirmación
+              document.getElementById('likeToastMessage').textContent = '¡Gracias por tu me gusta!';
+              likeToast.show();
+              
+              // Animación de corazón
+              this.classList.add('heart-animation');
+              setTimeout(() => {
+                  this.classList.remove('heart-animation');
+              }, 1000);
+          } else {
+              // Si hay error, revertir cambios visuales
+              this.classList.remove('liked');
+              this.querySelector('i').classList.remove('bi-heart-fill');
+              this.querySelector('i').classList.add('bi-heart');
+              this.innerHTML = '<i class="bi bi-heart"></i> Me gusta';
+              document.querySelector('#reviewDetailLikes .detail-likes-count').textContent = currentLikes;
+              this.setAttribute('data-likes', currentLikes);
+              
+              if (reviewCard) {
+                  reviewCard.querySelector('.likes-count').textContent = currentLikes;
+                  const cardLikeBtn = reviewCard.querySelector('.like-btn');
+                  cardLikeBtn.setAttribute('data-likes', currentLikes);
+                  cardLikeBtn.querySelector('.like-count').textContent = currentLikes;
+                  cardLikeBtn.classList.remove('liked');
+                  cardLikeBtn.querySelector('i').classList.remove('bi-heart-fill');
+                  cardLikeBtn.querySelector('i').classList.add('bi-heart');
+              }
+              
+              console.error('Error al dar me gusta:', data.message);
+          }
+      })
+      .catch(error => {
+          // Si hay error, revertir cambios visuales
+          this.classList.remove('liked');
+          this.querySelector('i').classList.remove('bi-heart-fill');
+          this.querySelector('i').classList.add('bi-heart');
+          this.innerHTML = '<i class="bi bi-heart"></i> Me gusta';
+          document.querySelector('#reviewDetailLikes .detail-likes-count').textContent = currentLikes;
+          this.setAttribute('data-likes', currentLikes);
+          
+          if (reviewCard) {
+              reviewCard.querySelector('.likes-count').textContent = currentLikes;
+              const cardLikeBtn = reviewCard.querySelector('.like-btn');
+              cardLikeBtn.setAttribute('data-likes', currentLikes);
+              cardLikeBtn.querySelector('.like-count').textContent = currentLikes;
+              cardLikeBtn.classList.remove('liked');
+              cardLikeBtn.querySelector('i').classList.remove('bi-heart-fill');
+              cardLikeBtn.querySelector('i').classList.add('bi-heart');
+          }
+          
+          console.error('Error al dar me gusta:', error);
+      });
+  });
+  
+  // Función para abrir el modal de verificación de contrato
+  function openVerifyContractModal(reviewId) {
+      const modal = document.getElementById('verifyContractModal');
+      document.getElementById('edit-review-id').value = reviewId;
+      document.getElementById('verifyMessage').style.display = 'none';
+      document.getElementById('verifyMessage').innerHTML = '';
+      document.getElementById('contractNumber').value = '';
+      
+      // Cerrar el modal de detalle si está abierto
+      if (currentReviewId === reviewId) {
+          bootstrap.Modal.getInstance(document.getElementById('reviewDetailModal')).hide();
+      }
+      
+      // Pequeño retraso para asegurar una transición suave
+      setTimeout(() => {
+          const bsModal = new bootstrap.Modal(modal);
+          bsModal.show();
+      }, 300);
+  }
+  
+  // Botón de editar en el modal de detalle
+  document.getElementById('editDetailBtn').addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-review-id');
+      // Cerrar el modal de detalle primero
+      bootstrap.Modal.getInstance(document.getElementById('reviewDetailModal')).hide();
+      // Luego abrir el modal de verificación de contrato
+      setTimeout(() => {
+          openVerifyContractModal(reviewId);
+      }, 300); // Pequeño retraso para asegurar una transición suave
+  });
+  
+  // Verificar contrato antes de editar
+  document.getElementById('verifyContractBtn').addEventListener('click', function() {
+      const reviewId = document.getElementById('edit-review-id').value;
+      const contractNumber = document.getElementById('contractNumber').value;
+      const verifyMessage = document.getElementById('verifyMessage');
+      
+      if (!contractNumber.trim()) {
+          verifyMessage.innerHTML = '<div class="alert alert-warning">Por favor, ingrese su número de contrato.</div>';
+          verifyMessage.style.display = 'block';
+          return;
+      }
+      
+      // Hacer petición AJAX para verificar contrato
+      fetch('/api/reviews/verify-contract', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reviewId, contractNumber })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Cerrar modal de verificación
+              bootstrap.Modal.getInstance(document.getElementById('verifyContractModal')).hide();
+              
+              // Abrir modal de edición y cargar datos
+              loadReviewForEdit(reviewId, contractNumber);
+          } else {
+              verifyMessage.innerHTML = `<div class="alert alert-danger">${data.message || 'Número de contrato incorrecto. Por favor, verifique e intente nuevamente.'}</div>`;
+              verifyMessage.style.display = 'block';
+          }
+      })
+      .catch(error => {
+          console.error('Error al verificar contrato:', error);
+          verifyMessage.innerHTML = '<div class="alert alert-danger">Error al verificar el contrato. Por favor, intente nuevamente.</div>';
+          verifyMessage.style.display = 'block';
+      });
+  });
+  
+  // Cargar datos de la reseña para editar
+function loadReviewForEdit(reviewId, contractNumber) {
+
+
+
+  // Hacer petición AJAX para obtener datos de la reseña
+  fetch(`/api/reviews/${reviewId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      return response.json();
+    })
+    .then(review => {
+      // Rellenar formulario con datos de la reseña
+      document.getElementById('editReviewId').value = reviewId;
+      document.getElementById('editContractNumber').value = contractNumber;
+      document.getElementById('editReviewerName').value = review.nombre_cliente;
+      document.getElementById('editEventType').value = review.tipo_evento_id;
+      document.getElementById('editReviewText').value = review.comentario;
+      
+      // Seleccionar calificación
+      document.querySelector(`input[name="editCalificacion"][value="${review.calificacion}"]`).checked = true;
+      
+      // Mostrar imágenes existentes
+      const existingImagesGrid = document.getElementById('existingImagesGrid');
+      existingImagesGrid.innerHTML = '';
+      
+      // Convertir review.imagenes a un arreglo si es una cadena JSON
+      let imagenes = [];
+      if (review.imagenes) {
+        try {
+          imagenes = JSON.parse(review.imagenes);
+        } catch (error) {
+          console.error("Error al parsear las imágenes:", error);
+        }
+      }
+      
+      if (imagenes && imagenes.length > 0) {
+        document.getElementById('existingImagesContainer').style.display = 'block';
+        imagenes.forEach((src, index) => {
+          const imgWrapper = document.createElement('div');
+          imgWrapper.className = 'existing-image-item';
+          imgWrapper.innerHTML = `
+            <img src="${src}" alt="Imagen ${index + 1}" class="existing-image">
+            <button type="button" class="remove-existing-image" data-index="${index}">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          `;
+          existingImagesGrid.appendChild(imgWrapper);
+        });
+      } else {
+        document.getElementById('existingImagesContainer').style.display = 'none';
+      }
+      
+      // Limpiar previsualización de nuevas imágenes
+      document.getElementById('editImagePreviewContainer').innerHTML = '';
+      
+      // Abrir modal de edición
+      const editModal = new bootstrap.Modal(document.getElementById('editReviewModal'));
+      editModal.show();
+    })
+    .catch(error => {
+      console.error('Error al cargar datos de la reseña:', error);
+      alert('Error al cargar los datos de la reseña. Por favor, intente nuevamente.');
+    });
+}
+
+  
+  // Actualizar reseña
+  document.getElementById('updateReviewBtn').addEventListener('click', function() {
+    const form = document.getElementById('editReviewForm');
+
+    // Validar formulario
+    if (!validateForm(form)) {
+        return;
+    }
+
+    // Crear FormData del formulario
+    const formData = new FormData(form);
+    
+    // Hacer petición AJAX para actualizar reseña
+    fetch('/api/reviews/edit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editReviewModal')).hide();
+            updateReviewCard(data);
+            editToast.show();
+
+            if (currentReviewId === data.id) {
+                const updatedCard = document.querySelector(`.review-card[data-review-id="${data.id}"]`);
+                openReviewDetail(updatedCard);
+            }
+        } else {
+            alert(data.message || 'Error al actualizar la reseña. Por favor, intente nuevamente.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al actualizar reseña:', error);
+        alert('Error al actualizar la reseña. Por favor, intente nuevamente.');
+    });
+  });
+  
+  // Función para actualizar la tarjeta de reseña en la página
+  function updateReviewCard(reviewData) {
+      const reviewCard = document.querySelector(`.review-card[data-review-id="${reviewData.id}"]`);
+      
+      if (reviewCard) {
+          // Actualizar nombre
+          reviewCard.querySelector('.reviewer-name').textContent = reviewData.nombre_cliente;
+          
+          // Actualizar calificación
+          const ratingStars = reviewCard.querySelector('.review-rating');
+          ratingStars.innerHTML = '';
+          for (let i = 0; i < 5; i++) {
+              const star = document.createElement('i');
+              star.className = i < reviewData.calificacion ? 'bi bi-star-fill' : 'bi bi-star';
+              ratingStars.appendChild(star);
+          }
+          
+          // Actualizar texto
+          reviewCard.querySelector('.review-text').textContent = reviewData.comentario;
+          
+          // Actualizar imágenes
+          const reviewFooter = reviewCard.querySelector('.review-footer');
+          if (reviewData.imagenes && reviewData.imagenes.length > 0) {
+              // Si tiene imágenes, actualizar o crear el contenedor de imágenes
+              let imagesContainer = reviewCard.querySelector('.review-images');
+              if (!imagesContainer) {
+                  // Si no existe el contenedor de imágenes, crearlo
+                  reviewFooter.innerHTML = `
+                      <span class="event-type">
+                          <i class="bi ${reviewData.eventIcon || 'bi-calendar-event'}"></i> ${reviewData.tipo_evento || 'Evento'}
+                      </span>
+                      <div class="review-images"></div>
+                  `;
+                  imagesContainer = reviewCard.querySelector('.review-images');
+              } else {
+                  // Si existe, limpiar el contenedor
+                  imagesContainer.innerHTML = '';
+              }
+              
+              // Agregar las imágenes
+              reviewData.imagenes.forEach(src => {
+                  const img = document.createElement('img');
+                  img.src = src;
+                  img.alt = 'Foto del evento';
+                  img.className = 'review-image';
+                  imagesContainer.appendChild(img);
+              });
+              
+              // Quitar clase no-images si la tenía
+              reviewCard.classList.remove('no-images');
+          } else {
+              // Si no tiene imágenes, mostrar indicador de "solo texto"
+              reviewFooter.innerHTML = `
+                  <span class="event-type">
+                      <i class="bi ${reviewData.eventIcon || 'bi-calendar-event'}"></i> ${reviewData.tipo_evento || 'Evento'}
+                  </span>
+                  <div class="no-images-indicator">
+                      <i class="bi bi-card-text"></i>
+                      <span>Solo texto</span>
+                  </div>
+              `;
+              
+              // Agregar clase no-images
+              reviewCard.classList.add('no-images');
+          }
+          
+          // Actualizar atributos
+          reviewCard.setAttribute('data-rating', reviewData.calificacion);
+          reviewCard.setAttribute('data-category', reviewData.tipo_evento_id);
+      }
+  }
+  
+  // Validación de formulario
+  function validateForm(form) {
+      let isValid = true;
+      
+      // Validar campos requeridos
+      form.querySelectorAll('[required]').forEach(field => {
+          if (!field.value.trim()) {
+              field.classList.add('is-invalid');
+              isValid = false;
+          } else {
+              field.classList.remove('is-invalid');
+          }
+      });
+      
+      // Validar calificación
+      const ratingInputs = form.querySelectorAll('input[name="editCalificacion"]');
+      let ratingSelected = false;
+      ratingInputs.forEach(input => {
+          if (input.checked) {
+              ratingSelected = true;
+          }
+      });
+      
+      if (!ratingSelected) {
+          isValid = false;
+          form.querySelector('.rating-container').classList.add('is-invalid');
+      } else {
+          form.querySelector('.rating-container').classList.remove('is-invalid');
+      }
+      
+      return isValid;
+  }
+  
+  // Previsualización de imágenes para el formulario de agregar reseña
+  const imageInput = document.getElementById('reviewImages');
+  const previewContainer = document.getElementById('imagePreviewContainer');
+  
+  if (imageInput) {
+      imageInput.addEventListener('change', function() {
+          previewContainer.innerHTML = '';
+          
+          if (this.files) {
+              const fileCount = Math.min(this.files.length, 5); // Limitar a 5 imágenes
+              
+              for (let i = 0; i < fileCount; i++) {
+                  const file = this.files[i];
+                  if (file.type.startsWith('image/')) {
+                      const reader = new FileReader();
+                      
+                      reader.onload = (e) => {
+                          const previewWrapper = document.createElement('div');
+                          previewWrapper.className = 'image-preview-item';
+                          
+                          const img = document.createElement('img');
+                          img.src = e.target.result;
+                          img.className = 'preview-image';
+                          
+                          const removeBtn = document.createElement('button');
+                          removeBtn.className = 'remove-image-btn';
+                          removeBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+                          removeBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              previewWrapper.remove();
+                          });
+                          
+                          previewWrapper.appendChild(img);
+                          previewWrapper.appendChild(removeBtn);
+                          previewContainer.appendChild(previewWrapper);
+                      };
+                      
+                      reader.readAsDataURL(file);
+                  }
+              }
+          }
+      });
+  }
+  
+  // Previsualización de imágenes para el formulario de editar reseña
+  const editImageInput = document.getElementById('editReviewImages');
+  const editPreviewContainer = document.getElementById('editImagePreviewContainer');
+  
+  if (editImageInput) {
+      editImageInput.addEventListener('change', function() {
+          editPreviewContainer.innerHTML = '';
+          
+          if (this.files) {
+              const fileCount = Math.min(this.files.length, 5); // Limitar a 5 imágenes
+              
+              for (let i = 0; i < fileCount; i++) {
+                  const file = this.files[i];
+                  if (file.type.startsWith('image/')) {
+                      const reader = new FileReader();
+                      
+                      reader.onload = (e) => {
+                          const previewWrapper = document.createElement('div');
+                          previewWrapper.className = 'image-preview-item';
+                          
+                          const img = document.createElement('img');
+                          img.src = e.target.result;
+                          img.className = 'preview-image';
+                          
+                          const removeBtn = document.createElement('button');
+                          removeBtn.className = 'remove-image-btn';
+                          removeBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+                          removeBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              previewWrapper.remove();
+                          });
+                          
+                          previewWrapper.appendChild(img);
+                          previewWrapper.appendChild(removeBtn);
+                          editPreviewContainer.appendChild(previewWrapper);
+                      };
+                      
+                      reader.readAsDataURL(file);
+                  }
+              }
+          }
+      });
+  }
+  
+  // Detectar scroll horizontal en filtros
+  const filterContainer = document.querySelector('.filter-scroll-wrapper');
+  if (filterContainer) {
+      filterContainer.addEventListener('scroll', function() {
+          const isScrollEnd = this.scrollLeft + this.offsetWidth >= this.scrollWidth - 20;
+          const gradientOverlay = document.querySelector('.filter-gradient-overlay');
+          
+          if (isScrollEnd) {
+              gradientOverlay.style.opacity = '0';
+          } else {
+              gradientOverlay.style.opacity = '1';
+          }
+      });
+  }
+  
+  // Animación para las tarjetas de reseñas
+  const reviewItems = document.querySelectorAll('.review-card');
+  const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+          if (entry.isIntersecting) {
+              entry.target.classList.add('animate-fadeIn');
+              observer.unobserve(entry.target);
+          }
+      });
+  }, { threshold: 0.1 });
+
+  reviewItems.forEach((item, index) => {
+      item.style.animationDelay = `${index * 0.1}s`;
+      observer.observe(item);
+  });
+});
+</script>
 

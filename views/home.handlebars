@@ -1,587 +1,936 @@
 <!-- Hero Section -->
 <section class="hero">
-   <div class="hero-content animate-fadeIn">
-       <h1 class="gradient-text">Plato y Copa</h1>
-       <p class="hero-tagline">Servicio de meseros</p>
-       <p class="hero-description">Elevamos la experiencia de tus eventos con un servicio excepcional y atención al detalle impecable</p>
-       
-       <div class="container feature-container">
-           <div class="row">
-               <div class="col-md-4 mb-4 animate-fadeIn delay-1">
-                   <a href="#servicios" class="text-decoration-none">
-                       <div class="feature-box text-center">
-                           <div class="feature-icon">
-                               <i class="bi bi-award"></i>
-                           </div>
-                           <h5>Servicio premium</h5>
-                           <p>Atención personalizada de primer nivel</p>
-                       </div>
-                   </a>
-               </div>
-               <div class="col-md-4 mb-4 animate-fadeIn delay-2">
-                   <a href="#servicios" class="text-decoration-none">
-                       <div class="feature-box text-center">
-                           <div class="feature-icon">
-                               <i class="bi bi-stars"></i>
-                           </div>
-                           <h5>Experiencia</h5>
-                           <p>Años de excelencia en eventos</p>
-                       </div>
-                   </a>
-               </div>
-               <div class="col-md-4 mb-4 animate-fadeIn delay-3">
-                   <a href="#servicios" class="text-decoration-none">
-                       <div class="feature-box text-center">
-                           <div class="feature-icon">
-                               <i class="bi bi-clock-history"></i>
-                           </div>
-                           <h5>Disponibilidad</h5>
-                           <p>24/7 para tus necesidades</p>
-                       </div>
-                   </a>
-               </div>
-           </div>
-       </div>
+  <div class="hero-content animate-fadeIn">
+      <h1 class="gradient-text">Plato y Copa</h1>
+      <p class="hero-tagline">Servicio de meseros</p>
+      <p class="hero-description">Elevamos la experiencia de tus eventos con un servicio excepcional y atención al detalle impecable</p>
+      
+      <div class="container feature-container">
+          <div class="row">
+              <div class="col-md-4 mb-4 animate-fadeIn delay-1">
+                  <a href="#servicios" class="text-decoration-none">
+                      <div class="feature-box text-center">
+                          <div class="feature-icon">
+                              <i class="bi bi-award"></i>
+                          </div>
+                          <h5>Servicio premium</h5>
+                          <p>Atención personalizada de primer nivel</p>
+                      </div>
+                  </a>
+              </div>
+              <div class="col-md-4 mb-4 animate-fadeIn delay-2">
+                  <a href="#servicios" class="text-decoration-none">
+                      <div class="feature-box text-center">
+                          <div class="feature-icon">
+                              <i class="bi bi-stars"></i>
+                          </div>
+                          <h5>Experiencia</h5>
+                          <p>Años de excelencia en eventos</p>
+                      </div>
+                  </a>
+              </div>
+              <div class="col-md-4 mb-4 animate-fadeIn delay-3">
+                  <a href="#servicios" class="text-decoration-none">
+                      <div class="feature-box text-center">
+                          <div class="feature-icon">
+                              <i class="bi bi-clock-history"></i>
+                          </div>
+                          <h5>Disponibilidad</h5>
+                          <p>24/7 para tus necesidades</p>
+                      </div>
+                  </a>
+              </div>
+          </div>
+      </div>
 
-       <div class="hero-buttons">
-            <a href="https://wa.me/5212223780903" class="btn btn-gold btn-lg">
-                <i class="bi bi-calendar-check me-2"></i>Reservar
-            </a>
-            <a href="#cotizacion" class="btn btn-outline-gold btn-lg">
-                <i class="bi bi-calculator me-2"></i>Cotizar
-            </a>
-        </div>
-        <a href="#servicios" class="scroll-down-btn">
-            <i class="bi bi-chevron-down"></i>
-        </a>
-   </div>
+      <div class="hero-buttons">
+           <a href="https://wa.me/5212223780903" class="btn btn-gold btn-lg me-2 mb-2 mb-md-0">
+               <i class="bi bi-calendar-check me-2"></i>Reservar
+           </a>
+           <a href="#cotizacion" class="btn btn-outline-gold btn-lg mb-2 mb-md-0">
+               <i class="bi bi-calculator me-2"></i>Cotizar
+           </a>
+       </div>
+       <a href="#servicios" class="scroll-down-btn">
+           <i class="bi bi-chevron-down"></i>
+       </a>
+  </div>
 </section>
+
 <!-- Servicios -->
 <section id="servicios" class="services-section">
-   <div class="container">
-       <h2 class="section-title gradient-text">Nuestros Servicios</h2>
-       <p class="section-subtitle">Experiencia y profesionalismo en cada momento de tu evento</p>
-       
-       <div class="row">
-           {{#each services}}
-               <div class="col-lg-3 col-md-6 mb-4">
-                   <a href="/servicios/{{id}}" class="text-decoration-none service-link">
-                       <div class="service-card interactive-card">
-                           <div class="service-icon">
-                               <i class="bi {{icono}}"></i>
-                           </div>
-                           <h5 class="service-title">{{titulo}}</h5>
-                           <p class="service-description">{{descripcion_corta}}</p>
-                       </div>
-                   </a>
-               </div>
-           {{/each}}
-       </div>
-   </div>
+  <div class="container">
+      <h2 class="section-title gradient-text">Nuestros Servicios</h2>
+      <p class="section-subtitle">Experiencia y profesionalismo en cada momento de tu evento</p>
+      
+      <div class="row">
+          {{#each services}}
+              <div class="col-lg-3 col-md-6 mb-4">
+                  <a href="/servicios/{{id}}" class="text-decoration-none service-link">
+                      <div class="service-card interactive-card">
+                          <div class="service-icon">
+                              <i class="bi {{icono}}"></i>
+                          </div>
+                          <h5 class="service-title">{{titulo}}</h5>
+                          <p class="service-description">{{descripcion_corta}}</p>
+                      </div>
+                  </a>
+              </div>
+          {{/each}}
+      </div>
+  </div>
 </section>
 
 <!-- Reseñas -->
 <section class="reviews-section m-0" id="resenas">
-   <div class="container">
-       <h2 class="section-title gradient-text">Lo que dicen nuestros clientes</h2>
-       <p class="section-subtitle">Testimonios de clientes satisfechos</p>
-       
-       <div class="row">
-           {{#each reviews}}
-           <div class="col-lg-4 col-md-6 mb-4">
-               <a href="/resenas/{{id}}" class="text-decoration-none review-link">
-                   <div class="review-card interactive-card">
-                       <div class="review-header">
-                           <div class="reviewer-info">
-                               <h5>{{nombre_cliente}}</h5>
-                               <span>{{fecha}}</span>
-                           </div>
-                           <div class="verified-badge">
-                               {{#if verificado}}Verificado{{/if}}
-                           </div>
-                       </div>
-                       <div class="review-stars">
-                           {{#times calificacion}}★{{/times}}{{#times (subtract 5 calificacion)}}☆{{/times}}
-                       </div>
-                       <p class="review-text">
-                           "{{comentario}}"
-                       </p>
-                       <div class="review-footer">
-                           <span class="event-type">{{tipo_evento}}</span>
-                       </div>
-                   </div>
-               </a>
-           </div>
-           {{/each}}
-       </div>
+  <div class="container">
+      <h2 class="section-title gradient-text">Lo que dicen nuestros clientes</h2>
+      <p class="section-subtitle">Testimonios de clientes satisfechos</p>
+      
+      <div class="row">
+          {{#each reviews}}
+          <div class="col-lg-4 col-md-6 mb-4">
+              <a href="/resenas/{{id}}" class="text-decoration-none review-link">
+                  <div class="review-card interactive-card">
+                      <div class="review-header">
+                          <div class="reviewer-info">
+                              <h5>{{nombre_cliente}}</h5>
+                              <span>{{fecha}}</span>
+                          </div>
+                          <div class="verified-badge">
+                              {{#if verificado}}Verificado{{/if}}
+                          </div>
+                      </div>
+                      <div class="review-stars">
+                          {{#times calificacion}}★{{/times}}{{#times (subtract 5 calificacion)}}☆{{/times}}
+                      </div>
+                      <p class="review-text">
+                          "{{comentario}}"
+                      </p>
+                      <div class="review-footer">
+                          <span class="event-type">{{tipo_evento}}</span>
+                      </div>
+                  </div>
+              </a>
+          </div>
+          {{/each}}
+      </div>
 
-       <!-- Botón para ver más reseñas -->
-       <div class="text-center mt-4">
-           <a href="/resenas" class="btn btn-gold">Ver más reseñas</a>
-       </div>
-   </div>
+      <!-- Botón para ver más reseñas -->
+      <div class="text-center mt-4">
+          <a href="/resenas" class="btn btn-gold">Ver más reseñas</a>
+      </div>
+  </div>
 </section>
 
 <!-- Estadísticas -->
 <section class="stats-section">
-   <div class="container">
-       <div class="row">
-           {{#each stats}}
-           <div class="col-md-3 col-6 mb-4 mb-md-0">
-               <div class="stat-card">
-                   <div class="stat-icon">
-                       <i class="bi {{icono}}"></i>
-                   </div>
-                   <div class="stat-number">{{numero}}</div>
-                   <div class="stat-label">{{label}}</div>
-               </div>
-           </div>
-           {{/each}}
-       </div>
-   </div>
+  <div class="container">
+      <div class="row">
+          {{#each stats}}
+          <div class="col-md-3 col-6 mb-4 mb-md-0">
+              <div class="stat-card">
+                  <div class="stat-icon">
+                      <i class="bi {{icono}}"></i>
+                  </div>
+                  <div class="stat-number">{{numero}}</div>
+                  <div class="stat-label">{{label}}</div>
+              </div>
+          </div>
+          {{/each}}
+      </div>
+  </div>
 </section>
+
 <!-- Galería -->
 <section class="gallery-section" id="galeria">
-   <div class="container">
-       <h2 class="section-title gradient-text">Nuestra Galería</h2>
-       <p class="section-subtitle">Explora nuestros momentos más destacados</p>
-       
-       <div id="galleryCarousel" class="carousel slide gallery-carousel" data-bs-ride="carousel">
-           <div class="carousel-inner">
-               {{#each galleryImages}}
-               <div class="carousel-item {{#if @first}}active{{/if}}">
-                   <a href="/galeria/{{id}}" class="gallery-carousel-link">
-                       <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
-                       <div class="carousel-caption d-none d-md-block">
-                           <h5>{{titulo}}</h5>
-                           <p>{{descripcion}}</p>
-                       </div>
-                   </a>
-               </div>
-               {{/each}}
-           </div>
-           <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-               <span class="visually-hidden">Anterior</span>
-           </button>
-           <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-               <span class="carousel-control-next-icon" aria-hidden="true"></span>
-               <span class="visually-hidden">Siguiente</span>
-           </button>
-       </div>
-       
-       <div class="text-center mt-4">
-           <a href="/galeria" class="btn btn-outline-gold">Ver galería completa</a>
-       </div>
-   </div>
+  <div class="container">
+      <h2 class="section-title gradient-text">Nuestra Galería</h2>
+      <p class="section-subtitle">Explora nuestros momentos más destacados</p>
+      
+      <div id="galleryCarousel" class="carousel slide gallery-carousel" data-bs-ride="carousel">
+          <div class="carousel-inner">
+              {{#each galleryImages}}
+              <div class="carousel-item {{#if @first}}active{{/if}}">
+                  <a href="/galeria/{{id}}" class="gallery-carousel-link">
+                      <img src="{{url_imagen}}" class="d-block w-100" alt="{{titulo}}">
+                      <div class="carousel-caption d-none d-md-block">
+                          <h5>{{titulo}}</h5>
+                          <p>{{descripcion}}</p>
+                      </div>
+                  </a>
+              </div>
+              {{/each}}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Siguiente</span>
+          </button>
+      </div>
+      
+      <div class="text-center mt-4">
+          <a href="/galeria" class="btn btn-outline-gold">Ver galería completa</a>
+      </div>
+  </div>
 </section>
 
 <!-- Sección de Cotización -->
 <section id="cotizacion" class="reservation-section">
+ <div class="container">
+     <h2 class="section-title gradient-text">Cotiza tu Servicio</h2>
+     <p class="section-subtitle">Calcula el costo de tu evento y reserva al instante</p>
+     
+     <div class="row justify-content-center">
+         <div class="col-lg-10">
+             <div class="reservation-form">
+                 <form id="quotationForm" action="/quote-form" method="POST" novalidate>
+                     <!-- Información Personal -->
+                     <div class="row mb-4">
+                         <div class="col-12">
+                             <h5 class="text-gold mb-3">Información Personal
+                                <div class="personal-tooltip d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Ingresa tu información personal para identificar tu cotización">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </h5>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-person form-icon"></i>
+                                 <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Nombre completo" required data-validate="name">
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Ingresa tu nombre completo para identificar tu cotización">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-envelope form-icon"></i>
+                                 <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required data-validate="email">
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Te enviaremos la cotización a este correo">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-telephone form-icon"></i>
+                                 <input type="tel" class="form-control" id="phone" name="phone" placeholder="Teléfono" required data-validate="phone">
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Formato: 10 dígitos sin espacios">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group date-picker-container">
+                                 <i class="bi bi-calendar-event form-icon"></i>
+                                 <input type="date" class="form-control" id="eventDate" name="eventDate" placeholder="Fecha del evento" required min="{{currentDate}}">
+                                 <div class="form-tooltip date-tooltip" data-bs-toggle="tooltip" data-bs-placement="left" title="Selecciona la fecha de tu evento (mínimo 3 días de anticipación)">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                                 <span class="date-helper-text">Haz clic para seleccionar fecha</span>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- Detalles del Servicio -->
+                     <div class="row mb-4">
+                         <div class="col-12">
+                             <h5 class="text-gold mb-3">Detalles del Servicio
+                                <div class="details-tooltip d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Toda la información sobre tu evento para el servicio">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </h5>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-people form-icon"></i>
+                                 <input type="number" id="numWaiters" name="numWaiters" class="form-control" placeholder="Número de meseros" min="1" required data-validate="number">
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Recomendamos 1 mesero por cada 20-25 invitados">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-clock form-icon"></i>
+                                 <select id="serviceDuration" name="serviceDuration" class="form-control" required>
+                                     <option value="" selected disabled>Duración del servicio</option>
+                                     <option value="6">6 horas</option>
+                                     <option value="8">8 horas</option>
+                                 </select>
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Tiempo que los meseros estarán en tu evento">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-geo-alt form-icon"></i>
+                                 <select id="serviceLocation" name="serviceLocation" class="form-control" required>
+                                     <option value="" selected disabled>Ubicación del servicio</option>
+                                     <option value="local">Local - Puebla capital </option>
+                                     <option value="foraneo">Foráneo (precio adicional)</option>
+                                 </select>
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Local: Puebla capital. Foráneo: fuera de la ciudad (incluye cargo por transporte)">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <i class="bi bi-tags form-icon"></i>
+                                 <select id="eventType" name="eventType" class="form-control" required>
+                                     <option value="" selected disabled>Tipo de evento</option>
+                                     {{#each tiposEventos}}
+                                     <option value="{{id}}">{{nombre}}</option>
+                                     {{/each}}
+                                 </select>
+                                 <div class="form-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Selecciona el tipo de evento para personalizar nuestro servicio">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- Servicios Adicionales -->
+                     <div class="row mb-4">
+                         <div class="col-12">
+                             <h5 class="text-gold mb-3">
+                                 Servicios Adicionales
+                                 <div class="service-tooltip d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Servicios opcionales para complementar tu evento">
+                                     <i class="bi bi-question-circle"></i>
+                                 </div>
+                             </h5>
+                         </div>
+                         <div class="col-md-4">
+                             <div class="service-option">
+                                 <div class="form-check checkbox-container">
+                                     <input class="form-check-input" type="checkbox" id="lavalozas" name="lavalozas">
+                                     <label class="form-check-label" for="lavalozas">
+                                         Lavalozas
+                                         <span class="service-price">$300</span>
+                                     </label>
+                                     <div class="checkbox-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Personal dedicado a lavar la loza durante el evento">
+                                         <i class="bi bi-question-circle"></i>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-4">
+                             <div class="service-option">
+                                 <div class="form-check checkbox-container">
+                                     <input class="form-check-input" type="checkbox" id="cuidaCoches" name="cuidaCoches">
+                                     <label class="form-check-label" for="cuidaCoches">
+                                         Cuidacoches
+                                         <span class="service-price">$400</span>
+                                     </label>
+                                     <div class="checkbox-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Personal para vigilar y organizar los vehículos de tus invitados">
+                                         <i class="bi bi-question-circle"></i>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="col-md-4">
+                             <div class="service-option">
+                                 <div class="form-check checkbox-container">
+                                     <input class="form-check-input" type="checkbox" id="montajeDesmontaje" name="montajeDesmontaje">
+                                     <label class="form-check-label" for="montajeDesmontaje">
+                                         Montaje y desmontaje
+                                         <span class="service-price">$80 por mesero</span>
+                                     </label>
+                                     <div class="checkbox-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="Incluye preparación del lugar antes del evento y limpieza posterior">
+                                         <i class="bi bi-question-circle"></i>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Resultado de la Cotización -->
+                     <div class="quotation-result">
+                         <div class="row align-items-center">
+                             <div class="col-md-7">
+                                 <div class="quotation-details">
+                                     <h5 class="text-gold">Detalles de la cotización:</h5>
+                                     <ul id="quotationDetails" class="quotation-list">
+                                         <li>Servicio base: <span id="baseServiceCost">$0.00</span></li>
+                                         <li>Servicios adicionales: <span id="additionalServicesCost">$0.00</span></li>
+                                         <li>Cargo por ubicación: <span id="locationCharge">$0.00</span></li>
+                                     </ul>
+                                 </div>
+                             </div>
+                             <div class="col-md-5">
+                                 <div class="total-price">
+                                     <h4>Total estimado:</h4>
+                                     <div class="price-display" id="totalPrice">$0.00</div>
+                                     <p class="price-note">*Precio aproximado, puede variar según la distancia en servicios foráneos</p>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- Botones de Acción -->
+                     <div class="form-actions">
+                         <div class="row">
+                             <div class="col-12">
+                                 <a href="#" id="reserveButton" class="btn btn-gold w-100">
+                                     <i class="bi bi-whatsapp me-2"></i>Reservar ahora
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     </div>
+ </div>
+</section>
+
+<!-- Contacto -->
+<section class="contact-section" id="contacto">
   <div class="container">
-      <h2 class="section-title gradient-text">Cotiza tu Servicio</h2>
-      <p class="section-subtitle">Calcula el costo de tu evento y reserva al instante</p>
+      <h2 class="section-title gradient-text">Contáctanos</h2>
+      <p class="section-subtitle">Estamos aquí para hacer de tu evento una experiencia inolvidable</p>
       
-      <div class="row justify-content-center">
-          <div class="col-lg-10">
-              <div class="reservation-form">
-                  <form id="quotationForm" action="/quote-form" method="POST" novalidate>
-                      <!-- Información Personal -->
-                      <div class="row mb-4">
-                          <div class="col-12">
-                              <h5 class="text-gold mb-3">Información Personal</h5>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-person form-icon"></i>
-                                  <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Nombre completo" required data-validate="name">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-envelope form-icon"></i>
-                                  <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required data-validate="email">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-telephone form-icon"></i>
-                                  <input type="tel" class="form-control" id="phone" name="phone" placeholder="Teléfono" required data-validate="phone">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group date-picker-container">
-                                  <i class="bi bi-calendar-event form-icon"></i>
-                                  <label for="eventDate" class="date-label">
-                                    <input type="date" class="form-control" id="eventDate" name="eventDate" placeholder="Fecha del evento" required min="{{currentDate}}">
-                                    <span class="date-input-addon">
-                                        <i class="bi bi-calendar-check"></i>
-                                    </span>
-                                  </label>
-                                  <span class="date-helper-text">Haz clic para seleccionar fecha</span>
-                              </div>
-                          </div>
-                      </div>
-
-                      <!-- Detalles del Servicio -->
-                      <div class="row mb-4">
-                          <div class="col-12">
-                              <h5 class="text-gold mb-3">Detalles del Servicio</h5>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-people form-icon"></i>
-                                  <input type="number" id="numWaiters" name="numWaiters" class="form-control" placeholder="Número de meseros" min="1" required data-validate="number">
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-clock form-icon"></i>
-                                  <select id="serviceDuration" name="serviceDuration" class="form-control" required>
-                                      <option value="" selected disabled>Duración del servicio</option>
-                                      <option value="6">6 horas ($350 por mesero)</option>
-                                      <option value="8">8 horas ($450 por mesero)</option>
-                                  </select>
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-geo-alt form-icon"></i>
-                                  <select id="serviceLocation" name="serviceLocation" class="form-control" required>
-                                      <option value="" selected disabled>Ubicación del servicio</option>
-                                      <option value="local">Local</option>
-                                      <option value="foraneo">Foráneo (precio adicional)</option>
-                                  </select>
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <i class="bi bi-tags form-icon"></i>
-                                  <select id="eventType" name="eventType" class="form-control" required>
-                                      <option value="" selected disabled>Tipo de evento</option>
-                                      {{#each tiposEventos}}
-                                      <option value="{{id}}">{{nombre}}</option>
-                                      {{/each}}
-                                  </select>
-                              </div>
-                          </div>
-                      </div>
-
-                      <!-- Servicios Adicionales -->
-                      <div class="row mb-4">
-                          <div class="col-12">
-                              <h5 class="text-gold mb-3">Servicios Adicionales</h5>
-                          </div>
-                          <div class="col-md-4">
-                              <div class="service-option">
-                                  <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" id="lavalozas" name="lavalozas">
-                                      <label class="form-check-label" for="lavalozas">
-                                          Lavalozas
-                                          <span class="service-price">$300</span>
-                                      </label>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-4">
-                              <div class="service-option">
-                                  <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" id="cuidaCoches" name="cuidaCoches">
-                                      <label class="form-check-label" for="cuidaCoches">
-                                          Cuidacoches
-                                          <span class="service-price">$400</span>
-                                      </label>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-4">
-                              <div class="service-option">
-                                  <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" id="montajeDesmontaje" name="montajeDesmontaje">
-                                      <label class="form-check-label" for="montajeDesmontaje">
-                                          Montaje y desmontaje
-                                          <span class="service-price">$80 por mesero</span>
-                                      </label>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      
-                      <!-- Resultado de la Cotización -->
-                      <div class="quotation-result">
-                          <div class="row align-items-center">
-                              <div class="col-md-7">
-                                  <div class="quotation-details">
-                                      <h5 class="text-gold">Detalles de la cotización:</h5>
-                                      <ul id="quotationDetails" class="quotation-list">
-                                          <li>Servicio base: <span id="baseServiceCost">$0.00</span></li>
-                                          <li>Servicios adicionales: <span id="additionalServicesCost">$0.00</span></li>
-                                          <li>Cargo por ubicación: <span id="locationCharge">$0.00</span></li>
-                                      </ul>
-                                  </div>
-                              </div>
-                              <div class="col-md-5">
-                                  <div class="total-price">
-                                      <h4>Total estimado:</h4>
-                                      <div class="price-display" id="totalPrice">$0.00</div>
-                                      <p class="price-note">*Precio aproximado, puede variar según la distancia en servicios foráneos</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <!-- Botones de Acción -->
-                      <div class="form-actions">
-                          <div class="row">
-                              <div class="col-md-6 mb-3 mb-md-0 mx-auto">
-                                  <button type="button" id="saveQuotation" class="btn btn-gold w-100">
-                                      <i class="bi bi-save me-2"></i>Guardar cotización
-                                  </button>
-                              </div>
-                              <div class="col-md-6 mx-auto" id="reserveButtonContainer" style="display: none;">
-                                  <a href="#" id="reserveButton" class="btn btn-custom w-100">
-                                      <i class="bi bi-whatsapp me-2"></i>Reservar ahora
-                                  </a>
-                              </div>
-                          </div>
-                      </div>
-                  </form>
+      <div class="contact-container">
+          <!-- Información de Contacto -->
+          <div class="contact-info">
+              <h4>Información de contacto</h4>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-telephone-plus"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Teléfono</strong>
+                      <span>
+                          <a href="tel:+522223780903">+52 (222) 378-0903</a>
+                      </span>
+                  </div>
               </div>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Email</strong>
+                      <span>
+                          <a href="mailto:platoycopa.oficial@gmail.com">Platoycopa.oficial@gmail.com</a>
+                      </span>
+                  </div>
+              </div>
+              
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Dirección</strong>
+                      <span>
+                          <a href="https://www.google.com/maps/search/?api=1&query=Puebla,+Puebla" target="_blank" rel="noopener noreferrer">
+                              Puebla, Puebla
+                          </a>
+                      </span>
+                  </div>
+              </div>
+               <!-- Redes Sociales --> <!-- Redes Sociales -->
+              <div class="contact-item">
+                  <div class="contact-icon">
+                      <i class="bi bi-share"></i>
+                  </div>
+                  <div class="contact-text">
+                      <strong>Redes Sociales</strong>
+                      <span>
+                          <a href="https://www.facebook.com/share/15qpCyANjq/" target="_blank" rel="noopener noreferrer">Facebook</a> |
+                          <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0" target="_blank" rel="noopener noreferrer">Instagram</a> |
+                          <a href="https://wa.me/5212223780903" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                      </span>
+                  </div>
+              </div>
+          </div>          
+
+          <!-- Formulario -->
+          <div class="contact-form">
+              <h4>Envíanos un mensaje</h4>
+              <form action="/contact-form" method="POST" id="homeContactForm" novalidate>
+                  <div class="form-group">
+                      <i class="bi bi-person form-icon"></i>
+                      <input type="text" name="name" class="form-control" placeholder="Nombre completo" required data-validate="name">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-envelope form-icon"></i>
+                      <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required data-validate="email">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-telephone form-icon"></i>
+                      <input type="tel" name="phone" class="form-control" placeholder="Teléfono" required data-validate="phone">
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-tags form-icon"></i>
+                      <select name="eventType" class="form-control" required>
+                          <option value="" selected disabled>Tipo de Evento</option>
+                          {{#each tiposEventos}}
+                          <option value="{{id}}">{{nombre}}</option>
+                          {{/each}}
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <i class="bi bi-chat-text form-icon"></i>
+                      <textarea name="message" class="form-control" placeholder="Escribe tu mensaje..." required data-validate="message" rows="4"></textarea>
+                  </div>
+                  <button type="submit" class="btn-send btn btn-gold">Enviar Mensaje</button>
+              </form>
           </div>
       </div>
   </div>
 </section>
 
-<!-- Contacto -->
-<section class="contact-section" id="contacto">
-   <div class="container">
-       <h2 class="section-title gradient-text">Contáctanos</h2>
-       <p class="section-subtitle">Estamos aquí para hacer de tu evento una experiencia inolvidable</p>
-       
-       <div class="contact-container">
-           <!-- Información de Contacto -->
-           <div class="contact-info">
-               <h4>Información de contacto</h4>
-               
-               <div class="contact-item">
-                   <div class="contact-icon">
-                       <i class="bi bi-telephone-plus"></i>
-                   </div>
-                   <div class="contact-text">
-                       <strong>Teléfono</strong>
-                       <span>
-                           <a href="tel:+522223780903">+52 (222) 378-0903</a>
-                       </span>
-                   </div>
-               </div>
-               
-               <div class="contact-item">
-                   <div class="contact-icon">
-                       <i class="bi bi-envelope"></i>
-                   </div>
-                   <div class="contact-text">
-                       <strong>Email</strong>
-                       <span>
-                           <a href="mailto:info@platoycopa.com">Platoycopa.oficial.com</a>
-                       </span>
-                   </div>
-               </div>
-               
-               <div class="contact-item">
-                   <div class="contact-icon">
-                       <i class="bi bi-geo-alt"></i>
-                   </div>
-                   <div class="contact-text">
-                       <strong>Dirección</strong>
-                       <span>
-                           <a href="https://www.google.com/maps/search/?api=1&query=Puebla,+Puebla" target="_blank" rel="noopener noreferrer">
-                               Puebla, Puebla
-                           </a>
-                       </span>
-                   </div>
-               </div>
-               
-               <!-- Redes Sociales -->
-               <div class="contact-item">
-                   <div class="contact-icon">
-                       <i class="bi bi-share"></i>
-                   </div>
-                   <div class="contact-text">
-                       <strong>Redes Sociales</strong>
-                       <span>
-                           <a href="https://www.facebook.com/share/15qpCyANjq/" target="_blank" rel="noopener noreferrer">Facebook</a> |
-                           <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0" target="_blank" rel="noopener noreferrer">Instagram</a> |
-                           <a href="https://wa.me/5212223780903" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                       </span>
-                   </div>
-               </div>
-           </div>
+{{> back-to-top}}
 
-           <!-- Formulario -->
-           <div class="contact-form">
-               <h4>Envíanos un mensaje</h4>
-               <form action="/contact-form" method="POST" id="homeContactForm" novalidate>
-                   <div class="form-group">
-                       <i class="bi bi-person form-icon"></i>
-                       <input type="text" name="name" class="form-control" placeholder="Nombre completo" required data-validate="name">
-                   </div>
-                   <div class="form-group">
-                       <i class="bi bi-envelope form-icon"></i>
-                       <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required data-validate="email">
-                   </div>
-                   <div class="form-group">
-                       <i class="bi bi-telephone form-icon"></i>
-                       <input type="tel" name="phone" class="form-control" placeholder="Teléfono" required data-validate="phone">
-                   </div>
-                   <div class="form-group">
-                       <i class="bi bi-tags form-icon"></i>
-                       <select name="eventType" class="form-control" required>
-                           <option value="" selected disabled>Tipo de Evento</option>
-                           {{#each tiposEventos}}
-                           <option value="{{id}}">{{nombre}}</option>
-                           {{/each}}
-                       </select>
-                   </div>
-                   <div class="form-group">
-                       <i class="bi bi-chat-text form-icon"></i>
-                       <textarea name="message" class="form-control" placeholder="Escribe tu mensaje..." required data-validate="message" rows="4"></textarea>
-                   </div>
-                   <button type="submit" class="btn-send">Enviar Mensaje</button>
-               </form>
-           </div>
-       </div>
-   </div>
-</section>
 
 <script src="/js/form-validation.js"></script>
 <script src="/js/quotation-calculator.js"></script>
 
+<!-- Inicialización de tooltips -->
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+       // Inicializar todos los tooltips
+       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+       var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+           return new bootstrap.Tooltip(tooltipTriggerEl, {
+               boundary: document.body // Esto ayuda con problemas de posicionamiento
+           });
+       });
+   });
+</script>
+
 {{#if success}}
 <div class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
- ¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {{/if}}
 
 {{#if error}}
 <div class="alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
- Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {{/if}}
-
-
-
-
 
 <style>
 /* Estilos para el botón de scroll hacia abajo */
 .scroll-down-btn {
-    position: absolute;
-    bottom: -75px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.3);
-    border: 2px solid var(--gold);
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    transition: all 0.3s ease;
-    animation: bounce 2s infinite;
-    z-index: 2;
+   position: absolute;
+   bottom: -75px;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 50px;
+   height: 50px;
+   border-radius: 50%;
+   background: rgba(0, 0, 0, 0.3);
+   border: 2px solid var(--gold);
+   color: var(--gold);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 1.5rem;
+   transition: all 0.3s ease;
+   animation: bounce 2s infinite;
+   z-index: 2;
 }
 
 .scroll-down-btn:hover {
-    background: var(--gold);
-    color: var(--black);
-    transform: translateX(-50%) scale(1.1);
+   background: var(--gold);
+   color: var(--black);
+   transform: translateX(-50%) scale(1.1);
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateX(-50%) translateY(0);
-    }
-    40% {
-        transform: translateX(-50%) translateY(-10px);
-    }
-    60% {
-        transform: translateX(-50%) translateY(-5px);
-    }
+   0%, 20%, 50%, 80%, 100% {
+       transform: translateX(-50%) translateY(0);
+   }
+   40% {
+       transform: translateX(-50%) translateY(-10px);
+   }
+   60% {
+       transform: translateX(-50%) translateY(-5px);
+   }
 }
 
 /* Estilos para elementos resaltados */
 .highlighted {
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
-    border: 2px solid var(--gold);
+   position: relative;
+   z-index: 2;
+   box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+   border: 2px solid var(--gold);
 }
 
 .highlighted::before {
-    content: "Seleccionado";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: var(--black);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    z-index: 3;
+   content: "Seleccionado";
+   position: absolute;
+   top: -10px;
+   left: 50%;
+   transform: translateX(-50%);
+   background: var(--gold);
+   color: var(--black);
+   padding: 3px 10px;
+   border-radius: 20px;
+   font-size: 0.8rem;
+   font-weight: 600;
+   z-index: 3;
 }
 
 .highlighted-service {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
-    border: 2px solid var(--gold);
-    border-radius: var(--border-radius);
-    position: relative;
-    z-index: 2;
+   transform: scale(1.05);
+   box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+   border: 2px solid var(--gold);
+   border-radius: var(--border-radius);
+   position: relative;
+   z-index: 2;
 }
 
 .highlighted-service::before {
-    content: "Servicio seleccionado";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: var(--black);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    z-index: 3;
+   content: "Servicio seleccionado";
+   position: absolute;
+   top: -10px;
+   left: 50%;
+   transform: translateX(-50%);
+   background: var(--gold);
+   color: var(--black);
+   padding: 3px 10px;
+   border-radius: 20px;
+   font-size: 0.8rem;
+   font-weight: 600;
+   z-index: 3;
 }
 
 .highlighted-review {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
-    border: 2px solid var(--gold);
-    border-radius: var(--border-radius);
-    position: relative;
-    z-index: 2;
+   transform: scale(1.05);
+   box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
+   border: 2px solid var(--gold);
+   border-radius: var(--border-radius);
+   position: relative;
+   z-index: 2;
 }
 
 .highlighted-review::before {
-    content: "Reseña seleccionada";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: var(--black);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    z-index: 3;
+   content: "Reseña seleccionada";
+   position: absolute;
+   top: -10px;
+   left: 50%;
+   transform: translateX(-50%);
+   background: var(--gold);
+   color: var(--black);
+   padding: 3px 10px;
+   border-radius: 20px;
+   font-size: 0.8rem;
+   font-weight: 600;
+   z-index: 3;
+}
+
+/* Estilos para tooltips en formularios */
+.form-tooltip {
+   position: absolute;
+   right: 10px;
+   top: 50%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   cursor: pointer;
+   z-index: 5;
+}
+
+.service-tooltip {
+   position: absolute;
+   right: 10px;
+   top: 50%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   cursor: pointer;
+   z-index: 5;
+}
+
+.personal-tooltip {
+   position: absolute;
+   right: 10px;
+   top: 7%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   cursor: pointer;
+   z-index: 5;
+}
+.details-tooltip {
+   position: absolute;
+   right: 10px;
+   top: 28%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   cursor: pointer;
+   z-index: 5;
+}
+
+/* Ajuste específico para el tooltip de fecha */
+.date-tooltip {
+   right: 10px; /* Alejado del borde para no interferir con el icono de calendario */
+   z-index: 10; /* Mayor z-index para asegurar que esté por encima de otros elementos */
+}
+
+/* Ajuste para tooltips en checkboxes */
+.checkbox-container {
+   position: relative;
+   padding-right: 30px; /* Espacio para el tooltip */
+}
+
+.checkbox-tooltip {
+   position: absolute;
+   right: 0;
+   top: 50%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   cursor: pointer;
+   z-index: 5;
+}
+
+.form-group {
+   position: relative;
+   margin-bottom: 1.5rem;
+}
+
+/* Estilos para mensajes de error de validación */
+.error-message {
+   color: #dc3545;
+   font-size: 0.85rem;
+   margin-top: 0.25rem;
+   display: block;
+}
+
+.is-invalid {
+   border-color: #dc3545;
+}
+
+/* Estilo para campos válidos */
+.is-valid {
+   border-color: #28a745;
+   background-color: rgba(255, 255, 255, 0.95) !important;
+   color: #000 !important;
+}
+
+/* Mejoras para responsive */
+@media (max-width: 768px) {
+   .hero-buttons {
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 10px;
+   }
+   
+   .hero-buttons .btn {
+       width: 100%;
+       margin-bottom: 10px;
+   }
+   
+   /* Ajustes para el formulario de cotización */
+   .form-tooltip {
+       top: 12px;
+       right: 10px;
+       transform: none;
+   }
+   .personal-tooltip{
+        top: 2%;
+        right: 10px;
+        transform: none;
+   }
+   .details-tooltip{
+       top: 25%;
+       right: 10px;
+       transform: none;
+   }
+
+   .service-tooltip {
+       top: 48%;
+       right: 10px;
+       transform: none;
+   }
+   
+   /* Ajuste para el tooltip de fecha */
+   .date-tooltip {
+       right: 10px
+   }
+   
+   /* Ajuste para espacio en la parte inferior en móvil */
+   body {
+       padding-bottom: 60px;
+   }
+}
+
+/* Mejoras para los tooltips en formularios */
+.tooltip {
+   font-size: 0.85rem;
+   opacity: 1;
+}
+
+.tooltip .tooltip-inner {
+   background-color: var(--black);
+   border: 1px solid var(--gold);
+   color: #fff;
+   padding: 8px 12px;
+   max-width: 250px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip .tooltip-arrow::before {
+   border-top-color: var(--gold);
+}
+
+/* Mejoras para los botones del hero en móvil */
+@media (max-width: 576px) {
+   .hero-buttons {
+       width: 100%;
+       padding: 0 15px;
+   }
+   
+   .hero-buttons .btn {
+       margin-bottom: 15px;
+   }
+}
+
+/* Estilos para el formulario de cotización */
+.date-picker-container {
+   position: relative;
+}
+
+.date-helper-text {
+   position: absolute;
+   bottom: -20px;
+   left: 10px;
+   font-size: 0.8rem;
+   color: #6c757d;
+}
+
+/* Estilos para el botón de reserva */
+#reserveButtonContainer {
+   opacity: 0;
+   height: 0;
+   overflow: hidden;
+   transition: all 0.5s ease;
+}
+
+#reserveButtonContainer.show {
+   opacity: 1;
+   height: auto;
+   overflow: visible;
+}
+
+/* Ajustes para el campo de fecha */
+input[type="date"] {
+   position: relative;
+   padding-right: 40px; /* Espacio para el icono de calendario */
+}
+
+/* Personalización del calendario nativo */
+input[type="date"]::-webkit-calendar-picker-indicator {
+   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 24 24"><path fill="%23E5C76B" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+   cursor: pointer;
+   opacity: 0.8;
+   position: absolute;
+   right: 10px;
+   top: 50%;
+   transform: translateY(-50%);
+   width: 20px;
+   height: 20px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+   opacity: 1;
+}
+
+/* Ajuste para evitar que los iconos de error interfieran con los tooltips */
+.form-group.date-picker-container .date-tooltip {
+   z-index: 10;
+}
+
+.form-group.date-picker-container.is-invalid .date-tooltip {
+   right: 60px; /* Mover más a la izquierda cuando hay error */
+}
+
+/* Estilo para mensajes de error en el campo de fecha */
+.form-group.date-picker-container .error-message {
+   position: relative;
+   z-index: 1;
+}
+
+/* Personalización del calendario para que coincida con el diseño del sitio */
+::-webkit-datetime-edit {
+   padding: 0;
+}
+
+::-webkit-datetime-edit-fields-wrapper {
+   background: transparent;
+}
+
+::-webkit-datetime-edit-text {
+   color: var(--gold);
+   padding: 0 0.2em;
+}
+
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-year-field {
+   color: inherit;
+}
+
+::-webkit-inner-spin-button {
+   display: none;
+}
+
+::-webkit-calendar-picker-indicator {
+   filter: invert(0.8) sepia(1) saturate(5) hue-rotate(20deg);
+}
+
+/* Asegurar que los campos válidos tengan fondo blanco */
+input.is-valid, 
+select.is-valid, 
+textarea.is-valid {
+   background-color: #fff !important;
+}
+
+/* Ajustes para evitar interferencias entre iconos */
+.form-group .form-icon {
+   position: absolute;
+   left: 10px;
+   top: 50%;
+   transform: translateY(-50%);
+   color: var(--gold);
+   z-index: 2;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+   padding-left: 35px; /* Espacio para el icono descriptivo */
+}
+
+/* Ajuste para evitar que los iconos de error interfieran con los tooltips */
+.form-group.is-invalid .form-tooltip {
+   right: 30px; /* Mover a la izquierda cuando hay error */
+}
+
+/* Ajuste para el campo de fecha cuando tiene error */
+.form-group.date-picker-container.is-invalid input[type="date"] {
+   padding-right: 60px; /* Espacio para el icono de calendario y el de error */
+}
+
+/* Asegurar que los campos válidos tengan fondo blanco y texto negro */
+input.is-valid, 
+select.is-valid, 
+textarea.is-valid {
+   background-color: #fff !important;
+   color: #000 !important;
 }
 </style>
+

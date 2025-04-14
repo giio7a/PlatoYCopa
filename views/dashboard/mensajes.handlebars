@@ -1,0 +1,2646 @@
+<div class="mensajes-container">
+  <!-- Panel lateral de mensajes -->
+  <div class="mensajes-sidebar" id="mensajesSidebar">
+    <div class="sidebar-header">
+      <h2><i class="bi bi-envelope-fill"></i> Mensajes</h2>
+      <div class="sidebar-actions">
+        <button class="btn-refresh" id="refreshMessages" title="Actualizar mensajes">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <button class="btn-mobile-back d-md-none" id="btnMobileBack" title="Volver al mensaje">
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="search-filter-container">
+      <div class="search-container">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchMessages" placeholder="Buscar mensajes..." class="search-input">
+      </div>
+      <div class="filter-container">
+        <select id="filterMessages" class="filter-select">
+          <option value="all">Todos</option>
+          <option value="unread">No leídos</option>
+          <option value="read">Leídos</option>
+          <option value="replied">Respondidos</option>
+          <option value="archived">Archivados</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="messages-counter">
+      <span class="counter-label">No leídos</span>
+      <span class="counter-badge" id="unreadCount">{{unreadCount}}</span>
+    </div>
+    
+    <div class="messages-list" id="mensajesList">
+      {{#if mensajes.length}}
+        {{#each mensajes}}
+          <div class="message-item {{#unless leido}}unread{{/unless}} {{#if archivado}}archived{{/if}}" 
+               data-id="{{id}}" 
+               data-read="{{#if leido}}true{{else}}false{{/if}}"
+               data-replied="{{#if respondido}}true{{else}}false{{/if}}"
+               data-archived="{{#if archivado}}true{{else}}false{{/if}}">
+            <div class="message-status">
+              {{#unless leido}}<span class="status-dot unread" title="No leído"></span>{{/unless}}
+              {{#if respondido}}<span class="status-icon replied" title="Respondido"><i class="bi bi-reply-fill"></i></span>{{/if}}
+              {{#if archivado}}<span class="status-icon archived" title="Archivado"><i class="bi bi-archive-fill"></i></span>{{/if}}
+            </div>
+            <div class="message-avatar">
+              <span>{{firstLetter nombre}}</span>
+            </div>
+            <div class="message-content">
+              <div class="message-sender">{{nombre}}</div>
+              <div class="message-subject">{{tipo_evento_nombre}}</div>
+              <div class="message-preview">{{truncate mensaje 60}}</div>
+              <div class="message-date">{{formatDate fecha_envio}}</div>
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="empty-messages">
+          <div class="empty-icon">
+            <i class="bi bi-envelope-open"></i>
+          </div>
+          <p>No hay mensajes disponibles</p>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <!-- Panel principal de contenido -->
+  <div class="mensajes-content" id="mensajesContent">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <i class="bi bi-envelope-paper"></i>
+      </div>
+      <h3>Selecciona un mensaje</h3>
+      <p>Elige un mensaje de la lista para ver su contenido</p>
+    </div>
+    
+    <div class="message-detail" id="messageDetail" style="display: none;">
+      <div class="message-toolbar">
+        <div class="toolbar-left">
+          <button id="btnBack" class="btn-icon btn-back d-none d-md-flex" title="Volver a la lista">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <button id="btnMobileList" class="btn-icon d-md-none" title="Ver lista de mensajes">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <button id="btnReply" class="btn-action" title="Responder">
+            <i class="bi bi-reply"></i>
+            <span class="d-none d-sm-inline">Responder</span>
+          </button>
+          <button id="btnForward" class="btn-action" title="Reenviar">
+            <i class="bi bi-forward"></i>
+            <span class="d-none d-sm-inline">Reenviar</span>
+          </button>
+          <div class="dropdown">
+            <button class="btn-icon" id="moreActions">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <div class="dropdown-menu" id="actionsMenu">
+              <button id="btnPrint" class="dropdown-item">
+                <i class="bi bi-printer"></i>
+                <span>Imprimir</span>
+              </button>
+              <button id="btnArchive" class="dropdown-item">
+                <i class="bi bi-archive"></i>
+                <span>Archivar</span>
+              </button>
+              <button id="btnDelete" class="dropdown-item text-danger">
+                <i class="bi bi-trash"></i>
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="message-content-area">
+        <div class="message-header">
+          <div class="message-title-row">
+            <h2 id="messageSubject"></h2>
+            <div class="message-badges">
+              <span class="message-badge" id="messageBadge"></span>
+            </div>
+          </div>
+          
+          <div class="message-meta">
+            <div class="sender-info">
+              <div class="message-avatar large">
+                <span id="senderInitial"></span>
+              </div>
+              <div class="sender-details">
+                <div class="sender-name" id="senderName"></div>
+                <div class="sender-email" id="senderEmail"></div>
+              </div>
+            </div>
+            <div class="message-info">
+              <div class="message-date" id="messageDate"></div>
+              <div class="message-event-type">
+                <span class="event-label">Tipo de evento:</span>
+                <span class="event-value" id="messageEventType"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="message-body-container">
+          <div class="message-body" id="messageBody"></div>
+        </div>
+        
+        <div class="reply-status" id="replyStatus" style="display: none;">
+          <div class="reply-status-icon">
+            <i class="bi bi-info-circle"></i>
+          </div>
+          <div class="reply-status-message">
+            <p>Este mensaje ya ha sido respondido por <span id="repliedBy"></span> el <span id="repliedDate"></span>.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal de respuesta -->
+      <div class="modal-backdrop" id="replyModalBackdrop"></div>
+      <div class="modal reply-modal" id="replyModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title"><i class="bi bi-reply"></i> Responder mensaje</h3>
+            <button class="modal-close" id="closeReplyModal">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="reply-info">
+              <div class="reply-field">
+                <span class="reply-label">Para:</span>
+                <span class="reply-value" id="replyTo"></span>
+              </div>
+              <div class="reply-field">
+                <span class="reply-label">Asunto:</span>
+                <span class="reply-value" id="replySubject"></span>
+              </div>
+            </div>
+            <div class="reply-editor">
+              <textarea id="replyMessage" class="reply-textarea" placeholder="Escribe tu respuesta aquí..."></textarea>
+            </div>
+            <div class="reply-options">
+              <label class="checkbox-container">
+                <input type="checkbox" id="includeSignature" checked>
+                <span class="checkmark"></span>
+                <span>Incluir firma</span>
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" id="btnCancelReply">Cancelar</button>
+            <button class="btn-primary" id="btnSendReply">
+              <i class="bi bi-send"></i>
+              <span>Enviar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de reenvío -->
+      <div class="modal-backdrop" id="forwardModalBackdrop"></div>
+      <div class="modal forward-modal" id="forwardModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title"><i class="bi bi-forward"></i> Reenviar mensaje</h3>
+            <button class="modal-close" id="closeForwardModal">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="forwardTo">Para:</label>
+              <input type="email" id="forwardTo" class="form-control" placeholder="Correo electrónico">
+            </div>
+            <div class="form-group">
+              <label for="forwardSubject">Asunto:</label>
+              <input type="text" id="forwardSubject" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="forwardMessage">Mensaje:</label>
+              <textarea id="forwardMessage" class="forward-textarea"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" id="btnCancelForward">Cancelar</button>
+            <button class="btn-primary" id="btnSendForward">
+              <i class="bi bi-send"></i>
+              <span>Reenviar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="modal" id="deleteModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmar eliminación</h3>
+      <button class="modal-close" id="closeDeleteModal">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon warning">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <p>¿Estás seguro de que deseas eliminar este mensaje? Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="cancelDelete">Cancelar</button>
+      <button class="btn-danger" id="confirmDelete">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Plantilla de impresión (oculta) -->
+<div id="printTemplate" style="display: none;">
+  <div class="print-header">
+    <img src="/img/Plato_y_Copa_logo.jpg" alt="Plato y Copa" class="print-logo">
+    <h2>Mensaje de Contacto - Plato y Copa</h2>
+  </div>
+  <div class="print-content">
+    <div class="print-meta">
+      <p><strong>De:</strong> <span id="printSender"></span> (<span id="printEmail"></span>)</p>
+      <p><strong>Fecha:</strong> <span id="printDate"></span></p>
+      <p><strong>Tipo de evento:</strong> <span id="printEventType"></span></p>
+    </div>
+    <div class="print-body">
+      <p id="printBody"></p>
+    </div>
+  </div>
+  <div class="print-footer">
+    <p>Plato y Copa - Servicio de meseros</p>
+    <p>Email: platoycopa.oficial@gmail.com | Tel: +52 (222) 378-0903</p>
+  </div>
+</div>
+
+<!-- Sistema de notificaciones -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<style>
+/* Variables y configuración global */
+:root {
+ 
+  
+  /* Colores de fondo */
+  --bg-dark: #121212;
+  --bg-darker: #0a0a0a;
+  --bg-lighter: #1e1e1e;
+  --bg-lightest: #2a2a2a;
+  
+  /* Colores de texto */
+  --text-light: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --text-subtle: rgba(255, 255, 255, 0.5);
+  
+  /* Colores de acento */
+  --accent-blue: #3a86ff;
+  --accent-green: #2ecc71;
+  --accent-red: #e74c3c;
+  
+  /* Bordes y sombras */
+  --border-color: rgba(229, 199, 107, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-strong: 0 12px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Radios y espaciado */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  /* Transiciones */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* Estilos base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Utilidades responsive */
+.d-none {
+  display: none !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+@media (min-width: 576px) {
+  .d-sm-inline {
+    display: inline !important;
+  }
+  .modal-content{
+    width: 90vw !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .d-md-none {
+    display: none !important;
+  }
+  
+  .d-md-flex {
+    display: flex !important;
+  }
+  .modal-content{
+    width: 90vw !important;
+  }
+}
+
+/* Contenedor principal */
+.mensajes-container {
+  display: flex;
+  height: calc(100vh - 120px);
+  background-color: var(--bg-darker);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Panel lateral de mensajes */
+.mensajes-sidebar {
+  width: 350px;
+  background-color: var(--bg-dark);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+  z-index: 10;
+}
+
+.sidebar-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-refresh, .btn-mobile-back {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+}
+
+.btn-refresh:hover, .btn-mobile-back:hover {
+  background-color: rgba(229, 199, 107, 0.15);
+  transform: rotate(180deg);
+}
+
+.search-filter-container {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-container i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 10px 10px 35px;
+  background-color: var(--bg-lighter);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-light);
+  font-size: 0.9rem;
+  transition: all var(--transition-normal);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.2);
+}
+
+.filter-container {
+  position: relative;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--bg-lighter);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-light);
+  font-size: 0.9rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e5c76b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) center;
+  transition: all var(--transition-normal);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.2);
+}
+
+.messages-counter {
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.counter-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.counter-badge {
+  background: var(--gold-gradient);
+  color: var(--bg-darker);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  min-width: 24px;
+  text-align: center;
+}
+
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.message-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  background-color: var(--bg-lighter);
+  border-left: 3px solid transparent;
+}
+
+.message-item:hover {
+  background-color: var(--bg-lightest);
+}
+
+.message-item.active {
+  background-color: rgba(229, 199, 107, 0.1);
+  border-left-color: var(--gold);
+}
+
+.message-item.unread {
+  background-color: rgba(229, 199, 107, 0.05);
+}
+
+.message-item.archived {
+  opacity: 0.7;
+}
+
+.message-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.unread {
+  background-color: var(--gold);
+  box-shadow: 0 0 5px var(--gold);
+}
+
+.status-icon {
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gold-gradient);
+  color: var(--bg-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.message-avatar.large {
+  width: 50px;
+  height: 50px;
+  font-size: 1.2rem;
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-sender {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-subject {
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-preview {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-date {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  margin-top: 3px;
+}
+
+.empty-messages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  padding: 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: var(--gold);
+  opacity: 0.5;
+  margin-bottom: 15px;
+}
+
+.empty-messages p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* Panel principal de contenido */
+.mensajes-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-darker);
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-light);
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 400px;
+}
+
+.message-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.message-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-dark);
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: none;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-icon:hover {
+  background-color: rgba(229, 199, 107, 0.15);
+  color: var(--gold);
+}
+
+.btn-action {
+  height: 36px;
+  padding: 0 15px;
+  border-radius: var(--radius-full);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-action:hover {
+  background-color: rgba(229, 199, 107, 0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  width: 180px;
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+  z-index: 100;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-normal);
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  color: var(--text-light);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-lightest);
+}
+
+.dropdown-item i {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.dropdown-item.text-danger {
+  color: var(--accent-red);
+}
+
+.dropdown-item.text-danger i {
+  color: var(--accent-red);
+}
+
+.message-content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.message-header {
+  margin-bottom: 20px;
+}
+
+.message-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.message-title-row h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.message-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.message-badge {
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.message-badge.replied {
+  background-color: var(--accent-green);
+  color: white;
+}
+
+.message-badge.archived {
+  background-color: var(--text-subtle);
+  color: white;
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-md);
+  padding: 15px;
+}
+
+.sender-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.sender-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.sender-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 3px;
+}
+
+.sender-email {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.message-info {
+  text-align: right;
+}
+
+.message-date {
+  font-size: 0.9rem;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+
+.message-event-type {
+  font-size: 0.9rem;
+}
+
+.event-label {
+  color: var(--text-muted);
+  margin-right: 3px;
+}
+
+.event-value {
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.message-body-container {
+  margin: 20px 0;
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+}
+
+.message-body {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-light);
+}
+
+.reply-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background-color: rgba(58, 134, 255, 0.1);
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  padding: 15px;
+}
+
+.reply-status-icon {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.reply-status-message {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.reply-status-message span {
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* Estilos para modales de respuesta y reenvío */
+.reply-modal, .forward-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 1001;
+  width: 90%;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.reply-modal.show, .forward-modal.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.reply-modal .modal-content, .forward-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background-color: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--border-color);
+}
+
+.reply-modal .modal-body, .forward-modal .modal-body {
+  overflow-y: auto;
+  padding: 20px;
+  text-align: left;
+}
+
+.reply-info {
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.reply-field {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.reply-field:last-child {
+  margin-bottom: 0;
+}
+
+.reply-label {
+  font-weight: 500;
+  color: var(--text-muted);
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.reply-value {
+  color: var(--text-light);
+}
+
+.reply-editor, .form-group {
+  margin-bottom: 15px;
+}
+
+.reply-textarea, .forward-textarea, .form-control {
+    height: 20vh;
+  width: 100%;
+  background-color: var(--bg-lighter);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  color: var(--text-light);
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 150px;
+  transition: all var(--transition-normal);
+}
+
+.form-control {
+  min-height: auto;
+  height: 42px;
+}
+
+.reply-textarea:focus, .forward-textarea:focus, .form-control:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.2);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gold);
+}
+
+.reply-options {
+  margin-top: 15px;
+}
+
+.reply-modal .modal-footer, .forward-modal .modal-footer {
+  justify-content: flex-end;
+  padding: 15px 20px 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: var(--bg-lighter);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.checkbox-container:hover .checkmark {
+  border-color: var(--gold);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--gold);
+  border-color: var(--gold);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.btn-primary {
+  background: var(--gold-gradient);
+  color: var(--bg-darker);
+  border: none;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 10px rgba(229, 199, 107, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(229, 199, 107, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--bg-lighter);
+  color: var(--text-light);
+  border: 1px solid var(--border-color);
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-lightest);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn-danger {
+  background-color: var(--accent-red);
+  color: white;
+  border: none;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 1001;
+  width: 90%;
+  max-width: 500px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  background-color: transparent !important;
+}
+
+.modal.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-content {
+  width: 90vw !important;  
+  background-color: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  color: var(--gold);
+  font-weight: 600;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background-color: var(--bg-lighter);
+  color: var(--text-light);
+}
+
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.modal-icon.warning {
+  color: var(--accent-red);
+}
+
+.modal-body p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.modal-footer {
+  padding: 15px 20px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Sistema de notificaciones */
+.notifications-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+}
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  box-shadow: var(--shadow-medium);
+  animation: slideIn 0.3s ease;
+  border-left: 4px solid;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.notification.success {
+  border-left-color: var(--accent-green);
+}
+
+.notification.error {
+  border-left-color: var(--accent-red);
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.notification.success .notification-icon {
+  color: var(--accent-green);
+}
+
+.notification.error .notification-icon {
+  color: var(--accent-red);
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 3px;
+}
+
+.notification-message {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 3px;
+  transition: all var(--transition-fast);
+}
+
+.notification-close:hover {
+  color: var(--text-light);
+}
+
+/* Estilos de impresión */
+.print-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.print-logo {
+  max-width: 150px;
+  margin-bottom: 15px;
+}
+
+.print-meta {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+}
+
+.print-body {
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.print-footer {
+  text-align: center;
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Animación de carga */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1200px) {
+  .mensajes-sidebar {
+    width: 320px;
+  }
+}
+
+@media (max-width: 992px) {
+  .mensajes-container {
+    height: calc(100vh - 100px);
+  }
+  
+  .mensajes-sidebar {
+    width: 280px;
+  }
+  
+  .message-title-row h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mensajes-container {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 100px);
+  }
+  .modal-content{
+    width: 90vw !important;
+  }
+  
+  .mensajes-sidebar {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 20;
+  }
+  
+  .mensajes-sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .mensajes-content {
+    width: 100%;
+  }
+  
+  .message-meta {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .message-info {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .reply-modal, .forward-modal {
+    width: 95%;
+    max-height: 80vh;
+  }
+  
+  .reply-textarea, .forward-textarea {
+    min-height: 120px;
+  }
+
+}
+
+@media (max-width: 576px) {
+  .moodal-footer {
+    flex-direction: column;
+  }
+  .sidebar-header {
+    padding: 15px;
+  }
+  .modal-content{
+    width: 90vw !important;
+  }
+  .message-toolbar {
+    padding: 10px 15px;
+  }
+  
+  .message-content-area {
+    padding: 15px;
+  }
+  
+  .message-title-row h2 {
+    font-size: 1.3rem;
+  }
+  
+  .message-body-container {
+    padding: 15px;
+  }
+}
+
+/* Personalización de scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-lighter);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(229, 199, 107, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 199, 107, 0.5);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables principales
+    let currentMessageId = null;
+    const mensajesList = document.getElementById('mensajesList');
+    const mensajesSidebar = document.getElementById('mensajesSidebar');
+    const mensajesContent = document.getElementById('mensajesContent');
+    const emptyState = document.getElementById('emptyState');
+    const messageDetail = document.getElementById('messageDetail');
+    const searchInput = document.getElementById('searchMessages');
+    const filterSelect = document.getElementById('filterMessages');
+    const moreActions = document.getElementById('moreActions');
+    const actionsMenu = document.getElementById('actionsMenu');
+    
+    // Botones
+    const btnBack = document.getElementById('btnBack');
+    const btnMobileList = document.getElementById('btnMobileList');
+    const btnMobileBack = document.getElementById('btnMobileBack');
+    const btnReply = document.getElementById('btnReply');
+    const btnForward = document.getElementById('btnForward');
+    const btnPrint = document.getElementById('btnPrint');
+    const btnArchive = document.getElementById('btnArchive');
+    const btnDelete = document.getElementById('btnDelete');
+    const btnCancelReply = document.getElementById('btnCancelReply');
+    const btnSendReply = document.getElementById('btnSendReply');
+    const btnCancelForward = document.getElementById('btnCancelForward');
+    const btnSendForward = document.getElementById('btnSendForward');
+    const refreshMessages = document.getElementById('refreshMessages');
+    
+    // Modal de eliminación
+    const deleteModal = document.getElementById('deleteModal');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const closeDeleteModal = document.getElementById('closeDeleteModal');
+    
+    // Modales de respuesta y reenvío
+    const replyModal = document.getElementById('replyModal');
+    const replyModalBackdrop = document.getElementById('replyModalBackdrop');
+    const closeReplyModal = document.getElementById('closeReplyModal');
+    const forwardModal = document.getElementById('forwardModal');
+    const forwardModalBackdrop = document.getElementById('forwardModalBackdrop');
+    const closeForwardModal = document.getElementById('closeForwardModal');
+    
+    // Secciones
+    const replyStatus = document.getElementById('replyStatus');
+    
+    // Elementos del mensaje
+    const messageSubject = document.getElementById('messageSubject');
+    const messageBadge = document.getElementById('messageBadge');
+    const senderInitial = document.getElementById('senderInitial');
+    const senderName = document.getElementById('senderName');
+    const senderEmail = document.getElementById('senderEmail');
+    const messageDate = document.getElementById('messageDate');
+    const messageEventType = document.getElementById('messageEventType');
+    const messageBody = document.getElementById('messageBody');
+    
+    // Elementos de respuesta
+    const replyTo = document.getElementById('replyTo');
+    const replySubject = document.getElementById('replySubject');
+    const replyMessage = document.getElementById('replyMessage');
+    const repliedBy = document.getElementById('repliedBy');
+    const repliedDate = document.getElementById('repliedDate');
+    
+    // Elementos de reenvío
+    const forwardTo = document.getElementById('forwardTo');
+    const forwardSubject = document.getElementById('forwardSubject');
+    const forwardMessage = document.getElementById('forwardMessage');
+    
+    // Elementos de impresión
+    const printSender = document.getElementById('printSender');
+    const printEmail = document.getElementById('printEmail');
+    const printDate = document.getElementById('printDate');
+    const printEventType = document.getElementById('printEventType');
+    const printBody = document.getElementById('printBody');
+    
+    // Contenedor de notificaciones
+    const notificationsContainer = document.getElementById('notificationsContainer');
+    
+    // Cargar configuraciones desde cookies
+    function loadSettings() {
+        const settings = {
+            darkMode: getCookie('darkMode') === 'true',
+            fontSize: getCookie('fontSize') || 'medium',
+            compactView: getCookie('compactView') === 'true',
+            autoRefresh: getCookie('autoRefresh') === 'true',
+            refreshInterval: parseInt(getCookie('refreshInterval')) || 60
+        };
+        
+        // Aplicar configuraciones
+        applySettings(settings);
+        
+        return settings;
+    }
+    
+    // Aplicar configuraciones
+    function applySettings(settings) {
+        // Aplicar modo oscuro/claro
+        if (settings.darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        
+        // Aplicar tamaño de fuente
+        document.documentElement.setAttribute('data-font-size', settings.fontSize);
+        
+        // Aplicar vista compacta
+        if (settings.compactView) {
+            document.body.classList.add('compact-view');
+        } else {
+            document.body.classList.remove('compact-view');
+        }
+        
+        // Configurar auto-refresh
+        if (settings.autoRefresh) {
+            startAutoRefresh(settings.refreshInterval);
+        }
+    }
+    
+    // Iniciar auto-refresh
+    let refreshTimer;
+    function startAutoRefresh(interval) {
+        clearInterval(refreshTimer);
+        if (interval > 0) {
+            refreshTimer = setInterval(() => {
+                refreshMessages.click();
+            }, interval * 1000);
+        }
+    }
+    
+    // Función para obtener cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+    
+    // Cargar configuraciones al inicio
+    const settings = loadSettings();
+    
+    // Función para verificar si estamos en vista móvil
+    function isMobile() {
+        return window.innerWidth < 768;
+    }
+    
+    // Función para mostrar/ocultar la lista de mensajes en móvil
+    function toggleMobileList(show) {
+        if (mensajesSidebar) {
+            if (show) {
+                mensajesSidebar.classList.add('show');
+            } else {
+                mensajesSidebar.classList.remove('show');
+            }
+        }
+    }
+    
+    // Event listeners para elementos de la lista de mensajes
+    if (mensajesList) {
+        const messageItems = mensajesList.querySelectorAll('.message-item');
+        messageItems.forEach(item => {
+            item.addEventListener('click', () => {
+                loadMessageDetail(item.dataset.id);
+                if (isMobile()) {
+                    toggleMobileList(false);
+                }
+            });
+        });
+    }
+    
+    // Event listeners para botones móviles
+    if (btnMobileList) {
+        btnMobileList.addEventListener('click', () => {
+            toggleMobileList(true);
+        });
+    }
+    
+    if (btnMobileBack) {
+        btnMobileBack.addEventListener('click', () => {
+            toggleMobileList(false);
+        });
+    }
+    
+    // Funcionalidad de búsqueda
+    if (searchInput) {
+        searchInput.addEventListener('input', filterMessages);
+    }
+    
+    // Funcionalidad de filtro
+    if (filterSelect) {
+        filterSelect.addEventListener('change', filterMessages);
+    }
+    
+    // Menú desplegable de acciones
+    if (moreActions && actionsMenu) {
+        moreActions.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actionsMenu.classList.toggle('show');
+        });
+        
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', () => {
+            actionsMenu.classList.remove('show');
+        });
+        
+        // Evitar que el clic en el menú lo cierre
+        actionsMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+    
+    // Event listeners para botones
+    if (btnBack) {
+        btnBack.addEventListener('click', () => {
+            hideMessageDetail();
+        });
+    }
+    
+    if (btnReply) {
+        btnReply.addEventListener('click', () => {
+            showReplyModal();
+        });
+    }
+    
+    if (btnForward) {
+        btnForward.addEventListener('click', () => {
+            showForwardModal();
+        });
+    }
+    
+    if (btnPrint) {
+        btnPrint.addEventListener('click', () => {
+            printMessage();
+        });
+    }
+    
+    if (btnArchive) {
+        btnArchive.addEventListener('click', () => {
+            toggleArchiveMessage();
+        });
+    }
+    
+    if (btnDelete) {
+        btnDelete.addEventListener('click', () => {
+            showDeleteConfirmation();
+        });
+    }
+    
+    if (refreshMessages) {
+        refreshMessages.addEventListener('click', () => {
+            window.location.reload();
+        });
+    }
+    
+    // Event listeners para modal de eliminación
+    if (confirmDelete) {
+        confirmDelete.addEventListener('click', () => {
+            deleteMessage();
+        });
+    }
+    
+    if (cancelDelete) {
+        cancelDelete.addEventListener('click', () => {
+            hideDeleteModal();
+        });
+    }
+    
+    if (closeDeleteModal) {
+        closeDeleteModal.addEventListener('click', () => {
+            hideDeleteModal();
+        });
+    }
+    
+    // Event listeners para modales de respuesta y reenvío
+    if (closeReplyModal) {
+        closeReplyModal.addEventListener('click', hideReplyModal);
+    }
+
+    if (closeForwardModal) {
+        closeForwardModal.addEventListener('click', hideForwardModal);
+    }
+
+    // Cerrar modales al hacer clic en el backdrop
+    if (replyModalBackdrop) {
+        replyModalBackdrop.addEventListener('click', hideReplyModal);
+    }
+
+    if (forwardModalBackdrop) {
+        forwardModalBackdrop.addEventListener('click', hideForwardModal);
+    }
+    
+    if (btnCancelReply) {
+        btnCancelReply.addEventListener('click', () => {
+            hideReplyModal();
+        });
+    }
+    
+    if (btnSendReply) {
+        btnSendReply.addEventListener('click', () => {
+            sendReply();
+        });
+    }
+    
+    if (btnCancelForward) {
+        btnCancelForward.addEventListener('click', () => {
+            hideForwardModal();
+        });
+    }
+    
+    if (btnSendForward) {
+        btnSendForward.addEventListener('click', () => {
+            sendForward();
+        });
+    }
+    
+    // Función para mostrar modal de eliminación
+    function showDeleteConfirmation() {
+        if (deleteModal && modalBackdrop) {
+            modalBackdrop.classList.add('show');
+            deleteModal.classList.add('show');
+        } else {
+            // Fallback si no existe el modal personalizado
+            if (confirm('¿Estás seguro de que deseas eliminar este mensaje? Esta acción no se puede deshacer.')) {
+                deleteMessage();
+            }
+        }
+    }
+    
+    // Función para ocultar modal de eliminación
+    function hideDeleteModal() {
+        if (deleteModal && modalBackdrop) {
+            modalBackdrop.classList.remove('show');
+            deleteModal.classList.remove('show');
+        }
+    }
+    
+    // Función para mostrar modal de respuesta
+    function showReplyModal() {
+        if (replyModal && replyModalBackdrop) {
+            replyModalBackdrop.classList.add('show');
+            replyModal.classList.add('show');
+            
+            // Preparar plantilla de respuesta basada en configuraciones
+            const replyTemplate = getCookie('replyTemplate') || '';
+            if (replyTemplate && replyMessage) {
+                replyMessage.value = replyTemplate;
+            }
+            
+            // Enfocar el campo de mensaje
+            if (replyMessage) {
+                setTimeout(() => replyMessage.focus(), 300);
+            }
+        }
+    }
+    
+    // Función para ocultar modal de respuesta
+    function hideReplyModal() {
+        if (replyModal && replyModalBackdrop) {
+            replyModalBackdrop.classList.remove('show');
+            replyModal.classList.remove('show');
+        }
+    }
+    
+    // Función para mostrar modal de reenvío
+    function showForwardModal() {
+        if (forwardModal && forwardModalBackdrop) {
+            forwardModalBackdrop.classList.add('show');
+            forwardModal.classList.add('show');
+            
+            // Enfocar el campo de destinatario
+            if (forwardTo) {
+                setTimeout(() => forwardTo.focus(), 300);
+            }
+        }
+    }
+    
+    // Función para ocultar modal de reenvío
+    function hideForwardModal() {
+        if (forwardModal && forwardModalBackdrop) {
+            forwardModalBackdrop.classList.remove('show');
+            forwardModal.classList.remove('show');
+        }
+    }
+    
+    // Función para cargar el detalle del mensaje
+    function loadMessageDetail(messageId) {
+        currentMessageId = messageId;
+        
+        // Marcar todos los elementos como inactivos
+        const messageItems = mensajesList.querySelectorAll('.message-item');
+        messageItems.forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Marcar el elemento actual como activo
+        const currentItem = mensajesList.querySelector(`.message-item[data-id="${messageId}"]`);
+        if (currentItem) {
+            currentItem.classList.add('active');
+        }
+        
+        
+        // Mostrar estado de carga
+        emptyState.style.display = 'flex';
+        emptyState.innerHTML = `
+            <div class="empty-icon">
+                <i class="bi bi-arrow-repeat spin"></i>
+            </div>
+            <h3>Cargando mensaje...</h3>
+            <p>Por favor espera mientras se carga el contenido</p>
+        `;
+        messageDetail.style.display = 'none';
+        
+        // Obtener detalles del mensaje
+        fetch(`/api/mensajes/${messageId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayMessageDetail(data.mensaje);
+                    markAsRead(messageId);
+                } else {
+                    showError('No se pudo cargar el mensaje');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Error al cargar el mensaje');
+            });
+    }
+    
+    // Función para mostrar el detalle del mensaje
+    function displayMessageDetail(mensaje) {
+        try {
+            // Verificar que los elementos existen antes de asignarles valores
+            if (messageSubject) {
+                messageSubject.textContent = mensaje.tipo_evento_nombre || 'Consulta general';
+            }
+            
+            // Establecer badge
+            if (messageBadge) {
+                messageBadge.textContent = '';
+                messageBadge.className = 'message-badge';
+                if (mensaje.respondido) {
+                    messageBadge.textContent = 'Respondido';
+                    messageBadge.classList.add('replied');
+                } else if (mensaje.archivado) {
+                    messageBadge.textContent = 'Archivado';
+                    messageBadge.classList.add('archived');
+                }
+            }
+            
+            // Establecer información del remitente
+            if (senderInitial && mensaje.nombre) {
+                const initial = mensaje.nombre.charAt(0).toUpperCase();
+                senderInitial.textContent = initial;
+            }
+            
+            if (senderName) {
+                senderName.textContent = mensaje.nombre || 'Desconocido';
+            }
+            
+            if (senderEmail) {
+                senderEmail.textContent = mensaje.email || 'Sin correo';
+            }
+            
+            // Establecer fecha
+            if (messageDate && mensaje.fecha_envio) {
+                const date = new Date(mensaje.fecha_envio);
+                messageDate.textContent = date.toLocaleString('es-MX', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            // Establecer tipo de evento
+            if (messageEventType) {
+                messageEventType.textContent = mensaje.tipo_evento_nombre || 'No especificado';
+            }
+            
+            // Establecer cuerpo del mensaje
+            if (messageBody) {
+                messageBody.textContent = mensaje.mensaje || 'Sin contenido';
+            }
+            
+            // Mostrar/ocultar estado de respuesta
+            if (replyStatus) {
+                if (mensaje.respondido) {
+                    replyStatus.style.display = 'flex';
+                    if (repliedBy) repliedBy.textContent = mensaje.respondido_por || 'un administrador';
+                    
+                    if (repliedDate && mensaje.fecha_respuesta) {
+                        const repliedDateObj = new Date(mensaje.fecha_respuesta);
+                        repliedDate.textContent = repliedDateObj.toLocaleString('es-MX', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                    
+                    // Deshabilitar botón de respuesta
+                    if (btnReply) {
+                        btnReply.disabled = true;
+                        btnReply.title = 'Este mensaje ya ha sido respondido';
+                        
+                    }
+                } else {
+                    replyStatus.style.display = 'none';
+                    if (btnReply) {
+                        btnReply.disabled = false;
+                        btnReply.title = 'Responder';
+                    }
+                }
+            }
+            
+            // Actualizar texto del botón de archivo
+            if (btnArchive) {
+                // Corregido: Usar el valor de archivado para determinar el texto y el icono
+                const isArchived = mensaje.archivado;
+                const archiveText = isArchived ? 'Desarchivar' : 'Archivar';
+                const archiveIcon = isArchived ? 'bi-archive-fill' : 'bi-archive';
+                
+                // Actualizar el texto del botón en el menú desplegable
+                const archiveSpan = btnArchive.querySelector('span');
+                if (archiveSpan) {
+                    archiveSpan.textContent = archiveText;
+                }
+                
+                // Actualizar el icono del botón
+                const archiveI = btnArchive.querySelector('i');
+                if (archiveI) {
+                    archiveI.className = `bi ${archiveIcon}`;
+                }
+                
+                btnArchive.title = archiveText;
+            }
+            
+            // Establecer información de respuesta
+            if (replyTo) replyTo.textContent = mensaje.email || 'Sin correo';
+            if (replySubject) replySubject.textContent = `Re: ${mensaje.tipo_evento_nombre || 'Consulta general'}`;
+            
+            // Establecer información de reenvío
+            if (forwardSubject) {
+                forwardSubject.value = `Fwd: ${mensaje.tipo_evento_nombre || 'Consulta general'}`;
+            }
+            
+            if (forwardMessage) {
+                const date = mensaje.fecha_envio ? new Date(mensaje.fecha_envio).toLocaleString('es-MX') : 'Fecha desconocida';
+                forwardMessage.value = `
+---------- Mensaje original ----------
+De: ${mensaje.nombre || 'Desconocido'} <${mensaje.email || 'Sin correo'}>
+Fecha: ${date}
+Asunto: ${mensaje.tipo_evento_nombre || 'Consulta general'}
+
+${mensaje.mensaje || 'Sin contenido'}`;
+            }
+            
+            // Establecer información de impresión
+            if (printSender) printSender.textContent = mensaje.nombre || 'Desconocido';
+            if (printEmail) printEmail.textContent = mensaje.email || 'Sin correo';
+            
+            if (printDate && mensaje.fecha_envio) {
+                const date = new Date(mensaje.fecha_envio);
+                printDate.textContent = date.toLocaleString('es-MX');
+            }
+            if (printEventType) printEventType.textContent = mensaje.tipo_evento_nombre || 'No especificado';
+            if (printBody) printBody.textContent = mensaje.mensaje || 'Sin contenido';
+            
+            // Ocultar estado vacío y mostrar detalle
+            emptyState.style.display = 'none';
+            messageDetail.style.display = 'flex';
+        } catch (error) {
+            console.error('Error al mostrar detalle del mensaje:', error);
+            showError('Error al mostrar el detalle del mensaje');
+        }
+    }
+    
+    // Función para marcar mensaje como leído
+    function markAsRead(messageId) {
+        const messageItem = mensajesList.querySelector(`.message-item[data-id="${messageId}"]`);
+        if (messageItem && messageItem.classList.contains('unread')) {
+            // Actualizar UI
+            messageItem.classList.remove('unread');
+            messageItem.dataset.read = 'true';
+            
+            // Eliminar indicador de no leído
+            const unreadIndicator = messageItem.querySelector('.status-dot.unread');
+            if (unreadIndicator) {
+                unreadIndicator.remove();
+            }
+            
+            // Actualizar contador de no leídos
+            const unreadCount = document.getElementById('unreadCount');
+            if (unreadCount) {
+                const count = parseInt(unreadCount.textContent) - 1;
+                unreadCount.textContent = count > 0 ? count : 0;
+            }
+            
+            // Enviar solicitud para marcar como leído
+            fetch(`/api/mensajes/${messageId}/read`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .catch(error => {
+                console.error('Error al marcar mensaje como leído:', error);
+            });
+        }
+    }
+    
+    // Función para ocultar el detalle del mensaje
+    function hideMessageDetail() {
+        emptyState.style.display = 'flex';
+        emptyState.innerHTML = `
+            <div class="empty-icon">
+                <i class="bi bi-envelope-paper"></i>
+            </div>
+            <h3>Selecciona un mensaje</h3>
+            <p>Elige un mensaje de la lista para ver su contenido</p>
+        `;
+        messageDetail.style.display = 'none';
+        
+        // Desmarcar elemento activo
+        const activeItem = mensajesList.querySelector('.message-item.active');
+        if (activeItem) {
+            activeItem.classList.remove('active');
+        }
+        
+        currentMessageId = null;
+        
+        // En móvil, mostrar la lista
+        if (isMobile()) {
+            toggleMobileList(true);
+        }
+    }
+    
+    // Función para enviar respuesta
+    function sendReply() {
+        if (!replyMessage || !replyMessage.value.trim()) {
+            showNotification('error', 'Error', 'Por favor escribe un mensaje de respuesta');
+            return;
+        }
+        
+        if (btnSendReply) {
+            btnSendReply.disabled = true;
+            btnSendReply.innerHTML = `
+                <i class="bi bi-arrow-repeat spin"></i>
+                <span>Enviando...</span>
+            `;
+        }
+        
+        // Preparar el mensaje con firma si está marcado
+        let mensajeCompleto = replyMessage.value;
+        const includeSignature = document.getElementById('includeSignature')?.checked || false;
+        
+        if (includeSignature) {
+            mensajeCompleto += `
+
+--
+Plato y Copa - Servicio de meseros
+Email: platoycopa.oficial@gmail.com
+Tel: +52 (222) 378-0903`;
+        }
+        
+        fetch(`/api/mensajes/${currentMessageId}/reply`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mensaje: mensajeCompleto,
+                includeSignature: false // Ya incluimos la firma manualmente si es necesario
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar UI
+                const messageItem = mensajesList.querySelector(`.message-item[data-id="${currentMessageId}"]`);
+                if (messageItem) {
+                    messageItem.dataset.replied = 'true';
+                    
+                    // Agregar indicador de respondido si no existe
+                    const statusContainer = messageItem.querySelector('.message-status');
+                    if (statusContainer && !messageItem.querySelector('.status-icon.replied')) {
+                        const repliedIndicator = document.createElement('span');
+                        repliedIndicator.className = 'status-icon replied';
+                        repliedIndicator.title = 'Respondido';
+                        repliedIndicator.innerHTML = '<i class="bi bi-reply-fill"></i>';
+                        statusContainer.appendChild(repliedIndicator);
+                    }
+                }
+                
+                // Mostrar notificación de éxito
+                showNotification('success', 'Éxito', 'Respuesta enviada correctamente');
+                
+                // Recargar detalle del mensaje
+                loadMessageDetail(currentMessageId);
+            } else {
+                showNotification('error', 'Error', data.message || 'Error al enviar la respuesta. Verifica la configuración de correo en el servidor.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al responder mensaje:', error);
+            showNotification('error', 'Error', 'Error al enviar la respuesta. Verifica la configuración de correo en el servidor.');
+        })
+        .finally(() => {
+            if (btnSendReply) {
+                btnSendReply.disabled = false;
+                btnSendReply.innerHTML = `
+                    <i class="bi bi-send"></i>
+                    <span>Enviar respuesta</span>
+                `;
+            }
+            hideReplyModal();
+        });
+    }
+    
+    // Función para enviar reenvío
+    function sendForward() {
+        if (!forwardTo || !forwardTo.value.trim()) {
+            showNotification('error', 'Error', 'Por favor ingresa un correo electrónico de destino');
+            return;
+        }
+        
+        if (!validateEmail(forwardTo.value)) {
+            showNotification('error', 'Error', 'Por favor ingresa un correo electrónico válido');
+            return;
+        }
+        
+        if (btnSendForward) {
+            btnSendForward.disabled = true;
+            btnSendForward.innerHTML = `
+                <i class="bi bi-arrow-repeat spin"></i>
+                <span>Enviando...</span>
+            `;
+        }
+        
+        fetch(`/api/mensajes/${currentMessageId}/forward`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: forwardTo.value,
+                asunto: forwardSubject?.value || '',
+                mensaje: forwardMessage?.value || ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('success', 'Éxito', 'Mensaje reenviado correctamente');
+            } else {
+                showNotification('error', 'Error', data.message || 'Error al reenviar el mensaje. Verifica la configuración de correo en el servidor.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al reenviar mensaje:', error);
+            showNotification('error', 'Error', 'Error al reenviar el mensaje. Verifica la configuración de correo en el servidor.');
+        })
+        .finally(() => {
+            if (btnSendForward) {
+                btnSendForward.disabled = false;
+                btnSendForward.innerHTML = `
+                    <i class="bi bi-send"></i>
+                    <span>Reenviar mensaje</span>
+                `;
+            }
+            hideForwardModal();
+        });
+    }
+    
+    // Función para alternar archivar mensaje
+    function toggleArchiveMessage() {
+        if (!btnArchive) return;
+        
+        // Corregido: Determinar la acción basada en el texto del botón
+        const isArchived = btnArchive.querySelector('span').textContent.toLowerCase() === 'desarchivar';
+        const action = isArchived ? 'unarchive' : 'archive';
+        
+        fetch(`/api/mensajes/${currentMessageId}/${action}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar UI
+                const messageItem = mensajesList.querySelector(`.message-item[data-id="${currentMessageId}"]`);
+                if (messageItem) {
+                    if (action === 'archive') {
+                        messageItem.classList.add('archived');
+                        messageItem.dataset.archived = 'true';
+                        
+                        // Agregar indicador de archivado si no existe
+                        const statusContainer = messageItem.querySelector('.message-status');
+                        if (statusContainer && !messageItem.querySelector('.status-icon.archived')) {
+                            const archivedIndicator = document.createElement('span');
+                            archivedIndicator.className = 'status-icon archived';
+                            archivedIndicator.title = 'Archivado';
+                            archivedIndicator.innerHTML = '<i class="bi bi-archive-fill"></i>';
+                            statusContainer.appendChild(archivedIndicator);
+                        }
+                        
+                        showNotification('success', 'Éxito', 'Mensaje archivado correctamente');
+                    } else {
+                        messageItem.classList.remove('archived');
+                        messageItem.dataset.archived = 'false';
+                        
+                        // Eliminar indicador de archivado
+                        const archivedIndicator = messageItem.querySelector('.status-icon.archived');
+                        if (archivedIndicator) {
+                            archivedIndicator.remove();
+                        }
+                        
+                        showNotification('success', 'Éxito', 'Mensaje desarchivado correctamente');
+                    }
+                }
+                
+                // Recargar detalle del mensaje
+                loadMessageDetail(currentMessageId);
+            } else {
+                showNotification('error', 'Error', data.message || `Error al ${action === 'archive' ? 'archivar' : 'desarchivar'} el mensaje`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('error', 'Error', `Error al ${action === 'archive' ? 'archivar' : 'desarchivar'} el mensaje`);
+        });
+    }
+    
+    // Función para eliminar mensaje
+    function deleteMessage() {
+        fetch(`/api/mensajes/${currentMessageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar UI
+                const messageItem = mensajesList.querySelector(`.message-item[data-id="${currentMessageId}"]`);
+                if (messageItem) {
+                    messageItem.remove();
+                }
+                
+                // Ocultar modal
+                hideDeleteModal();
+                
+                // Ocultar detalle del mensaje
+                hideMessageDetail();
+                
+                // Mostrar notificación de éxito
+                showNotification('success', 'Éxito', 'Mensaje eliminado correctamente');
+                
+                // Actualizar estado vacío si no quedan mensajes
+                if (mensajesList && mensajesList.querySelectorAll('.message-item').length === 0) {
+                    mensajesList.innerHTML = `
+                        <div class="empty-messages">
+                            <div class="empty-icon">
+                                <i class="bi bi-envelope-open"></i>
+                            </div>
+                            <p>No hay mensajes disponibles</p>
+                        </div>
+                    `;
+                }
+            } else {
+                showNotification('error', 'Error', data.message || 'Error al eliminar el mensaje');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('error', 'Error', 'Error al eliminar el mensaje');
+        });
+    }
+    
+    // Función para imprimir mensaje
+    function printMessage() {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            showNotification('error', 'Error', 'Por favor permite las ventanas emergentes para imprimir el mensaje');
+            return;
+        }
+        
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Mensaje de Contacto - Plato y Copa</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    .print-header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #e5c76b;
+                        padding-bottom: 20px;
+                    }
+                    .print-logo {
+                        max-width: 150px;
+                        margin-bottom: 15px;
+                    }
+                    .print-meta {
+                        margin-bottom: 30px;
+                        border-bottom: 1px solid #ddd;
+                        padding-bottom: 15px;
+                    }
+                    .print-body {
+                        margin-bottom: 30px;
+                        line-height: 1.6;
+                    }
+                    .print-footer {
+                        text-align: center;
+                        border-top: 1px solid #ddd;
+                        padding-top: 15px;
+                        font-size: 0.9rem;
+                        color: #666;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <img src="/img/Plato_y_Copa_logo.jpg" alt="Plato y Copa" class="print-logo">
+                    <h2>Mensaje de Contacto - Plato y Copa</h2>
+                </div>
+                <div class="print-content">
+                    <div class="print-meta">
+                        <p><strong>De:</strong> ${printSender?.textContent || 'Desconocido'} (${printEmail?.textContent || 'Sin correo'})</p>
+                        <p><strong>Fecha:</strong> ${printDate?.textContent || 'Fecha desconocida'}</p>
+                        <p><strong>Tipo de evento:</strong> ${printEventType?.textContent || 'No especificado'}</p>
+                    </div>
+                    <div class="print-body">
+                        <p>${printBody?.textContent || 'Sin contenido'}</p>
+                    </div>
+                </div>
+                <div class="print-footer">
+                    <p>Plato y Copa - Servicio de meseros</p>
+                    <p>Email: platoycopa.oficial@gmail.com | Tel: +52 (222) 378-0903</p>
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // Esperar a que las imágenes se carguen antes de imprimir
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    }
+    
+    // Función para filtrar mensajes
+    function filterMessages() {
+        if (!searchInput || !filterSelect || !mensajesList) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+        
+        const messageItems = mensajesList.querySelectorAll('.message-item');
+        let visibleCount = 0;
+        
+        messageItems.forEach(item => {
+            const sender = item.querySelector('.message-sender')?.textContent.toLowerCase() || '';
+            const subject = item.querySelector('.message-subject')?.textContent.toLowerCase() || '';
+            const preview = item.querySelector('.message-preview')?.textContent.toLowerCase() || '';
+            
+            const matchesSearch = sender.includes(searchTerm) || 
+                                subject.includes(searchTerm) || 
+                                preview.includes(searchTerm);
+            
+            let matchesFilter = true;
+            if (filterValue === 'unread') {
+                matchesFilter = item.dataset.read === 'false';
+            } else if (filterValue === 'read') {
+                matchesFilter = item.dataset.read === 'true';
+            } else if (filterValue === 'replied') {
+                matchesFilter = item.dataset.replied === 'true';
+            } else if (filterValue === 'archived') {
+                matchesFilter = item.dataset.archived === 'true';
+            }
+            
+            const isVisible = matchesSearch && matchesFilter;
+            item.style.display = isVisible ? 'flex' : 'none';
+            
+            if (isVisible) {
+                visibleCount++;
+            }
+        });
+        
+        // Mostrar mensaje de no resultados si es necesario
+        if (visibleCount === 0) {
+            let noResultsEl = mensajesList.querySelector('.no-results');
+            if (!noResultsEl) {
+                noResultsEl = document.createElement('div');
+                noResultsEl.className = 'empty-messages no-results';
+                noResultsEl.innerHTML = `
+                    <div class="empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <p>No se encontraron mensajes que coincidan con tu búsqueda</p>
+                `;
+                mensajesList.appendChild(noResultsEl);
+            }
+        } else {
+            const noResultsEl = mensajesList.querySelector('.no-results');
+            if (noResultsEl) {
+                noResultsEl.remove();
+            }
+        }
+    }
+    
+    // Función para mostrar notificaciones
+    function showNotification(type, title, message) {
+        if (!notificationsContainer) return;
+        
+        const id = 'notification-' + Date.now();
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.id = id;
+        
+        notification.innerHTML = `
+            <div class="notification-icon">
+                <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'}"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <button class="notification-close" onclick="document.getElementById('${id}').remove()">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        
+        notificationsContainer.appendChild(notification);
+        
+        // Auto-eliminar después de 5 segundos
+        setTimeout(() => {
+            const notificationEl = document.getElementById(id);
+            if (notificationEl) {
+                notificationEl.remove();
+            }
+        }, 5000);
+    }
+    
+    // Función para mostrar error en el detalle
+    function showError(message) {
+        emptyState.style.display = 'flex';
+        emptyState.innerHTML = `
+            <div class="empty-icon" style="color: var(--accent-red);">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h3>Error</h3>
+            <p>${message}</p>
+        `;
+        messageDetail.style.display = 'none';
+    }
+    
+    // Funciones auxiliares
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Inicializar la vista móvil si es necesario
+    if (isMobile()) {
+        toggleMobileList(true);
+    }
+    
+    // Manejar cambios de tamaño de ventana
+    window.addEventListener('resize', function() {
+        if (isMobile()) {
+            if (currentMessageId) {
+                toggleMobileList(false);
+            } else {
+                toggleMobileList(true);
+            }
+        } else {
+            // En escritorio, asegurarse de que el sidebar esté visible
+            if (mensajesSidebar) {
+                mensajesSidebar.classList.remove('show');
+            }
+        }
+    });
+});
+</script>

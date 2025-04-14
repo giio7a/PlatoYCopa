@@ -1,0 +1,1276 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Galería</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="addImageModal">
+      <i class="bi bi-plus-lg"></i> <span class="btn-text">Nueva Imagen</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Imágenes de la Galería</h3>
+    <div class="card-tools">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" class="table-search" placeholder="Buscar imagen...">
+      </div>
+      <div class="filter-box">
+        <select id="filterTipoEvento" class="form-control">
+          <option value="">Todos los tipos de eventos</option>
+          {{#each tiposEventos}}
+          <option value="{{this.id}}">{{this.nombre}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="gallery-grid">
+      {{#each imagenes}}
+      <div class="gallery-item" data-id="{{this.id}}" data-tipo-evento="{{this.tipo_evento_id}}">
+        <div class="gallery-image">
+          <img src="{{this.url_imagen}}" alt="{{this.titulo}}" loading="lazy">
+          <div class="gallery-overlay">
+            <div class="gallery-actions">
+              <button class="btn-gallery-action view" title="Ver imagen" data-src="{{this.url_imagen}}" data-title="{{this.titulo}}">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn-gallery-action edit" title="Editar" data-toggle="modal" data-target="editImageModal" data-id="{{this.id}}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-gallery-action delete btn-delete" title="Eliminar" data-id="{{this.id}}" data-type="galeria" data-name="{{this.titulo}}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-info">
+          <h4 class="gallery-title">{{this.titulo}}</h4>
+          <div class="gallery-meta">
+            <span class="gallery-type">{{this.tipo_evento}}</span>
+            {{#if this.destacada}}
+            <span class="gallery-featured"><i class="bi bi-star-fill"></i> Destacada</span>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="empty-state">
+        <i class="bi bi-images"></i>
+        <p>No hay imágenes en la galería</p>
+        <button class="btn btn-primary mt-3" data-toggle="modal" data-target="addImageModal">
+          <i class="bi bi-plus-lg"></i> Agregar primera imagen
+        </button>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<!-- Visor de imágenes -->
+<div class="image-viewer" id="imageViewer">
+  <div class="image-viewer-content">
+    <button class="image-viewer-close" id="imageViewerClose">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <img src="/placeholder.svg" alt="" id="viewerImage">
+    <h3 id="viewerTitle"></h3>
+  </div>
+</div>
+
+<!-- Modal para Agregar Imagen -->
+<div class="modal" id="addImageModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agregar Nueva Imagen</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addImageForm" class="crud-form needs-validation" enctype="multipart/form-data" novalidate>
+          <div class="form-group">
+            <label for="titulo" class="form-label">Título</label>
+            <input type="text" class="form-control" id="titulo" name="titulo" required>
+            <div class="invalid-feedback">Por favor ingresa un título para la imagen.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion" class="form-label">Descripción (Opcional)</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="2"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="tipo_evento_id" class="form-label">Tipo de Evento</label>
+                <select class="form-control" id="tipo_evento_id" name="tipo_evento_id" required>
+                  <option value="">Seleccionar...</option>
+                  {{#each tiposEventos}}
+                  <option value="{{this.id}}">{{this.nombre}}</option>
+                  {{/each}}
+                </select>
+                <div class="invalid-feedback">Por favor selecciona un tipo de evento.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="orden" name="orden" min="1" value="1" required>
+                <div class="invalid-feedback">Por favor ingresa un número de orden.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="imagen" class="form-label">Imagen</label>
+            <div class="image-preview-container">
+              <div class="image-preview" id="imagePreview">
+                <i class="bi bi-image"></i>
+                <span>Vista previa</span>
+              </div>
+              <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" required>
+            </div>
+            <div class="form-text">Tamaño recomendado: 1200x800px. Formato: JPG, PNG.</div>
+            <div class="invalid-feedback">Por favor selecciona una imagen.</div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="destacada" name="destacada" value="1">
+              <label class="form-check-label" for="destacada">Imagen destacada</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Imagen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Imagen -->
+<div class="modal" id="editImageModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Imagen</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editImageForm" class="crud-form needs-validation" enctype="multipart/form-data" novalidate>
+          <input type="hidden" id="edit_id" name="id">
+          
+          <div class="form-group">
+            <label for="edit_titulo" class="form-label">Título</label>
+            <input type="text" class="form-control" id="edit_titulo" name="titulo" required>
+            <div class="invalid-feedback">Por favor ingresa un título para la imagen.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_descripcion" class="form-label">Descripción (Opcional)</label>
+            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="2"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_tipo_evento_id" class="form-label">Tipo de Evento</label>
+                <select class="form-control" id="edit_tipo_evento_id" name="tipo_evento_id" required>
+                  <option value="">Seleccionar...</option>
+                  {{#each tiposEventos}}
+                  <option value="{{this.id}}">{{this.nombre}}</option>
+                  {{/each}}
+                </select>
+                <div class="invalid-feedback">Por favor selecciona un tipo de evento.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="edit_orden" name="orden" min="1" required>
+                <div class="invalid-feedback">Por favor ingresa un número de orden.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_imagen" class="form-label">Imagen</label>
+            <div class="current-image-container">
+              <img id="current_image" src="/placeholder.svg" alt="Imagen actual" class="current-image">
+            </div>
+            <input type="file" class="form-control" id="edit_imagen" name="imagen" accept="image/*">
+            <div class="form-text">Deja en blanco para mantener la imagen actual.</div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="edit_destacada" name="destacada" value="1">
+              <label class="form-check-label" for="edit_destacada">Imagen destacada</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Actualizar Imagen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal" id="confirmDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Eliminación</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar la imagen <strong id="deleteItemName"></strong>?</p>
+        <p>Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="toast-container"></div>
+
+{{#section 'styles'}}
+<style>
+  /* Estilos para el encabezado de página */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 0 10px;
+  }
+  
+  .page-title {
+    color: var(--gold);
+    font-weight: 300;
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Estilos para la barra de herramientas */
+  .card-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-box {
+    flex-shrink: 0;
+  }
+  
+  .filter-box select {
+    width: 200px;
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    color: var(--white);
+    border-radius: 5px;
+    padding: 8px 10px;
+  }
+  
+  /* Estilos para la galería */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .gallery-item {
+    background-color: var(--black-light);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--gold);
+  }
+  
+  .gallery-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .gallery-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+  }
+  
+  .gallery-item:hover .gallery-image img {
+    transform: scale(1.05);
+  }
+  
+  .gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .gallery-item:hover .gallery-overlay {
+    opacity: 1;
+  }
+  
+  .gallery-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-gallery-action {
+    background-color: var(--gold-light);
+    border: none;
+    color: var(--gold);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-gallery-action:hover {
+    background-color: var(--gold);
+    color: var(--black);
+  }
+
+  .gallery-info {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .gallery-title {
+    color: var(--gold);
+    font-weight: 500;
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+  }
+  
+  .gallery-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--white-dimmer);
+    font-size: 0.9rem;
+    margin-top: auto;
+  }
+  
+  .gallery-featured {
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Estilos para el visor de imágenes */
+  .image-viewer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .image-viewer.show {
+    display: flex;
+  }
+  
+  .image-viewer-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    text-align: center;
+  }
+  
+  .image-viewer-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 2001;
+  }
+  
+  .image-viewer img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .image-viewer h3 {
+    color: var(--white);
+    margin-top: 15px;
+    font-size: 1.2rem;
+  }
+  
+  /* Estilos para la vista previa de imágenes */
+  .image-preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .image-preview {
+    width: 100%;
+    height: 250px;
+    border: 1px dashed var(--gold-border);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-dimmer);
+    background-color: var(--black-lighter);
+    overflow: hidden;
+  }
+  
+  .image-preview i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .current-image-container {
+    margin-bottom: 10px;
+    text-align: center;
+     width: 100%;
+    height: 250px;
+    border-radius: 5px;
+    border: 1px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-dimmer);
+    background-color: var(--black-lighter);
+    overflow: hidden;
+  }
+  
+  .current-image {
+     width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Estilos para formularios */
+  .form-check {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .form-check-input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .form-check-label {
+    color: var(--white);
+    cursor: pointer;
+  }
+  
+  /* Estilos para estado vacío */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    color: var(--white-dimmer);
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold-light);
+  }
+  
+  .empty-state p {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  .mt-3 {
+    margin-top: 1rem;
+  }
+  
+  /* Estilos para toast */
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1060;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .toast {
+    min-width: 250px;
+    max-width: 350px;
+    background-color: var(--black-light);
+    color: var(--white);
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--gold);
+  }
+  
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .toast.success {
+    border-left-color: var(--success);
+  }
+  
+  .toast.error {
+    border-left-color: var(--danger);
+  }
+  
+  .toast.info {
+    border-left-color: var(--info);
+  }
+  
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .toast-content i {
+    font-size: 1.5rem;
+  }
+  
+  .toast-content i.bi-check-circle {
+    color: var(--success);
+  }
+  
+  .toast-content i.bi-x-circle {
+    color: var(--danger);
+  }
+  
+  .toast-content i.bi-info-circle {
+    color: var(--info);
+  }
+  
+  .toast-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--white-dimmer);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+  }
+  
+  .toast-close:hover {
+    color: var(--white);
+  }
+  
+  /* Animación de carga */
+  .spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Estilos para móvil */
+  @media screen and (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+    
+    .btn-text {
+      display: none;
+    }
+    
+    .btn-primary {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .card-tools {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+    
+    .search-box, .filter-box, .filter-box select {
+      width: 100%;
+    }
+    
+    .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .gallery-image {
+      height: 180px;
+    }
+    
+    /* Mostrar siempre los controles en móvil para mejor usabilidad táctil */
+    .gallery-overlay {
+      opacity: 1;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .btn-gallery-action {
+      width: 36px;
+      height: 36px;
+    }
+    
+    /* Ajustes para modales en móvil */
+    .modal-dialog {
+      margin: 10px auto;
+      width: calc(100% - 20px);
+      max-width: none;
+    }
+    
+    .modal-body {
+      padding: 15px;
+    }
+    
+    .form-row {
+      flex-direction: column;
+    }
+    
+    .form-col {
+      width: 100%;
+      padding: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .modal-footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-footer button {
+      width: 100%;
+    }
+  }
+  
+  /* Ajustes para orientación landscape */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    
+    .gallery-image {
+      height: 150px;
+    }
+    
+    .modal-dialog {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    
+    .modal-body {
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+    
+    .form-row {
+      flex-direction: row;
+    }
+    
+    .form-col {
+      width: 50%;
+      padding: 0 10px;
+    }
+    
+    .form-col:first-child {
+      padding-left: 0;
+    }
+    
+    .form-col:last-child {
+      padding-right: 0;
+    }
+    
+    .modal-footer {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+    
+    .modal-footer button {
+      width: auto;
+    }
+    
+    /* Ajustes para el visor de imágenes en landscape */
+    .image-viewer img {
+      max-height: 70vh;
+    }
+    
+    .image-viewer-close {
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Referencias a elementos DOM
+    const searchInput = document.getElementById('searchInput');
+    const filterTipoEvento = document.getElementById('filterTipoEvento');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const addImageForm = document.getElementById('addImageForm');
+    const editImageForm = document.getElementById('editImageForm');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Variables para almacenar el ID de la imagen a eliminar
+    let imageIdToDelete = null;
+    
+    // Función para mostrar notificaciones toast
+    function showToast(message, type = 'info') {
+      const toastContainer = document.querySelector('.toast-container');
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : 'bi-info-circle'}"></i>
+          <span>${message}</span>
+        </div>
+        <button class="toast-close"><i class="bi bi-x"></i></button>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      // Mostrar el toast
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 100);
+      
+      // Configurar el botón de cierre
+      const closeButton = toast.querySelector('.toast-close');
+      closeButton.addEventListener('click', () => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      });
+      
+      // Auto-cerrar después de 5 segundos
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 5000);
+    }
+    
+    // Función para abrir modales
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+      }
+    }
+    
+    // Función para cerrar modales
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    }
+    
+    // Abrir modal al hacer clic en botones con data-toggle="modal"
+    const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+    modalTriggers.forEach(trigger => {
+      trigger.addEventListener('click', function() {
+        const targetModal = this.getAttribute('data-target');
+        openModal(targetModal);
+        
+        // Si es el botón de editar, cargar los datos de la imagen
+        if (this.classList.contains('edit')) {
+          const imageId = this.getAttribute('data-id');
+          loadImageData(imageId);
+        }
+      });
+    });
+    
+    // Cerrar modal al hacer clic en botones con data-dismiss="modal"
+    const modalClosers = document.querySelectorAll('[data-dismiss="modal"]');
+    modalClosers.forEach(closer => {
+      closer.addEventListener('click', function() {
+        const modal = this.closest('.modal');
+        if (modal) {
+          modal.classList.remove('show');
+          document.body.classList.remove('modal-open');
+        }
+      });
+    });
+    
+    // Cerrar modal al hacer clic fuera del contenido
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+        event.target.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    });
+    
+    // Visor de imágenes
+    const viewButtons = document.querySelectorAll('.btn-gallery-action.view');
+    const imageViewer = document.getElementById('imageViewer');
+    const viewerImage = document.getElementById('viewerImage');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const imageViewerClose = document.getElementById('imageViewerClose');
+    
+    viewButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const imageSrc = this.getAttribute('data-src');
+        const imageTitle = this.getAttribute('data-title');
+        
+        viewerImage.src = imageSrc;
+        viewerImage.alt = imageTitle;
+        viewerTitle.textContent = imageTitle;
+        
+        imageViewer.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Evitar scroll
+      });
+    });
+    
+    imageViewerClose.addEventListener('click', function() {
+      imageViewer.classList.remove('show');
+      document.body.style.overflow = ''; // Restaurar scroll
+    });
+    
+    // Cerrar visor al hacer clic fuera de la imagen
+    imageViewer.addEventListener('click', function(event) {
+      if (event.target === imageViewer) {
+        imageViewer.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Vista previa de imágenes al seleccionarlas
+    const imageInput = document.getElementById('imagen');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput && imagePreview) {
+      imageInput.addEventListener('change', function() {
+        previewImage(this, imagePreview);
+      });
+    }
+    
+    // Vista previa para edición
+    const editImageInput = document.getElementById('edit_imagen');
+    if (editImageInput) {
+      editImageInput.addEventListener('change', function() {
+        const currentImage = document.getElementById('current_image');
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            currentImage.src = e.target.result;
+          }
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+    
+    // Función para previsualizar imágenes
+    function previewImage(input, previewElement) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewElement.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
+        }
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        previewElement.innerHTML = `<i class="bi bi-image"></i><span>Vista previa</span>`;
+      }
+    }
+    
+    // Filtrar por tipo de evento
+    if (filterTipoEvento) {
+      filterTipoEvento.addEventListener('change', function() {
+        const selectedValue = this.value;
+        
+        galleryItems.forEach(item => {
+          if (!selectedValue || item.getAttribute('data-tipo-evento') === selectedValue) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Búsqueda de imágenes
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        galleryItems.forEach(item => {
+          const title = item.querySelector('.gallery-title').textContent.toLowerCase();
+          const type = item.querySelector('.gallery-type').textContent.toLowerCase();
+          
+          if (title.includes(searchTerm) || type.includes(searchTerm)) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Validación de formularios
+    function validateForm(form) {
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return false;
+      }
+      return true;
+    }
+    
+    // Función para cargar datos de una imagen
+    function loadImageData(imageId) {
+      fetch(`/api/galeria/${imageId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const imagen = data.imagen;
+            
+            // Llenar formulario de edición
+            document.getElementById('edit_id').value = imagen.id;
+            document.getElementById('edit_titulo').value = imagen.titulo;
+            document.getElementById('edit_descripcion').value = imagen.descripcion || '';
+            document.getElementById('edit_tipo_evento_id').value = imagen.tipo_evento_id;
+            document.getElementById('edit_orden').value = imagen.orden;
+            document.getElementById('edit_destacada').checked = imagen.destacada === 1;
+            
+            // Mostrar imagen actual
+            const imagePreview = document.getElementById('current_image');
+            if (imagen.url_imagen) {
+              imagePreview.src = imagen.url_imagen;
+            } else {
+              imagePreview.src = '/placeholder.svg';
+            }
+          } else {
+            showToast(data.message || 'No se pudo cargar la información de la imagen.', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Ocurrió un error al cargar la información de la imagen.', 'error');
+        });
+    }
+    
+    // Manejar envío del formulario de agregar imagen
+    if (addImageForm) {
+      addImageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateForm(this)) return;
+        
+        const formData = new FormData(this);
+        
+        // Mostrar indicador de carga
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Guardando...';
+        
+        // Enviar datos al servidor
+        fetch('/api/galeria', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showToast('Imagen agregada correctamente', 'success');
+            closeModal('addImageModal');
+            
+            // Recargar la página para mostrar la nueva imagen
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            showToast(data.message || 'Error al agregar la imagen', 'error');
+            // Restaurar botón
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error al agregar la imagen', 'error');
+          // Restaurar botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        });
+      });
+    }
+    
+    // Manejar envío del formulario de editar imagen
+    if (editImageForm) {
+      editImageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateForm(this)) return;
+        
+        const formData = new FormData(this);
+        const imageId = formData.get('id');
+        
+        // Mostrar indicador de carga
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Actualizando...';
+        
+        // Enviar datos al servidor
+        fetch(`/api/galeria/${imageId}`, {
+          method: 'PUT',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showToast('Imagen actualizada correctamente', 'success');
+            closeModal('editImageModal');
+            
+            // Recargar la página para mostrar los cambios
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            showToast(data.message || 'Error al actualizar la imagen', 'error');
+            // Restaurar botón
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error al actualizar la imagen', 'error');
+          // Restaurar botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        });
+      });
+    }
+    
+    // Configurar modal de confirmación para eliminar
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        imageIdToDelete = this.getAttribute('data-id');
+        const imageName = this.getAttribute('data-name');
+        
+        // Actualizar el modal con el nombre de la imagen
+        document.getElementById('deleteItemName').textContent = imageName;
+        
+        // Abrir el modal de confirmación
+        openModal('confirmDeleteModal');
+      });
+    });
+    
+    // Manejar confirmación de eliminación
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener('click', function() {
+        if (!imageIdToDelete) return;
+        
+        // Mostrar indicador de carga
+        const originalText = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Eliminando...';
+        
+        // Enviar solicitud de eliminación
+        fetch(`/api/galeria/${imageIdToDelete}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showToast('Imagen eliminada correctamente', 'success');
+            closeModal('confirmDeleteModal');
+            
+            // Eliminar el elemento de la galería
+            const item = document.querySelector(`.gallery-item[data-id="${imageIdToDelete}"]`);
+            if (item) {
+              item.remove();
+            }
+            
+            // Si no quedan imágenes, mostrar mensaje
+            if (document.querySelectorAll('.gallery-item').length === 0) {
+              const galleryGrid = document.querySelector('.gallery-grid');
+              galleryGrid.innerHTML = `
+                <div class="empty-state">
+                  <i class="bi bi-images"></i>
+                  <p>No hay imágenes en la galería</p>
+                  <button class="btn btn-primary mt-3" data-toggle="modal" data-target="addImageModal">
+                    <i class="bi bi-plus-lg"></i> Agregar primera imagen
+                  </button>
+                </div>
+              `;
+              
+              // Volver a agregar event listener al botón
+              const newButton = galleryGrid.querySelector('button');
+              if (newButton) {
+                newButton.addEventListener('click', function() {
+                  openModal('addImageModal');
+                });
+              }
+            }
+          } else {
+            showToast(data.message || 'Error al eliminar la imagen', 'error');
+            // Restaurar botón
+            this.disabled = false;
+            this.innerHTML = originalText;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error al eliminar la imagen', 'error');
+          // Restaurar botón
+          this.disabled = false;
+          this.innerHTML = originalText;
+        })
+        .finally(() => {
+          imageIdToDelete = null;
+        });
+      });
+    }
+    
+    // Función para ajustar elementos según el tamaño de pantalla
+    function adjustResponsiveElements() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const isLandscape = width > height;
+      
+      // Ajustar altura de modales en landscape
+      if (isLandscape && width <= 992) {
+        const modalBodies = document.querySelectorAll('.modal-body');
+        modalBodies.forEach(body => {
+          body.style.maxHeight = (height - 150) + 'px';
+          body.style.overflowY = 'auto';
+        });
+      } else {
+        const modalBodies = document.querySelectorAll('.modal-body');
+        modalBodies.forEach(body => {
+          body.style.maxHeight = '';
+          body.style.overflowY = '';
+        });
+      }
+    }
+    
+    // Ejecutar al cargar
+    adjustResponsiveElements();
+    
+    // Ejecutar al cambiar tamaño o orientación
+    window.addEventListener('resize', adjustResponsiveElements);
+    window.addEventListener('orientationchange', adjustResponsiveElements);
+    
+    // Mejorar experiencia en dispositivos táctiles
+    if ('ontouchstart' in window) {
+      document.querySelectorAll('.btn-gallery-action, .modal-close, .image-viewer-close').forEach(el => {
+        el.style.padding = '10px';  // Aumentar área táctil
+      });
+    }
+  });
+</script>
+{{/section}}
+

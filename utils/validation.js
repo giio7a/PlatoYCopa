@@ -152,3 +152,10 @@ export function sanitizeCompletely(input) {
   return preventSQLInjection(sanitizeInput(input))
 }
 
+// Validar contraseña (al menos 8 caracteres, una mayúscula, una minúscula y un número)
+export function isValidPassword(password) {
+  if (!password) return false
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+  return passwordRegex.test(String(password))
+}
+

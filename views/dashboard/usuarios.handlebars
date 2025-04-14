@@ -1,0 +1,1862 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Usuarios</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">
+      <i class="bi bi-plus-lg"></i> <span class="btn-text">Nuevo Usuario</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Usuarios del Sistema</h3>
+    <div class="card-tools">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="table-search" placeholder="Buscar usuario...">
+      </div>
+      <div class="filter-box">
+        <select id="filterRole" class="form-control">
+          <option value="">Todos los roles</option>
+          <option value="admin">Administrador</option>
+          <option value="editor">Editor</option>
+          <option value="usuario">Usuario</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-container">
+      <table class="data-table responsive-table">
+        <thead>
+          <tr>
+            <th data-sort="id">#</th>
+            <th data-sort="imagen">Foto</th>
+            <th data-sort="nombre">Nombre</th>
+            <th data-sort="email">Email</th>
+            <th data-sort="telefono">Teléfono</th>
+            <th data-sort="rol">Rol</th>
+            <th data-sort="fecha_registro">Fecha de Registro</th>
+            <th data-sort="ultimo_acceso">Último Acceso</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each usuarios}}
+          <tr>
+            <td data-label="ID" data-column="id">{{this.id}}</td>
+            <td data-label="Foto" data-column="imagen" class="user-avatar-cell">
+              {{#if this.imagen_url}}
+                <img src="{{this.imagen_url}}" alt="{{this.nombre}}" class="user-avatar">
+              {{else}}
+                <div class="user-avatar-placeholder">{{firstLetter this.nombre}}</div>
+              {{/if}}
+            </td>
+            <td data-label="Nombre" data-column="nombre">{{this.nombre}}</td>
+            <td data-label="Email" data-column="email">{{this.email}}</td>
+            <td data-label="Teléfono" data-column="telefono">{{this.telefono}}</td>
+            <td data-label="Rol" data-column="rol">
+              <span class="badge-role {{this.rol}}">{{this.rol}}</span>
+            </td>
+            <td data-label="Fecha de Registro" data-column="fecha_registro">{{formatDate this.fecha_creacion}}</td>
+            <td data-label="Último Acceso" data-column="ultimo_acceso">{{formatDateTime this.ultimo_acceso}}</td>
+            <td data-label="Estado" data-column="activo">
+              {{#if this.activo}}
+              <span class="badge-status confirmada">Activo</span>
+              {{else}}
+              <span class="badge-status cancelada">Inactivo</span>
+              {{/if}}
+            </td>
+            <td data-label="Acciones">
+              <div class="actions">
+                <button class="btn-table-action edit" title="Editar" data-id="{{this.id}}" data-email="{{this.email}}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                {{#if this.activo}}
+                <button class="btn-table-action deactivate" title="Desactivar" data-id="{{this.id}}">
+                  <i class="bi bi-person-x"></i>
+                </button>
+                {{else}}
+                <button class="btn-table-action activate" title="Activar" data-id="{{this.id}}">
+                  <i class="bi bi-person-check"></i>
+                </button>
+                {{/if}}
+                <button class="btn-table-action reset-password" title="Restablecer Contraseña" data-id="{{this.id}}" data-email="{{this.email}}">
+                  <i class="bi bi-key"></i>
+                </button>
+                <button class="btn-table-action delete" title="Eliminar Usuario" data-id="{{this.id}}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td colspan="10" class="text-center">No hay usuarios registrados</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Usuario -->
+<div class="modal" id="addUserModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agregar Nuevo Usuario</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm" class="needs-validation" novalidate enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="nombre" class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+            <div class="invalid-feedback">Por favor ingresa el nombre completo.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">Por favor ingresa un email válido.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="telefono" name="telefono">
+            <div class="invalid-feedback">Por favor ingresa un número de teléfono válido.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="profile_image" class="form-label">Foto de Perfil</label>
+            <div class="custom-file-upload">
+              <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+              <label for="profile_image" class="custom-file-label">Seleccionar imagen</label>
+            </div>
+            <small class="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 5MB</small>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="password-input">
+                  <input type="password" class="form-control" id="password" name="password" required>
+                  <button type="button" class="toggle-password">
+                    <i class="bi bi-eye-slash"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback">Por favor ingresa una contraseña.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+                <div class="password-input">
+                  <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                  <button type="button" class="toggle-password">
+                    <i class="bi bi-eye-slash"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="rol" class="form-label">Rol</label>
+            <select class="form-control" id="rol" name="rol" required>
+              <option value="">Seleccionar...</option>
+              <option value="admin">Administrador</option>
+              <option value="editor">Editor</option>
+              <option value="usuario">Usuario</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un rol.</div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="activo" name="activo" checked>
+              <label class="form-check-label" for="activo">Usuario activo</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Usuario -->
+<div class="modal" id="editUserModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Usuario</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm" class="needs-validation" novalidate enctype="multipart/form-data">
+          <input type="hidden" id="edit_id" name="id">
+          <input type="hidden" id="original_email" name="original_email">
+          
+          <div class="form-group user-avatar-edit">
+            <label class="form-label">Foto de Perfil</label>
+            <div class="avatar-preview">
+              <img id="edit_avatar_preview" src="/images/default-profile.png" alt="Avatar">
+            </div>
+            <div class="custom-file-upload mt-2">
+              <input type="file" class="form-control" id="edit_profile_image" name="profile_image" accept="image/*">
+              <label for="edit_profile_image" class="custom-file-label">Cambiar imagen</label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_nombre" class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+            <div class="invalid-feedback">Por favor ingresa el nombre completo.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="edit_email" name="email" required>
+            <div class="invalid-feedback">Por favor ingresa un email válido.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_telefono" class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="edit_telefono" name="telefono">
+            <div class="invalid-feedback">Por favor ingresa un número de teléfono válido.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_password" class="form-label">Nueva Contraseña (dejar en blanco para mantener la actual)</label>
+            <div class="password-input">
+              <input type="password" class="form-control" id="edit_password" name="password">
+              <button type="button" class="toggle-password">
+                <i class="bi bi-eye-slash"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">La contraseña debe tener al menos 8 caracteres.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_rol" class="form-label">Rol</label>
+            <select class="form-control" id="edit_rol" name="rol" required>
+              <option value="">Seleccionar...</option>
+              <option value="admin">Administrador</option>
+              <option value="editor">Editor</option>
+              <option value="usuario">Usuario</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un rol.</div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="edit_activo" name="activo">
+              <label class="form-check-label" for="edit_activo">Usuario activo</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Restablecer Contraseña -->
+<div class="modal" id="resetPasswordModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Restablecer Contraseña</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="resetPasswordForm" class="needs-validation" novalidate>
+          <input type="hidden" id="reset_user_id" name="id">
+          
+          <div class="form-group">
+            <label for="reset_email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="reset_email" name="email" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="new_password" class="form-label">Nueva Contraseña</label>
+            <div class="password-input">
+              <input type="password" class="form-control" id="new_password" name="new_password" required>
+              <button type="button" class="toggle-password">
+                <i class="bi bi-eye-slash"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">Por favor ingresa una nueva contraseña.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirm_new_password" class="form-label">Confirmar Nueva Contraseña</label>
+            <div class="password-input">
+              <input type="password" class="form-control" id="confirm_new_password" name="confirm_new_password" required>
+              <button type="button" class="toggle-password">
+                <i class="bi bi-eye-slash"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="notify_user" name="notify_user" value="1" checked>
+              <label class="form-check-label" for="notify_user">Notificar al usuario por email</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Restablecer Contraseña</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para acciones importantes -->
+<div class="modal" id="confirmActionModal">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirmActionTitle">Confirmar Acción</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmActionMessage">¿Estás seguro de que deseas realizar esta acción?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="confirmActionBtn" class="btn btn-danger">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="toast-container">
+  <div id="toast-template" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i class="toast-icon bi"></i>
+      <strong class="toast-title me-auto"></strong>
+      <button type="button" class="btn-close" data-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body"></div>
+  </div>
+</div>
+
+{{#section 'styles'}}
+<style>
+  /* Variables globales */
+  :root {
+    --gold: #e5c76b;
+    --gold-dark: #d5b75b;
+    --gold-lighter: rgba(229, 199, 107, 0.05);
+    --gold-border: rgba(229, 199, 107, 0.3);
+    --black: #000000;
+    --black-light: #121212;
+    --black-lighter: #1e1e1e;
+    --white: #ffffff;
+    --white-dim: rgba(255, 255, 255, 0.8);
+    --white-dimmer: rgba(255, 255, 255, 0.5);
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --transition-speed: 0.3s;
+  }
+
+  /* Estilos para el encabezado de página */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .page-title {
+    color: var(--gold);
+    font-weight: 300;
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Estilos para la barra de herramientas */
+  .card-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-box {
+    flex-shrink: 0;
+  }
+  
+  .filter-box select {
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    color: var(--white);
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  
+  /* Estilos para la tabla */
+  .table-container {
+    overflow-x: auto;
+    width: 100%;
+  }
+  
+  /* Estilos responsive para la tabla */
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .responsive-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: var(--gold-light);
+    color: var(--gold);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  .responsive-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .responsive-table tr:hover {
+    background-color: var(--gold-lighter);
+  }
+  
+  /* Estilos para los avatares de usuario */
+  .user-avatar-cell {
+    text-align: center;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold-border);
+  }
+  
+  .user-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gold-dark);
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin: 0 auto;
+  }
+  
+  .user-avatar-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 3px solid var(--gold-border);
+  }
+  
+  .avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Estilos para los badges de rol */
+  .badge-role {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .badge-role.admin {
+    background-color: rgba(229, 199, 107, 0.2);
+    color: var(--gold);
+  }
+  
+  .badge-role.editor {
+    background-color: rgba(23, 162, 184, 0.2);
+    color: var(--info);
+  }
+  
+  .badge-role.usuario {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: var(--white-dim);
+  }
+  
+  /* Estilos para los badges de estado */
+  .badge-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .badge-status.confirmada {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--success);
+  }
+  
+  .badge-status.cancelada {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: var(--danger);
+  }
+  
+  /* Estilos para los botones de acción */
+  .actions {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .btn-table-action {
+    background: none;
+    border: none;
+    color: var(--white-dim);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .btn-table-action:hover {
+    background-color: var(--gold-light);
+  }
+  
+  .btn-table-action.edit:hover {
+    color: var(--info);
+  }
+  
+  .btn-table-action.deactivate:hover {
+    color: var(--danger);
+  }
+  
+  .btn-table-action.activate:hover {
+    color: var(--success);
+  }
+  
+  .btn-table-action.reset-password:hover {
+    color: var(--warning);
+  }
+  
+  .btn-table-action.delete:hover {
+    color: var(--danger);
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  /* Estilos para los campos de contraseña */
+  .password-input {
+    position: relative;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--white-dimmer);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    padding: 5px;
+  }
+  
+  .toggle-password:hover {
+    color: var(--gold);
+  }
+  
+  /* Estilos para input de archivo personalizado */
+  .custom-file-upload {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .custom-file-upload input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  
+  .custom-file-label {
+    display: block;
+    padding: 10px 15px;
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    color: var(--white-dim);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .custom-file-upload:hover .custom-file-label {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  
+  /* Estilos para modales */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  
+  .modal.show {
+    display: block;
+  }
+  
+  .modal-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: var(--black-light);
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .modal.show .modal-dialog {
+    transform: translateY(0);
+  }
+  
+  .modal-content {
+    position: relative;
+    width: 100%;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .modal-title {
+    color: var(--gold);
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--white-dimmer);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+  }
+  
+  .modal-close:hover {
+    color: var(--gold);
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--gold-border);
+  }
+  
+  /* Estilos para formularios */
+  .form-row {
+    display: flex;
+    margin: 0 -10px;
+    flex-wrap: wrap;
+  }
+  
+  .form-col {
+    padding: 0 10px;
+    width: 50%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--white);
+    font-weight: 500;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    color: var(--white);
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .form-control:focus {
+    border-color: var(--gold);
+    outline: none;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .form-check-input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .form-check-label {
+    color: var(--white);
+    cursor: pointer;
+  }
+
+  /* Estilos para toast notifications */
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1060;
+  }
+
+  .toast {
+    background-color: var(--black-light);
+    color: var(--white);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
+    min-width: 300px;
+    max-width: 350px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--gold-border);
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .toast-icon {
+    margin-right: 10px;
+  }
+
+  .toast-icon.bi-check-circle-fill {
+    color: var(--success);
+  }
+
+  .toast-icon.bi-exclamation-triangle-fill {
+    color: var(--warning);
+  }
+
+  .toast-icon.bi-x-circle-fill {
+    color: var(--danger);
+  }
+
+  .toast-icon.bi-info-circle-fill {
+    color: var(--info);
+  }
+
+  .toast-title {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .toast-body {
+    padding: 15px;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    color: var(--white-dimmer);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+  }
+
+  .btn-close:hover {
+    color: var(--white);
+  }
+  
+  /* Estilos para móvil */
+  @media screen and (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+    
+    .btn-text {
+      display: none;
+    }
+    
+    .btn-primary {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .card-tools {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      gap: 10px;
+    }
+    
+    .search-box, .filter-box, .filter-box select {
+      width: 100%;
+    }
+    
+    /* Estilos responsive para la tabla */
+    .responsive-table thead {
+      display: none;
+    }
+    
+    .responsive-table, 
+    .responsive-table tbody, 
+    .responsive-table tr, 
+    .responsive-table td {
+      display: block;
+      width: 100%;
+    }
+    
+    .responsive-table tr {
+      margin-bottom: 15px;
+      border: 1px solid var(--gold-border);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .responsive-table td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      text-align: right;
+      border-bottom: 1px solid var(--gold-border);
+    }
+    
+    .responsive-table td:last-child {
+      border-bottom: none;
+    }
+    
+    .responsive-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: var(--gold);
+      text-align: left;
+      padding-right: 10px;
+    }
+    
+    .responsive-table td .actions {
+      justify-content: flex-end;
+    }
+    
+    .form-col {
+      width: 100%;
+    }
+    
+    /* Ajustes para modales en móvil */
+    .modal-dialog {
+      margin: 10px auto;
+      width: calc(100% - 20px);
+      max-width: none;
+    }
+    
+    .modal-body {
+      padding: 15px;
+    }
+    
+    .modal-footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-footer button {
+      width: 100%;
+    }
+
+    /* Ajustes para toast en móvil */
+    .toast-container {
+      left: 20px;
+      right: 20px;
+    }
+
+    .toast {
+      min-width: auto;
+      max-width: none;
+      width: calc(100% - 40px);
+    }
+    
+    /* Ajustes para avatar en móvil */
+    .user-avatar-cell {
+      justify-content: center;
+    }
+    
+    .user-avatar-edit {
+      margin-bottom: 30px;
+    }
+  }
+  
+  /* Ajustes para orientación landscape */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .modal-dialog {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    
+    .modal-body {
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+    
+    .form-row {
+      flex-direction: row;
+    }
+    
+    .form-col {
+      width: 50%;
+    }
+    
+    .modal-footer {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+    
+    .modal-footer button {
+      width: auto;
+    }
+    
+    /* Ajustes para tablas en landscape */
+    .responsive-table thead {
+      display: table-header-group;
+    }
+    
+    .responsive-table tbody {
+      display: table-row-group;
+    }
+    
+    .responsive-table tr {
+      display: table-row;
+      margin-bottom: 0;
+      border: none;
+    }
+    
+    .responsive-table td {
+      display: table-cell;
+      text-align: left;
+      justify-content: flex-start;
+    }
+    
+    .responsive-table td::before {
+      content: none;
+    }
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-width: 320px) {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .page-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+    
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .actions {
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+  
+  /* Ajustes para pantallas táctiles */
+  @media (hover: none) {
+    .btn-table-action, .toggle-password {
+      width: 44px;
+      height: 44px;
+    }
+    
+    .form-check-input {
+      width: 22px;
+      height: 22px;
+    }
+  }
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Función para mostrar notificaciones toast
+  window.showToast = ({ type, title, message, duration = 5000 }) => {
+    const template = document.getElementById('toast-template');
+    const toast = template.cloneNode(true);
+    toast.id = 'toast-' + Date.now();
+    toast.classList.add('show');
+    
+    // Configurar icono según el tipo
+    const icon = toast.querySelector('.toast-icon');
+    if (type === 'success') {
+      icon.classList.add('bi-check-circle-fill');
+    } else if (type === 'error') {
+      icon.classList.add('bi-x-circle-fill');
+    } else if (type === 'warning') {
+      icon.classList.add('bi-exclamation-triangle-fill');
+    } else if (type === 'info') {
+      icon.classList.add('bi-info-circle-fill');
+    }
+    
+    // Configurar título y mensaje
+    toast.querySelector('.toast-title').textContent = title;
+    toast.querySelector('.toast-body').textContent = message;
+    
+    // Agregar al contenedor
+    document.querySelector('.toast-container').appendChild(toast);
+    
+    // Configurar cierre automático
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, duration);
+    
+    // Configurar botón de cierre
+    toast.querySelector('.btn-close').addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    });
+  }
+
+  // Función para abrir modales
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.classList.add('modal-open');
+    }
+  }
+
+  // Función para cerrar modales
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  }
+  
+  // Abrir modal al hacer clic en botones con data-toggle="modal"
+  const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const targetModal = this.getAttribute('data-target').substring(1); // Quitar el #
+      openModal(targetModal);
+    });
+  });
+  
+  // Cerrar modal al hacer clic en botones con data-dismiss="modal"
+  const modalClosers = document.querySelectorAll('[data-dismiss="modal"]');
+  modalClosers.forEach(closer => {
+    closer.addEventListener('click', function() {
+      const modal = this.closest('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    });
+  });
+  
+  // Cerrar modal al hacer clic fuera del contenido
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+      event.target.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  });
+  
+  // Filtrar por rol
+  const filterSelect = document.getElementById('filterRole');
+  const tableRows = document.querySelectorAll('.data-table tbody tr');
+  
+  if (filterSelect) {
+    filterSelect.addEventListener('change', function() {
+      const selectedValue = this.value;
+      
+      tableRows.forEach(row => {
+        const roleCell = row.querySelector('td[data-column="rol"]');
+        if (!roleCell) return;
+        
+        const roleBadge = roleCell.querySelector('.badge-role');
+        if (!roleBadge) return;
+        
+        const role = roleBadge.textContent.trim().toLowerCase();
+        
+        if (!selectedValue || role === selectedValue) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  // Búsqueda en tiempo real
+  const searchInput = document.querySelector('.table-search');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      tableRows.forEach(row => {
+        const name = row.querySelector('td[data-column="nombre"]').textContent.toLowerCase();
+        const email = row.querySelector('td[data-column="email"]').textContent.toLowerCase();
+        const role = row.querySelector('td[data-column="rol"] .badge-role').textContent.toLowerCase();
+        const phone = row.querySelector('td[data-column="telefono"]')?.textContent.toLowerCase() || '';
+        
+        if (name.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm) || phone.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  // Toggle password visibility
+  const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+  
+  togglePasswordButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const passwordInput = this.previousElementSibling;
+      const icon = this.querySelector('i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      }
+    });
+  });
+  
+  // Función para mostrar el modal de confirmación
+  function showConfirmModal(title, message, callback) {
+    document.getElementById('confirmActionTitle').textContent = title;
+    document.getElementById('confirmActionMessage').textContent = message;
+    
+    // Eliminar eventos anteriores
+    const confirmBtn = document.getElementById('confirmActionBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Agregar nuevo evento
+    newConfirmBtn.addEventListener('click', function() {
+      closeModal('confirmActionModal');
+      if (typeof callback === 'function') {
+        callback();
+      }
+    });
+    
+    openModal('confirmActionModal');
+  }
+  
+  // Función para previsualizar la imagen seleccionada
+  function previewImage(input, previewElement) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        previewElement.src = e.target.result;
+      }
+      
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  
+  // Previsualizar imagen en el formulario de edición
+  const editProfileImage = document.getElementById('edit_profile_image');
+  const editAvatarPreview = document.getElementById('edit_avatar_preview');
+  
+  if (editProfileImage && editAvatarPreview) {
+    editProfileImage.addEventListener('change', function() {
+      previewImage(this, editAvatarPreview);
+      
+      // Actualizar el texto del label
+      const fileName = this.files[0] ? this.files[0].name : 'Seleccionar imagen';
+      this.nextElementSibling.textContent = fileName;
+    });
+  }
+  
+  // Actualizar el texto del label al seleccionar un archivo
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  fileInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const fileName = this.files[0] ? this.files[0].name : 'Seleccionar imagen';
+      this.nextElementSibling.textContent = fileName;
+    });
+  });
+  
+  // Validar contraseñas coincidentes en el formulario de agregar usuario
+  const addUserForm = document.getElementById('addUserForm');
+  if (addUserForm) {
+    // Modificar el script para corregir el envío del formulario de agregar usuario
+    addUserForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      
+      if (password !== confirmPassword) {
+        document.getElementById('confirm_password').setCustomValidity('Las contraseñas no coinciden');
+        this.classList.add('was-validated');
+        return;
+      } else {
+        document.getElementById('confirm_password').setCustomValidity('');
+      }
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      // Crear FormData para enviar los datos incluyendo la imagen
+      const formData = new FormData(this);
+      
+      // Agregar el estado activo
+      const activoCheckbox = document.getElementById('activo');
+      formData.set('activo', activoCheckbox.checked ? "1" : "0");
+      
+      console.log('Enviando datos de usuario:', {
+        nombre: formData.get('nombre'),
+        email: formData.get('email'),
+        telefono: formData.get('telefono'),
+        rol: formData.get('rol'),
+        activo: formData.get('activo'),
+        imagen: formData.get('profile_image') ? 'Sí' : 'No'
+      });
+      
+      // Enviar solicitud para crear usuario
+      fetch('/dashboard/usuarios/api/usuarios', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        console.log('Respuesta del servidor:', response.status);
+        return response.json().then(data => {
+          if (!response.ok) {
+            throw new Error(data.message || 'Error en la respuesta del servidor: ' + response.status);
+          }
+          return data;
+        });
+      })
+      .then(data => {
+        if (data.success) {
+          // Cerrar modal
+          closeModal('addUserModal');
+          
+          // Mostrar mensaje de éxito
+          window.showToast({
+            type: 'success',
+            title: 'Éxito',
+            message: 'Usuario creado correctamente.'
+          });
+          
+          // Recargar la página para mostrar el nuevo usuario
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: data.message || 'No se pudo crear el usuario.'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error al crear usuario:', error);
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al procesar la solicitud: ' + error.message
+        });
+      });
+    });
+  }
+  
+  // Validar contraseñas coincidentes en el formulario de restablecer contraseña
+  const resetPasswordForm = document.getElementById('resetPasswordForm');
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const password = document.getElementById('new_password').value;
+      const confirmPassword = document.getElementById('confirm_new_password').value;
+      
+      if (password !== confirmPassword) {
+        document.getElementById('confirm_new_password').setCustomValidity('Las contraseñas no coinciden');
+      } else {
+        document.getElementById('confirm_new_password').setCustomValidity('');
+      }
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      // Recopilar datos del formulario
+      const userId = document.getElementById('reset_user_id').value;
+      
+      // Crear objeto de datos para enviar como JSON
+      const passwordData = {
+        new_password: document.getElementById('new_password').value,
+        confirm_new_password: document.getElementById('confirm_new_password').value,
+        notify_user: document.getElementById('notify_user') ? document.getElementById('notify_user').checked : false
+      };
+      
+      // Enviar solicitud para restablecer contraseña
+      fetch(`/dashboard/usuarios/api/usuarios/${userId}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(passwordData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la respuesta del servidor: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Cerrar modal
+          closeModal('resetPasswordModal');
+          
+          // Mostrar mensaje de éxito
+          window.showToast({
+            type: 'success',
+            title: 'Éxito',
+            message: 'Contraseña restablecida correctamente.'
+          });
+          
+          // Limpiar formulario
+          document.getElementById('new_password').value = '';
+          document.getElementById('confirm_new_password').value = '';
+          this.classList.remove('was-validated');
+        } else {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: data.message || 'No se pudo restablecer la contraseña.'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error al restablecer contraseña:', error);
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al procesar la solicitud: ' + error.message
+        });
+      });
+    });
+  }
+  
+  // Activar usuario
+  const activateButtons = document.querySelectorAll('.btn-table-action.activate');
+  
+  activateButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const userId = this.getAttribute('data-id');
+      
+      showConfirmModal(
+        'Activar Usuario',
+        '¿Estás seguro de que deseas activar este usuario? Podrá iniciar sesión en el sistema.',
+        () => {
+          console.log(`Enviando solicitud para activar usuario con ID: ${userId}`);
+          
+          // Enviar como JSON en lugar de FormData
+          fetch(`/dashboard/usuarios/api/usuarios/${userId}/activate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: userId })
+          })
+          .then(response => {
+            console.log(`Respuesta del servidor:`, response);
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log(`Datos recibidos:`, data);
+            if (data.success) {
+              window.showToast({
+                type: 'success',
+                title: 'Éxito',
+                message: 'Usuario activado correctamente.'
+              });
+              
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              window.showToast({
+                type: 'error',
+                title: 'Error',
+                message: data.message || 'No se pudo activar el usuario.'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: 'Ocurrió un error al procesar la solicitud: ' + error.message
+            });
+          });
+        }
+      );
+    });
+  });
+  
+  // Desactivar usuario
+  const deactivateButtons = document.querySelectorAll('.btn-table-action.deactivate');
+  
+  deactivateButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const userId = this.getAttribute('data-id');
+      
+      showConfirmModal(
+        'Desactivar Usuario',
+        '¿Estás seguro de que deseas desactivar este usuario? No podrá iniciar sesión hasta que sea activado nuevamente.',
+        () => {
+          console.log(`Enviando solicitud para desactivar usuario con ID: ${userId}`);
+          
+          // Enviar como JSON en lugar de FormData
+          fetch(`/dashboard/usuarios/api/usuarios/${userId}/deactivate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: userId })
+          })
+          .then(response => {
+            console.log(`Respuesta del servidor:`, response);
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log(`Datos recibidos:`, data);
+            if (data.success) {
+              window.showToast({
+                type: 'success',
+                title: 'Éxito',
+                message: 'Usuario desactivado correctamente.'
+              });
+              
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              window.showToast({
+                type: 'error',
+                title: 'Error',
+                message: data.message || 'No se pudo desactivar el usuario.'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: 'Ocurrió un error al procesar la solicitud: ' + error.message
+            });
+          });
+        }
+      );
+    });
+  });
+  
+  // Restablecer contraseña
+  const resetPasswordButtons = document.querySelectorAll('.btn-table-action.reset-password');
+  
+  resetPasswordButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const userId = this.getAttribute('data-id');
+      const userEmail = this.getAttribute('data-email');
+      
+      document.getElementById('reset_user_id').value = userId;
+      document.getElementById('reset_email').value = userEmail;
+      
+      openModal('resetPasswordModal');
+    });
+  });
+  
+  // Cargar datos para editar
+  const editButtons = document.querySelectorAll('.btn-table-action.edit');
+  
+  editButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const userId = this.getAttribute('data-id');
+      
+      // Fetch user data
+      fetch(`/dashboard/usuarios/api/usuarios/${userId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            const usuario = data.usuario;
+            
+            // Set form data
+            document.getElementById('edit_id').value = usuario.id;
+            document.getElementById('edit_nombre').value = usuario.nombre || '';
+            document.getElementById('edit_email').value = usuario.email || '';
+            document.getElementById('original_email').value = usuario.email || '';
+            document.getElementById('edit_telefono').value = usuario.telefono || '';
+            document.getElementById('edit_rol').value = usuario.rol || '';
+            
+            // Manejar el campo activo (puede ser 0, 1, true, false)
+            const isActive = usuario.activo === 1 || usuario.activo === true;
+            document.getElementById('edit_activo').checked = isActive;
+            
+            // Actualizar la imagen de perfil si existe
+            if (usuario.imagen_url) {
+              document.getElementById('edit_avatar_preview').src = usuario.imagen_url;
+            } else {
+              document.getElementById('edit_avatar_preview').src = '/images/default-profile.png';
+            }
+            
+            // Abrir el modal
+            openModal('editUserModal');
+          } else {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: data.message || 'No se pudo cargar la información del usuario.'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error al cargar datos del usuario:', error);
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Ocurrió un error al cargar la información del usuario: ' + error.message
+          });
+        });
+    });
+  });
+  
+  // Manejar envío del formulario de edición
+  const editUserForm = document.getElementById('editUserForm');
+  if (editUserForm) {
+    // Modificar el script para corregir el envío del formulario de edición
+    editUserForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      const userId = document.getElementById('edit_id').value;
+      
+      // Crear FormData para enviar los datos incluyendo la imagen
+      const formData = new FormData(this);
+      
+      // Agregar el estado activo
+      const activoCheckbox = document.getElementById('edit_activo');
+      formData.set('activo', activoCheckbox.checked ? "1" : "0");
+      
+      console.log('Enviando datos para actualizar usuario:', {
+        id: userId,
+        nombre: formData.get('nombre'),
+        email: formData.get('email'),
+        telefono: formData.get('telefono'),
+        rol: formData.get('rol'),
+        activo: formData.get('activo'),
+        imagen: formData.get('profile_image') ? 'Sí' : 'No'
+      });
+      
+      // Enviar como FormData para incluir la imagen
+      fetch(`/dashboard/usuarios/api/usuarios/${userId}`, {
+        method: 'PUT',
+        body: formData
+      })
+      .then(response => {
+        console.log('Respuesta del servidor:', response.status);
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.message || 'Error en la respuesta del servidor: ' + response.status);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Cerrar modal
+          closeModal('editUserModal');
+          
+          // Mostrar mensaje de éxito
+          window.showToast({
+            type: 'success',
+            title: 'Éxito',
+            message: 'Usuario actualizado correctamente.'
+          });
+          
+          // Recargar la página para mostrar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: data.message || 'No se pudo actualizar el usuario.'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error al actualizar usuario:', error);
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al actualizar el usuario: ' + error.message
+        });
+      });
+    });
+  }
+  
+  // Eliminar usuario
+  const deleteButtons = document.querySelectorAll('.btn-table-action.delete');
+  
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const userId = this.getAttribute('data-id');
+      
+      showConfirmModal(
+        'Eliminar Usuario',
+        '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
+        () => {
+          console.log(`Enviando solicitud para eliminar usuario con ID: ${userId}`);
+          
+          fetch(`/dashboard/usuarios/api/usuarios/${userId}`, {
+            method: 'DELETE'
+          })
+          .then(response => {
+            console.log(`Respuesta del servidor:`, response);
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log(`Datos recibidos:`, data);
+            if (data.success) {
+              window.showToast({
+                type: 'success',
+                title: 'Éxito',
+                message: 'Usuario eliminado correctamente.'
+              });
+              
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              window.showToast({
+                type: 'error',
+                title: 'Error',
+                message: data.message || 'No se pudo eliminar el usuario.'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: 'Ocurrió un error al procesar la solicitud: ' + error.message
+            });
+          });
+        }
+      );
+    });
+  });
+  
+  // Función para ajustar elementos según el tamaño de pantalla
+  function adjustResponsiveElements() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    
+    // Ajustar altura de modales en landscape
+    if (isLandscape && width <= 992) {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = (height - 150) + 'px';
+      });
+    } else {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = '';
+      });
+    }
+  }
+  
+  // Ejecutar al cargar
+  adjustResponsiveElements();
+  
+  // Ejecutar al cambiar tamaño o orientación
+  window.addEventListener('resize', adjustResponsiveElements);
+  window.addEventListener('orientationchange', adjustResponsiveElements);
+  
+  // Mejorar experiencia en dispositivos táctiles
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.btn-table-action, .toggle-password, .form-check-input').forEach(el => {
+      el.style.padding = '10px';  // Aumentar área táctil
+    });
+    
+    document.querySelectorAll('.form-check-input').forEach(el => {
+      el.style.width = '22px';  // Aumentar tamaño del checkbox
+      el.style.height = '22px';
+    });
+  }
+});
+</script>
+{{/section}}
+

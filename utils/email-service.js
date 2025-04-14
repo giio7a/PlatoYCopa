@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer"
-import db from "../database/postgress-db.js" // Se importa la BD para obtener el nombre del tipo de evento
 import path from "path"
 import { fileURLToPath } from "url"
 import fs from "fs"
@@ -10,21 +9,18 @@ const __dirname = path.dirname(__filename)
 
 // Configuración del transporte de correo
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Puedes cambiarlo por tu proveedor de correo
+  service: "gmail",
   auth: {
-    user: "platoycopa.oficial@gmail.com", // Reemplaza con el correo real
-    pass: "hjxs qukq pooq ytxr", // Reemplaza con la contraseña real o token de aplicación
+    user: "platoycopa.oficial@gmail.com",
+    pass: "hjxs qukq pooq ytxr",
   },
 })
 
-// Update the brandColors object to match the CSS variables
+// Colores de marca
 const brandColors = {
   gold: "#e5c76b",
   goldDark: "#c9a33b",
-  goldDarker: "#9f8a4b",
   goldLight: "rgba(229, 199, 107, 0.15)",
-  goldLighter: "rgba(229, 199, 107, 0.075)",
-  goldBorder: "rgba(229, 199, 107, 0.15)",
   black: "#000",
   blackLight: "#111",
   white: "#fff",
@@ -35,30 +31,12 @@ const brandColors = {
 // Función para obtener la imagen del logo como base64
 async function getLogoBase64() {
   try {
-    // Actualizar la ruta del logo según la estructura del sitio
-    const logoPath = path.join(__dirname, "../public/img/logo.png")
-    // Verificar si el archivo existe
+    const logoPath = path.join(__dirname, "../public/img/Plato_y_Copa_logo.jpg")
     if (fs.existsSync(logoPath)) {
       const logoData = fs.readFileSync(logoPath)
-      return `data:image/png;base64,${logoData.toString("base64")}`
+      return `data:image/jpeg;base64,${logoData.toString("base64")}`
     } else {
       console.warn("Logo no encontrado en:", logoPath)
-      // Intentar rutas alternativas si la primera falla
-      const alternativePaths = [
-        path.join(__dirname, "../img/logo.png"),
-        path.join(__dirname, "../../public/img/logo.png"),
-        path.join(__dirname, "../../img/logo.png"),
-      ]
-
-      for (const altPath of alternativePaths) {
-        if (fs.existsSync(altPath)) {
-          console.log("Logo encontrado en ruta alternativa:", altPath)
-          const logoData = fs.readFileSync(altPath)
-          return `data:image/png;base64,${logoData.toString("base64")}`
-        }
-      }
-
-      console.error("Logo no encontrado en ninguna ruta")
       return null
     }
   } catch (error) {
@@ -67,7 +45,7 @@ async function getLogoBase64() {
   }
 }
 
-// Actualizar el estilo para incluir la fuente web
+// Estilos para los correos electrónicos
 const emailStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
   
@@ -84,7 +62,7 @@ const emailStyles = `
     margin: 0 auto;
     padding: 20px;
     background-color: ${brandColors.blackLight};
-    border: 1px solid ${brandColors.goldBorder};
+    border: 1px solid ${brandColors.goldLight};
     border-radius: 8px;
   }
   .header {
@@ -117,7 +95,7 @@ const emailStyles = `
   }
   h2 {
     font-size: 1.8rem;
-    border-bottom: 2px solid ${brandColors.goldBorder};
+    border-bottom: 2px solid ${brandColors.goldLight};
     padding-bottom: 10px;
     margin-top: 30px;
     text-align: center;
@@ -130,7 +108,7 @@ const emailStyles = `
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
-    border: 1px solid ${brandColors.goldBorder};
+    border: 1px solid ${brandColors.goldLight};
     border-radius: 8px;
     overflow: hidden;
   }
@@ -140,7 +118,7 @@ const emailStyles = `
     font-weight: 500;
     text-align: left;
     padding: 12px;
-    border-bottom: 1px solid ${brandColors.goldBorder};
+    border-bottom: 1px solid ${brandColors.goldLight};
   }
   td {
     padding: 12px;
@@ -174,7 +152,7 @@ const emailStyles = `
     text-align: center;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid ${brandColors.goldBorder};
+    border-top: 1px solid ${brandColors.goldLight};
     color: ${brandColors.whiteDimmer};
     font-size: 12px;
     position: relative;
@@ -205,39 +183,129 @@ const emailStyles = `
     color: ${brandColors.white};
   }
   .gradient-text {
-    background: linear-gradient(${brandColors.gold} 0%, ${brandColors.goldDarker} 50%, ${brandColors.gold} 100%);
+    background: linear-gradient(${brandColors.gold} 0%, ${brandColors.goldDark} 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 10px rgba(229, 199, 107, 0.2));
   }
+  .button {
+    display: inline-block;
+    background-color: ${brandColors.gold};
+    color: ${brandColors.black} !important;
+    padding: 12px 25px;
+    margin: 20px 0;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  .button:hover {
+    background-color: ${brandColors.goldDark};
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(229, 199, 107, 0.2);
+  }
+  .info-text {
+    color: ${brandColors.whiteDim};
+    line-height: 1.8;
+    margin: 20px 0;
+  }
+  .signature {
+    border-top: 1px solid ${brandColors.goldLight};
+    margin-top: 20px;
+    padding-top: 15px;
+    color: ${brandColors.whiteDim};
+  }
+  .signature img {
+    max-width: 120px;
+    margin-bottom: 10px;
+  }
 `
+export async function sendWelcomeEmail({ to, nombre }) {
+  try {
+    const logoBase64 = await getLogoBase64(); // Ya definida en tu archivo
 
-// Update the sendContactEmail function to use the new styling
+    const html = `
+      <html>
+        <head>
+          <style>
+            ${emailStyles} /* Ya definido en tu archivo también */
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              ${logoBase64 
+                ? `<img src="${logoBase64}" alt="Plato y Copa" class="logo">`
+                : "<h1 class='gradient-text'>Plato y Copa</h1>"
+              }
+              <h2 class="gradient-text">¡Bienvenido a Plato y Copa!</h2>
+            </div>
+
+            <div class="info-text">
+              <p>Hola ${nombre},</p>
+              <p>¡Gracias por registrarte en nuestra plataforma!</p>
+              <p>Nos alegra que formes parte de nuestra comunidad.</p>
+              <p>En Plato y Copa, estamos comprometidos en brindarte el mejor servicio para que tu evento sea inolvidable.</p>
+            </div>
+
+            <div class="footer">
+              <p>Este correo fue enviado automáticamente después de tu registro.</p>
+              <div class="social-links">
+                <a href="https://www.facebook.com/share/15qpCyANjq/">Facebook</a> |
+                <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0">Instagram</a> |
+                <a href="https://wa.me/5212223780903">WhatsApp</a>
+              </div>
+              <p>© ${new Date().getFullYear()} Plato y Copa. Todos los derechos reservados.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "¡Bienvenido a Plato y Copa!",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Correo de bienvenida enviado a:", to);
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar correo de bienvenida:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Función para enviar correo de contacto
 export async function sendContactEmail(contactData) {
   try {
     const { nombre, email, telefono, tipo_evento, mensaje } = contactData
     const logoBase64 = await getLogoBase64()
 
-    // Obtener el nombre del tipo de evento desde la BD si el valor es un ID numérico
+    // Obtener el nombre del tipo de evento si es un ID
     let tipoEventoTexto = tipo_evento
-    if (!isNaN(tipo_evento)) {
+    if (typeof tipo_evento === "number" || !isNaN(tipo_evento)) {
       try {
-        const eventTypeData = await db.tiposEventosRepo.getById(tipo_evento)
-        if (eventTypeData && eventTypeData.nombre) {
-          tipoEventoTexto = eventTypeData.nombre
-        } else {
-          tipoEventoTexto = "Tipo de evento desconocido"
+        // Asumimos que db está disponible globalmente o se pasa como parámetro
+        const db = global.db || require("../database/postgress-db.js").default
+        const tipoEventoData = await db.tiposEventosRepo.getById(tipo_evento)
+        if (tipoEventoData && tipoEventoData.nombre) {
+          tipoEventoTexto = tipoEventoData.nombre
         }
       } catch (error) {
         console.error("Error al obtener tipo de evento:", error)
-        tipoEventoTexto = "Tipo de evento desconocido"
       }
     }
 
-    // Configurar el correo con una estructura HTML clara y bien formateada
+    // Configurar el correo con diseño premium
     const mailOptions = {
-      from: "Plato y Copa Website <platoycopa.oficial@gmail.com>",
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
       to: "platoycopa.oficial@gmail.com", // Correo de destino
       subject: `Nuevo mensaje de contacto de ${nombre}`,
       html: `
@@ -266,11 +334,11 @@ export async function sendContactEmail(contactData) {
                 </tr>
                 <tr class="highlight">
                   <td><strong>Teléfono:</strong></td>
-                  <td>${telefono}</td>
+                  <td>${telefono || "No proporcionado"}</td>
                 </tr>
                 <tr>
                   <td><strong>Tipo de evento:</strong></td>
-                  <td>${tipoEventoTexto}</td>
+                  <td>${tipoEventoTexto || "No especificado"}</td>
                 </tr>
               </table>
               
@@ -305,7 +373,144 @@ export async function sendContactEmail(contactData) {
   }
 }
 
-// Update the sendQuotationEmail function to use the new styling
+// Función para enviar respuesta a un mensaje de contacto
+export async function sendReplyEmail(replyData) {
+  try {
+    const { destinatario, nombre, mensaje, asunto, includeSignature, remitente } = replyData
+    const logoBase64 = await getLogoBase64()
+
+    // Preparar firma
+    let signature = ""
+    if (includeSignature) {
+      signature = `
+      <div class="signature">
+        ${logoBase64 ? `<img src="${logoBase64}" alt="Plato y Copa">` : ""}
+        <p><strong>Plato y Copa - Servicio de meseros</strong><br>
+        Email: platoycopa.oficial@gmail.com<br>
+        Tel: +52 (222) 378-0903<br>
+        <a href="https://www.platoycopa.com" style="color: ${brandColors.gold};">www.platoycopa.com</a></p>
+      </div>`
+    }
+
+    // Configurar el correo con diseño premium
+    const mailOptions = {
+      from: {
+        name: `${remitente} - Plato y Copa`,
+        address: "platoycopa.oficial@gmail.com",
+      },
+      to: destinatario,
+      subject: asunto,
+      html: `
+        <html>
+          <head>
+            <style>
+              ${emailStyles}
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                ${logoBase64 ? `<img src="${logoBase64}" alt="Plato y Copa" class="logo">` : "<h1 class='gradient-text'>Plato y Copa</h1>"}
+                <h2 class="gradient-text">Respuesta a tu Mensaje</h2>
+              </div>
+              
+              <div class="info-text">
+                <p>Hola ${nombre},</p>
+                <p>${mensaje.replace(/\n/g, "<br>")}</p>
+              </div>
+              
+              ${signature}
+              
+              <div class="footer">
+                <p>Este correo es una respuesta a tu mensaje enviado a través de nuestro sitio web.</p>
+                <div class="social-links">
+                  <a href="https://www.facebook.com/share/15qpCyANjq/">Facebook</a> |
+                  <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0">Instagram</a> |
+                  <a href="https://wa.me/5212223780903">WhatsApp</a>
+                </div>
+                <p>© ${new Date().getFullYear()} Plato y Copa. Todos los derechos reservados.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    }
+
+    // Enviar el correo
+    const info = await transporter.sendMail(mailOptions)
+    console.log("Correo de respuesta enviado:", info.messageId)
+
+    return { success: true, messageId: info.messageId }
+  } catch (error) {
+    console.error("Error al enviar correo de respuesta:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Función para enviar correo de reenvío
+export async function sendForwardEmail(forwardData) {
+  try {
+    const { destinatario, mensaje, asunto, remitente } = forwardData
+    const logoBase64 = await getLogoBase64()
+
+    // Configurar el correo con diseño premium
+    const mailOptions = {
+      from: {
+        name: `${remitente} - Plato y Copa`,
+        address: "platoycopa.oficial@gmail.com",
+      },
+      to: destinatario,
+      subject: asunto,
+      html: `
+        <html>
+          <head>
+            <style>
+              ${emailStyles}
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                ${logoBase64 ? `<img src="${logoBase64}" alt="Plato y Copa" class="logo">` : "<h1 class='gradient-text'>Plato y Copa</h1>"}
+                <h2 class="gradient-text">Mensaje Reenviado</h2>
+              </div>
+              
+              <div class="info-text">
+                <p>${mensaje.replace(/\n/g, "<br>")}</p>
+              </div>
+              
+              <div class="message-box">
+                <p><strong>Reenviado por:</strong> ${remitente}<br>
+                <strong>Fecha:</strong> ${new Date().toLocaleString("es-MX")}</p>
+              </div>
+              
+              <div class="footer">
+                <p>Este correo ha sido reenviado desde nuestro sistema de mensajería.</p>
+                <div class="social-links">
+                  <a href="https://www.facebook.com/share/15qpCyANjq/">Facebook</a> |
+                  <a href="https://www.instagram.com/platoycopa.oficial?igsh=aHpyNWxhZGxyOWJ0">Instagram</a> |
+                  <a href="https://wa.me/5212223780903">WhatsApp</a>
+                </div>
+                <p>© ${new Date().getFullYear()} Plato y Copa. Todos los derechos reservados.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    }
+
+    // Enviar el correo
+    const info = await transporter.sendMail(mailOptions)
+    console.log("Correo reenviado enviado:", info.messageId)
+
+    return { success: true, messageId: info.messageId }
+  } catch (error) {
+    console.error("Error al enviar correo reenviado:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Función para enviar correo de cotización
 export async function sendQuotationEmail(quotationData) {
   try {
     const {
@@ -328,27 +533,26 @@ export async function sendQuotationEmail(quotationData) {
 
     const logoBase64 = await getLogoBase64()
 
-    // Obtener el nombre del tipo de evento desde la BD si el valor es un ID numérico
+    // Obtener el nombre del tipo de evento si es un ID
     let tipoEventoTexto = eventType
-    if (!isNaN(eventType)) {
+    if (typeof eventType === "number" || !isNaN(eventType)) {
       try {
-        const eventTypeData = await db.tiposEventosRepo.getById(eventType)
-        if (eventTypeData && eventTypeData.nombre) {
-          tipoEventoTexto = eventTypeData.nombre
-        } else {
-          tipoEventoTexto = "Tipo de evento desconocido"
+        // Asumimos que db está disponible globalmente o se pasa como parámetro
+        const db = global.db || require("../database/postgress-db.js").default
+        const tipoEventoData = await db.tiposEventosRepo.getById(eventType)
+        if (tipoEventoData && tipoEventoData.nombre) {
+          tipoEventoTexto = tipoEventoData.nombre
         }
       } catch (error) {
         console.error("Error al obtener tipo de evento:", error)
-        tipoEventoTexto = "Tipo de evento desconocido"
       }
     }
 
-    // Configurar el correo
+    // Configurar el correo con diseño premium
     const mailOptions = {
-      from: "Plato y Copa Website <platoycopa.oficial@gmail.com>",
-      to: "platoycopa.oficial@gmail.com", // Correo de destino
-      subject: `Nueva cotización de ${fullName}`,
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to: "platoycopa.oficial@gmail.com", // Correo de destino (también se puede enviar al cliente)
+      subject: `Nueva cotización de ${fullName} - ${tipoEventoTexto}`,
       html: `
         <html>
           <head>
@@ -468,9 +672,211 @@ export async function sendQuotationEmail(quotationData) {
     return { success: false, error: error.message }
   }
 }
+// Función para enviar correo de modificación de cuenta
+export async function sendAccountModificationEmail({ to, nombreUsuario, modifiedBy, modifiedFields }) {
+  try {
+    // Construir el contenido descriptivo de los cambios
+    const changesList = modifiedFields.length > 0
+      ? `<ul>${modifiedFields.map(item => `<li>${item}</li>`).join('')}</ul>`
+      : "<p>No se detectaron cambios.</p>";
 
-export default {
-  sendContactEmail,
-  sendQuotationEmail,
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Modificación de Cuenta</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu cuenta ha sido modificada por ${modifiedBy}.</p>
+        <p>A continuación, se muestra un resumen de los cambios realizados:</p>
+        ${changesList}
+        <p>Si no solicitaste estos cambios o tienes alguna duda, por favor ponte en contacto con el equipo de soporte.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Modificación en tu cuenta - Plato y Copa",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de modificación enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de modificación:", error);
+    return { success: false, error: error.message };
+  }
+}
+export async function sendAccountActivationEmail({ to, nombreUsuario, modifiedBy }) {
+  try {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Cuenta Activada</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu cuenta ha sido <strong>activada</strong> por ${modifiedBy}.</p>
+        <p>A partir de ahora podrás acceder a todas las funcionalidades disponibles.</p>
+        <p>Si no reconoces esta acción, por favor contacta a soporte.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Tu cuenta ha sido activada",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de activación enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de activación:", error);
+    return { success: false, error: error.message };
+  }
+}
+export async function sendAccountDeactivationEmail({ to, nombreUsuario, modifiedBy }) {
+  try {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Cuenta Desactivada</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu cuenta ha sido <strong>desactivada</strong> por ${modifiedBy}.</p>
+        <p>Ya no podrás acceder al sistema hasta que se reactive. Si crees que se ha producido un error, contacta a soporte.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Tu cuenta ha sido desactivada",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de desactivación enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de desactivación:", error);
+    return { success: false, error: error.message };
+  }
 }
 
+export async function sendAccountDeletionEmail({ to, nombreUsuario, modifiedBy }) {
+  try {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Cuenta Eliminada</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu cuenta ha sido <strong>eliminada</strong> por ${modifiedBy}.</p>
+        <p>Esta acción es irreversible. Si tienes dudas o necesitas ayuda, contacta al equipo de soporte.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Tu cuenta ha sido eliminada",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de eliminación enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de eliminación:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function sendPasswordChangeNotificationEmail({ to, nombreUsuario, modifiedBy, newPassword }) {
+  try {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Contraseña Actualizada</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu contraseña ha sido actualizada por ${modifiedBy}.</p>
+        <p>Tu nueva contraseña es:</p>
+        <div style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 2px; margin: 20px 0;">
+          ${newPassword}
+        </div>
+        <p>Por razones de seguridad, te recomendamos cambiarla una vez que inicies sesión.</p>
+        <p>Si no autorizaste este cambio, por favor contacta al equipo de soporte inmediatamente.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Tu contraseña ha sido actualizada",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de cambio de contraseña enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de cambio de contraseña:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+
+
+// Función para enviar email de creación de cuenta
+export async function sendAccountCreationEmail({ to, nombreUsuario, createdBy }) {
+  try {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: ${brandColors.gold};">Cuenta Creada</h2>
+        </div>
+        <p>Hola ${nombreUsuario},</p>
+        <p>Tu cuenta ha sido creada por ${createdBy}.</p>
+        <p>Ahora ya puedes acceder al sistema y disfrutar de nuestros servicios.</p>
+        <p>Si tienes alguna duda, por favor contacta a soporte.</p>
+        <p>Saludos,<br>Equipo de Plato y Copa</p>
+      </div>
+    `;
+    
+    const mailOptions = {
+      from: "Plato y Copa <platoycopa.oficial@gmail.com>",
+      to,
+      subject: "Tu cuenta ha sido creada",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email de creación enviado a:", to);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error al enviar email de creación:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+
+
+// Exportar todas las funciones
+export default {
+  sendContactEmail,
+  sendReplyEmail,
+  sendForwardEmail,
+  sendQuotationEmail,
+  sendAccountModificationEmail,
+  sendAccountActivationEmail,
+  sendAccountDeactivationEmail,
+  sendAccountDeletionEmail,
+  sendPasswordChangeNotificationEmail,
+  sendAccountCreationEmail,
+  sendWelcomeEmail
+}

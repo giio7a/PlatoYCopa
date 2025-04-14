@@ -1,0 +1,1344 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Tipos de Eventos</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="addEventTypeModal">
+      <i class="bi bi-plus-lg"></i> <span class="btn-text">Nuevo Tipo de Evento</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Tipos de Eventos</h3>
+    <div class="card-tools">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" class="table-search" placeholder="Buscar tipo de evento...">
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="data-table responsive-table" id="tiposEventosTable">
+        <thead>
+          <tr>
+            <th data-sort="id">#</th>
+            <th data-sort="nombre">Nombre</th>
+            <th>Descripción</th>
+            <th>Icono</th>
+            <th class="actions-column">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each tiposEventos}}
+          <tr data-id="{{this.id}}">
+            <td data-label="ID" data-column="id">{{this.id}}</td>
+            <td data-label="Nombre" data-column="nombre">{{this.nombre}}</td>
+            <td data-label="Descripción" data-column="descripcion">{{truncate this.descripcion 100}}</td>
+            <td data-label="Icono" data-column="icono">
+              <i class="bi bi-{{this.icono}}"></i> {{this.icono}}
+            </td>
+            <td data-label="Acciones" class="actions-column">
+              <div class="actions">
+                <button class="btn-table-action edit" title="Editar" data-toggle="modal" data-target="editEventTypeModal" data-id="{{this.id}}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-table-action delete btn-delete" title="Eliminar" data-id="{{this.id}}" data-type="tipos-eventos" data-name="{{this.nombre}}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td colspan="5" class="text-center">No hay tipos de eventos registrados</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Tipo de Evento -->
+<div class="modal" id="addEventTypeModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agregar Nuevo Tipo de Evento</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addEventTypeForm" class="crud-form needs-validation" novalidate>
+          <div class="form-group">
+            <label for="nombre" class="form-label">Nombre del Tipo de Evento</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+            <div class="invalid-feedback">Por favor ingresa un nombre para el tipo de evento.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa una descripción.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="icono" class="form-label">Icono</label>
+            <div class="icon-selector">
+              <div class="selected-icon">
+                <i class="bi bi-calendar-event"></i>
+              </div>
+              <input type="text" class="form-control" id="icono" name="icono" value="calendar-event" required>
+              <button type="button" class="icon-toggle" aria-label="Mostrar iconos">
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <div class="icon-preview">
+                <div class="icon-grid">
+                  <div class="icon-item" data-icon="calendar-event"><i class="bi bi-calendar-event"></i></div>
+                  <div class="icon-item" data-icon="people"><i class="bi bi-people"></i></div>
+                  <div class="icon-item" data-icon="cup-hot"><i class="bi bi-cup-hot"></i></div>
+                  <div class="icon-item" data-icon="music-note-beamed"><i class="bi bi-music-note-beamed"></i></div>
+                  <div class="icon-item" data-icon="briefcase"><i class="bi bi-briefcase"></i></div>
+                  <div class="icon-item" data-icon="heart"><i class="bi bi-heart"></i></div>
+                  <div class="icon-item" data-icon="balloon"><i class="bi bi-balloon"></i></div>
+                  <div class="icon-item" data-icon="gift"><i class="bi bi-gift"></i></div>
+                  <div class="icon-item" data-icon="mortarboard"><i class="bi bi-mortarboard"></i></div>
+                  <div class="icon-item" data-icon="building"><i class="bi bi-building"></i></div>
+                  <div class="icon-item" data-icon="house"><i class="bi bi-house"></i></div>
+                  <div class="icon-item" data-icon="stars"><i class="bi bi-stars"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="invalid-feedback">Por favor selecciona un icono.</div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Tipo de Evento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Tipo de Evento -->
+<div class="modal" id="editEventTypeModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Tipo de Evento</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editEventTypeForm" class="crud-form needs-validation" novalidate>
+          <input type="hidden" id="edit_id" name="id">
+          
+          <div class="form-group">
+            <label for="edit_nombre" class="form-label">Nombre del Tipo de Evento</label>
+            <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+            <div class="invalid-feedback">Por favor ingresa un nombre para el tipo de evento.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa una descripción.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_icono" class="form-label">Icono</label>
+            <div class="icon-selector">
+              <div class="selected-icon">
+                <i id="edit_selected_icon" class="bi"></i>
+              </div>
+              <input type="text" class="form-control" id="edit_icono" name="icono" required>
+              <button type="button" class="icon-toggle" aria-label="Mostrar iconos">
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <div class="icon-preview">
+                <div class="icon-grid">
+                  <div class="icon-item" data-icon="calendar-event"><i class="bi bi-calendar-event"></i></div>
+                  <div class="icon-item" data-icon="people"><i class="bi bi-people"></i></div>
+                  <div class="icon-item" data-icon="cup-hot"><i class="bi bi-cup-hot"></i></div>
+                  <div class="icon-item" data-icon="music-note-beamed"><i class="bi bi-music-note-beamed"></i></div>
+                  <div class="icon-item" data-icon="briefcase"><i class="bi bi-briefcase"></i></div>
+                  <div class="icon-item" data-icon="heart"><i class="bi bi-heart"></i></div>
+                  <div class="icon-item" data-icon="balloon"><i class="bi bi-balloon"></i></div>
+                  <div class="icon-item" data-icon="gift"><i class="bi bi-gift"></i></div>
+                  <div class="icon-item" data-icon="mortarboard"><i class="bi bi-mortarboard"></i></div>
+                  <div class="icon-item" data-icon="building"><i class="bi bi-building"></i></div>
+                  <div class="icon-item" data-icon="house"><i class="bi bi-house"></i></div>
+                  <div class="icon-item" data-icon="stars"><i class="bi bi-stars"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="invalid-feedback">Por favor selecciona un icono.</div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Actualizar Tipo de Evento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal" id="confirmDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Eliminación</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el tipo de evento <strong id="deleteEventTypeName"></strong>?</p>
+        <p>Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="toast-container"></div>
+
+{{#section 'scripts'}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Referencias a elementos DOM
+  const searchInput = document.getElementById('searchInput');
+  const tiposEventosTable = document.getElementById('tiposEventosTable');
+  const addEventTypeForm = document.getElementById('addEventTypeForm');
+  const editEventTypeForm = document.getElementById('editEventTypeForm');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+  // Variables para almacenar el ID del tipo de evento a eliminar
+  let eventTypeIdToDelete = null;
+
+  // Función para abrir modales
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.classList.add('modal-open');
+    }
+  }
+
+  // Función para cerrar modales
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  // Función para mostrar notificaciones toast
+  function showToast(message, type = 'info') {
+    const toastContainer = document.querySelector('.toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : 'bi-info-circle'}"></i>
+        <span>${message}</span>
+      </div>
+      <button class="toast-close"><i class="bi bi-x"></i></button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Mostrar el toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    // Configurar el botón de cierre
+    const closeButton = toast.querySelector('.toast-close');
+    closeButton.addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    });
+    
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 5000);
+  }
+
+  // Abrir modal al hacer clic en botones con data-toggle="modal"
+  const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const targetModal = this.getAttribute('data-target');
+      openModal(targetModal);
+      
+      // Si es el botón de editar, cargar los datos del tipo de evento
+      if (this.classList.contains('edit')) {
+        const eventTypeId = this.getAttribute('data-id');
+        loadEventTypeData(eventTypeId);
+      }
+    });
+  });
+
+  // Cerrar modal al hacer clic en botones con data-dismiss="modal"
+  const modalClosers = document.querySelectorAll('[data-dismiss="modal"]');
+  modalClosers.forEach(closer => {
+    closer.addEventListener('click', function() {
+      const modal = this.closest('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    });
+  });
+
+  // Cerrar modal al hacer clic fuera del contenido
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+      event.target.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  });
+
+  // Función para ajustar elementos según el tamaño de pantalla
+  function adjustResponsiveElements() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    
+    // Ajustar altura de modales en landscape
+    if (isLandscape && width <= 992) {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = (height - 150) + 'px';
+        body.style.overflowY = 'auto';
+      });
+      
+      const iconPreviews = document.querySelectorAll('.icon-preview');
+      iconPreviews.forEach(preview => {
+        preview.style.maxHeight = '200px';
+        preview.style.overflowY = 'auto';
+      });
+    } else {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = '';
+        body.style.overflowY = '';
+      });
+      
+      const iconPreviews = document.querySelectorAll('.icon-preview');
+      iconPreviews.forEach(preview => {
+        preview.style.maxHeight = '';
+        preview.style.overflowY = '';
+      });
+    }
+  }
+
+  // Ejecutar al cargar
+  adjustResponsiveElements();
+
+  // Ejecutar al cambiar tamaño o orientación
+  window.addEventListener('resize', adjustResponsiveElements);
+  window.addEventListener('orientationchange', adjustResponsiveElements);
+
+  // Función para filtrar la tabla
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const rows = tiposEventosTable.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        if (row.querySelector('td[colspan]')) return; // Ignorar fila de "No hay tipos de eventos"
+        
+        const nombre = row.querySelector('td[data-column="nombre"]').textContent.toLowerCase();
+        const descripcion = row.querySelector('td[data-column="descripcion"]').textContent.toLowerCase();
+        
+        if (nombre.includes(searchTerm) || descripcion.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Validación de formularios
+  function validateForm(form) {
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return false;
+    }
+    return true;
+  }
+
+  // Configurar selector de iconos
+  const iconToggles = document.querySelectorAll('.icon-toggle');
+  
+  iconToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const iconSelector = this.closest('.icon-selector');
+      const iconPreview = iconSelector.querySelector('.icon-preview');
+      
+      // Toggle la clase active en el botón
+      this.classList.toggle('active');
+      
+      // Toggle la clase show en el preview
+      iconPreview.classList.toggle('show');
+    });
+  });
+  
+  // Cerrar el selector de iconos al hacer clic fuera
+  document.addEventListener('click', function(event) {
+    const iconSelectors = document.querySelectorAll('.icon-selector');
+    
+    iconSelectors.forEach(selector => {
+      const iconPreview = selector.querySelector('.icon-preview');
+      const iconToggle = selector.querySelector('.icon-toggle');
+      
+      if (!selector.contains(event.target) && iconPreview.classList.contains('show')) {
+        iconPreview.classList.remove('show');
+        iconToggle.classList.remove('active');
+      }
+    });
+  });
+  
+  // Configurar funcionalidad del selector de iconos
+  const iconSelectors = document.querySelectorAll('.icon-selector');
+  
+  iconSelectors.forEach(selector => {
+    const input = selector.querySelector('input');
+    const selectedIcon = selector.querySelector('.selected-icon i');
+    const iconItems = selector.querySelectorAll('.icon-item');
+    
+    // Actualizar icono cuando cambia el input
+    input.addEventListener('input', function() {
+      selectedIcon.className = `bi bi-${this.value}`;
+    });
+    
+    // Seleccionar icono al hacer clic en un elemento
+    iconItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const icon = this.getAttribute('data-icon');
+        input.value = icon;
+        selectedIcon.className = `bi bi-${icon}`;
+        
+        // Cerrar el selector después de elegir
+        const iconPreview = selector.querySelector('.icon-preview');
+        const iconToggle = selector.querySelector('.icon-toggle');
+        iconPreview.classList.remove('show');
+        iconToggle.classList.remove('active');
+      });
+    });
+  });
+
+  // Función para cargar datos de un tipo de evento
+  function loadEventTypeData(eventTypeId) {
+    fetch(`/api/tipos-eventos/${eventTypeId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const eventType = data.tipoEvento;
+          
+          // Llenar formulario de edición
+          document.getElementById('edit_id').value = eventType.id;
+          document.getElementById('edit_nombre').value = eventType.nombre;
+          document.getElementById('edit_descripcion').value = eventType.descripcion;
+          document.getElementById('edit_icono').value = eventType.icono || 'calendar-event';
+          
+          // Actualizar icono seleccionado
+          const selectedIcon = document.getElementById('edit_selected_icon');
+          selectedIcon.className = `bi bi-${eventType.icono || 'calendar-event'}`;
+          
+          // Ajustar modal después de cargar datos
+          adjustResponsiveElements();
+        } else {
+          showToast(data.message || 'No se pudo cargar la información del tipo de evento.', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Ocurrió un error al cargar la información del tipo de evento.', 'error');
+      });
+  }
+
+  // Manejar envío del formulario de agregar tipo de evento
+  if (addEventTypeForm) {
+    addEventTypeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm(this)) return;
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Mostrar indicador de carga
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Guardando...';
+      
+      // Enviar datos al servidor
+      fetch('/api/tipos-eventos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Tipo de evento creado correctamente', 'success');
+          closeModal('addEventTypeModal');
+          
+          // Recargar la página para mostrar el nuevo tipo de evento
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast(data.message || 'Error al crear el tipo de evento', 'error');
+          // Restaurar botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al crear el tipo de evento', 'error');
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      });
+    });
+  }
+
+  // Manejar envío del formulario de editar tipo de evento
+  if (editEventTypeForm) {
+    editEventTypeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm(this)) return;
+      
+      const formData = new FormData(this);
+      const eventTypeId = formData.get('id');
+      const data = Object.fromEntries(formData.entries());
+      
+      // Mostrar indicador de carga
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Actualizando...';
+      
+      // Enviar datos al servidor
+      fetch(`/api/tipos-eventos/${eventTypeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Tipo de evento actualizado correctamente', 'success');
+          closeModal('editEventTypeModal');
+          
+          // Recargar la página para mostrar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast(data.message || 'Error al actualizar el tipo de evento', 'error');
+          // Restaurar botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al actualizar el tipo de evento', 'error');
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      });
+    });
+  }
+
+  // Configurar modal de confirmación para eliminar
+  const deleteButtons = document.querySelectorAll('.btn-delete');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      eventTypeIdToDelete = this.getAttribute('data-id');
+      const eventTypeName = this.getAttribute('data-name');
+      
+      // Actualizar el modal con el nombre del tipo de evento
+      document.getElementById('deleteEventTypeName').textContent = eventTypeName;
+      
+      // Abrir el modal de confirmación
+      openModal('confirmDeleteModal');
+    });
+  });
+
+  // Manejar confirmación de eliminación
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', function() {
+      if (!eventTypeIdToDelete) return;
+      
+      // Mostrar indicador de carga
+      const originalText = this.innerHTML;
+      this.disabled = true;
+      this.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Eliminando...';
+      
+      // Enviar solicitud de eliminación
+      fetch(`/api/tipos-eventos/${eventTypeIdToDelete}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Tipo de evento eliminado correctamente', 'success');
+          closeModal('confirmDeleteModal');
+          
+          // Eliminar la fila de la tabla
+          const row = document.querySelector(`tr[data-id="${eventTypeIdToDelete}"]`);
+          if (row) {
+            row.remove();
+          }
+          
+          // Si no quedan tipos de eventos, mostrar mensaje
+          const rows = tiposEventosTable.querySelectorAll('tbody tr');
+          if (rows.length === 0) {
+            const tbody = tiposEventosTable.querySelector('tbody');
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = '<td colspan="5" class="text-center">No hay tipos de eventos registrados</td>';
+            tbody.appendChild(emptyRow);
+          }
+        } else {
+          showToast(data.message || 'Error al eliminar el tipo de evento', 'error');
+          // Restaurar botón
+          this.disabled = false;
+          this.innerHTML = originalText;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error al eliminar el tipo de evento', 'error');
+        // Restaurar botón
+        this.disabled = false;
+        this.innerHTML = originalText;
+      })
+      .finally(() => {
+        eventTypeIdToDelete = null;
+      });
+    });
+  }
+
+  // Mejorar experiencia en dispositivos táctiles
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.btn-table-action, .icon-item').forEach(el => {
+      el.style.padding = '10px';  // Aumentar área táctil
+    });
+  }
+});
+</script>
+{{/section}}
+
+{{#section 'styles'}}
+<style>
+/* Estilos para el encabezado de página */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 0 10px;
+}
+
+.page-title {
+  color: var(--gold);
+  font-weight: 300;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Estilos para la tabla */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Estilos responsive para la tabla */
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.responsive-table th {
+  text-align: left;
+  padding: 12px 15px;
+  background-color: var(--gold-light);
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.responsive-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.responsive-table tr:hover {
+  background-color: var(--gold-lighter);
+}
+
+.actions-column {
+  width: 120px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Estilos para modales */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  background-color: var(--black-light);
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  transform: translateY(-20px);
+  transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.modal-title {
+  color: var(--gold);
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: var(--gold);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--gold-border);
+}
+
+/* Estilos para el selector de iconos */
+.icon-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selected-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.selected-icon i {
+  font-size: 1.2rem;
+  color: var(--gold);
+}
+
+.icon-selector input {
+  padding-left: 40px;
+  flex-grow: 1;
+}
+
+.icon-toggle {
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  padding: 0 10px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.icon-toggle.active {
+  transform: rotate(180deg);
+}
+
+.icon-preview {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--black-light);
+  border: 1px solid var(--gold-border);
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 10;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.icon-preview.show {
+  display: block;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+.icon-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-item:hover {
+  background-color: var(--gold-light);
+}
+
+.icon-item i {
+  font-size: 1.2rem;
+  color: var(--gold);
+}
+
+/* Estilos para toast */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 250px;
+  max-width: 350px;
+  background-color: var(--black-light);
+  color: var(--white);
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  border-left: 4px solid var(--gold);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  border-left-color: var(--success);
+}
+
+.toast.error {
+  border-left-color: var(--danger);
+}
+
+.toast.info {
+  border-left-color: var(--info);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-content i {
+  font-size: 1.5rem;
+}
+
+.toast-content i.bi-check-circle {
+  color: var(--success);
+}
+
+.toast-content i.bi-x-circle {
+  color: var(--danger);
+}
+
+.toast-content i.bi-info-circle {
+  color: var(--info);
+}
+
+.toast-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.toast-close:hover {
+  color: var(--white);
+}
+
+/* Animación de carga */
+.spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para formularios */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--gold-border);
+  border-radius: 4px;
+  background-color: var(--black);
+  color: var(--white);
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.invalid-feedback {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin-top: 5px;
+  display: none;
+}
+
+.was-validated .form-control:invalid {
+  border-color: var(--danger);
+}
+
+.was-validated .form-control:invalid + .invalid-feedback {
+  display: block;
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  gap: 5px;
+}
+
+.btn-primary {
+  background-color: var(--gold);
+  color: var(--black);
+}
+
+.btn-primary:hover {
+  background-color: var(--gold-dark);
+}
+
+.btn-secondary {
+  background-color: var(--black-light);
+  color: var(--white);
+  border: 1px solid var(--gold-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--black-lighter);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-dark);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos para botones de acción en la tabla */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-table-action {
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.btn-table-action:hover {
+  background-color: var(--gold-lighter);
+}
+
+.btn-table-action.edit {
+  color: var(--warning);
+}
+
+.btn-table-action.delete {
+  color: var(--danger);
+}
+
+/* Estilos para móvil */
+@media screen and (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-text {
+    display: none;
+  }
+
+  .btn-primary {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .responsive-table thead {
+    display: none;
+  }
+
+  .responsive-table, 
+  .responsive-table tbody, 
+  .responsive-table tr, 
+  .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table tr {
+    margin-bottom: 15px;
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .responsive-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    text-align: right;
+    border-bottom: 1px solid var(--gold-border);
+  }
+
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--gold);
+    text-align: left;
+    padding-right: 10px;
+  }
+
+  .responsive-table td .actions {
+    justify-content: flex-end;
+  }
+
+  /* Ajustes para modales en móvil */
+  .modal-dialog {
+    margin: 10px auto;
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+
+  .toast-container {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  /* Ajustes para el selector de iconos en móvil */
+  .icon-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .icon-item {
+    width: 100%;
+    height: 50px; /* Más grande para facilitar el toque */
+  }
+}
+
+/* Ajustes para orientación landscape */
+@media (max-width: 992px) and (orientation: landscape) {
+  .modal-dialog {
+    max-width: 600px;
+    margin: 20px auto;
+  }
+
+  .modal-body {
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .modal-footer button {
+    width: auto;
+  }
+
+  /* Ajustes para tablas en landscape */
+  .responsive-table thead {
+    display: table-header-group;
+  }
+
+  .responsive-table tbody {
+    display: table-row-group;
+  }
+
+  .responsive-table tr {
+    display: table-row;
+    margin-bottom: 0;
+    border: none;
+  }
+
+  .responsive-table td {
+    display: table-cell;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .responsive-table td::before {
+    content: none;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-tools {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mejoras para compatibilidad con sidebar */
+.card {
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--black-light);
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.card-body {
+  padding: 15px;
+  background-color: var(--black-light);
+}
+
+.search-box {
+  position: relative;
+  max-width: 300px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+}
+
+.table-search {
+  padding: 8px 10px 8px 35px;
+  border: 1px solid var(--gold-border);
+  border-radius: 4px;
+  background-color: var(--black);
+  color: var(--white);
+  width: 100%;
+}
+
+.table-search:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+</style>
+{{/section}}
+

@@ -1,0 +1,257 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title-wrapper">
+      <h2 class="card-title">Resultados de búsqueda</h2>
+      <p class="card-subtitle">
+        {{#if results.length}}
+          Se encontraron <strong>{{totalResults}}</strong> resultados para "<strong>{{query}}</strong>"
+        {{else}}
+          {{#if noQuery}}
+            Ingresa un término para buscar en el dashboard
+          {{else}}
+            No se encontraron resultados para "<strong>{{query}}</strong>"
+          {{/if}}
+        {{/if}}
+      </p>
+    </div>
+  </div>
+
+  <div class="card-body">
+    {{#if noQuery}}
+      <div class="search-empty-state">
+        <div class="search-empty-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <h3>Realiza una búsqueda</h3>
+        <p>Ingresa un término de búsqueda en la barra superior para encontrar servicios, eventos, usuarios, reseñas y más.</p>
+      </div>
+    {{else}}
+      {{#if results.length}}
+        {{#each groupedResults as |categoryResults category|}}
+          <div class="search-category">
+            <h3 class="search-category-title">
+              <i class="bi {{lookup (lookup categoryResults 0) 'icon'}}"></i>
+              {{category}} ({{categoryResults.length}})
+            </h3>
+            <div class="search-results-grid">
+              {{#each categoryResults}}
+                <div class="search-result-item" 
+                     data-url="{{this.url}}" 
+                     data-entity-id="{{this.entityId}}" 
+                     data-entity-type="{{this.entityType}}" 
+                     data-is-section="{{this.isSection}}"
+                     data-id="{{this.id}}">
+                  <div class="search-result-icon">
+                    {{#if this.image}}
+                      <img src="{{this.image}}" alt="{{this.title}}">
+                    {{else}}
+                      <i class="bi {{this.icon}}"></i>
+                    {{/if}}
+                  </div>
+                  <div class="search-result-content">
+                    <h4 class="search-result-title">{{this.title}}</h4>
+                    <p class="search-result-description">{{this.description}}</p>
+                    {{#if this.isSection}}
+                      <span class="search-result-badge">Sección</span>
+                    {{/if}}
+                  </div>
+                  <div class="search-result-action">
+                    <i class="bi bi-arrow-right"></i>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="search-empty-state">
+          <div class="search-empty-icon">
+            <i class="bi bi-search"></i>
+          </div>
+          <h3>No se encontraron resultados</h3>
+          <p>No se encontraron coincidencias para "<strong>{{query}}</strong>". Intenta con otros términos como "reseñas", "servicios", "usuarios", "galería", "cotizaciones", "mensajes", "personal" o "tipos de eventos".</p>
+          
+          <div class="search-suggestions">
+            <h4>Sugerencias de búsqueda:</h4>
+            <div class="search-suggestions-grid">
+              <a href="/dashboard/buscar?q=servicios" class="search-suggestion-item">
+                <i class="bi bi-card-checklist"></i> Servicios
+              </a>
+              <a href="/dashboard/buscar?q=eventos" class="search-suggestion-item">
+                <i class="bi bi-calendar-event"></i> Tipos de Eventos
+              </a>
+              <a href="/dashboard/buscar?q=galeria" class="search-suggestion-item">
+                <i class="bi bi-images"></i> Galería
+              </a>
+              <a href="/dashboard/buscar?q=cotizaciones" class="search-suggestion-item">
+                <i class="bi bi-receipt"></i> Cotizaciones
+              </a>
+              <a href="/dashboard/buscar?q=mensajes" class="search-suggestion-item">
+                <i class="bi bi-envelope"></i> Mensajes
+              </a>
+              <a href="/dashboard/buscar?q=reseñas" class="search-suggestion-item">
+                <i class="bi bi-star"></i> Reseñas
+              </a>
+              <a href="/dashboard/buscar?q=personal" class="search-suggestion-item">
+                <i class="bi bi-file-earmark-text"></i> Personal
+              </a>
+              <a href="/dashboard/buscar?q=usuarios" class="search-suggestion-item">
+                <i class="bi bi-people"></i> Usuarios
+              </a>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+  </div>
+</div>
+
+<style>
+  .search-suggestions {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .search-suggestions h4 {
+    color: var(--gold);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  
+  .search-suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  
+  .search-suggestion-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--gold-border);
+    border-radius: var(--border-radius-md);
+    color: var(--white);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    box-shadow: var(--neo-shadow);
+  }
+  
+  .search-suggestion-item:hover {
+    background-color: rgba(229, 199, 107, 0.15);
+    transform: translateY(-3px);
+    color: var(--gold);
+    box-shadow: var(--gold-glow), var(--neo-shadow);
+  }
+  
+  .search-suggestion-item i {
+    color: var(--gold);
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 576px) {
+    .search-suggestions-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .search-result-badge {
+    display: inline-block;
+    background: var(--gold-gradient);
+    color: var(--black);
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 5px;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .search-result-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .search-result-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(229, 199, 107, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+  }
+
+  .search-result-item:hover::before {
+    opacity: 1;
+  }
+
+  .search-result-item[data-is-section="true"] {
+    border-left: 3px solid var(--gold);
+  }
+
+  .search-result-item[data-is-section="true"] .search-result-icon {
+    background: var(--gold-gradient);
+  }
+
+  .search-result-item[data-is-section="true"] .search-result-icon i {
+    color: var(--black);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Manejar clics en los resultados de búsqueda
+    const searchResultItems = document.querySelectorAll('.search-result-item');
+    
+    searchResultItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const entityId = this.getAttribute('data-entity-id');
+        const entityType = this.getAttribute('data-entity-type');
+        const isSection = this.getAttribute('data-is-section') === 'true';
+        
+        let url = this.getAttribute('data-url');
+        
+        if (!isSection && entityType === 'contrato') {
+          // Si no es una sección y es contrato, cambiar la ruta
+          url = '/dashboard/cotizaciones?tab=contratos';
+        } else if (isSection) {
+          // Si es una sección, simplemente navegar a ella
+          window.location.href = url;
+          return;
+        }
+        
+        // Si no es una sección, navegar a la URL y luego resaltar el elemento
+        sessionStorage.setItem('searchHighlight', JSON.stringify({
+          entityId: entityId,
+          entityType: entityType
+        }));
+        
+        window.location.href = url;
+      });
+    });
+
+    // Animar la aparición de los resultados
+    if (typeof gsap !== 'undefined') {
+      gsap.fromTo('.search-result-item', 
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
+      );
+
+      // Animar las sugerencias de búsqueda si existen
+      const suggestions = document.querySelectorAll('.search-suggestion-item');
+      if (suggestions.length > 0) {
+        gsap.fromTo(suggestions, 
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: "back.out(1.2)", delay: 0.2 }
+        );
+      }
+    }
+  });
+</script>

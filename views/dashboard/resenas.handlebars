@@ -1,0 +1,1813 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Reseñas</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#addReviewModal">
+      <i class="bi bi-plus-lg"></i> <span class="btn-text">Nueva Reseña</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Reseñas de Clientes</h3>
+    <div class="card-tools">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="table-search" placeholder="Buscar reseña...">
+      </div>
+      <div class="filter-box">
+        <select id="filterRating" class="form-control">
+          <option value="">Todas las calificaciones</option>
+          <option value="5">5 estrellas</option>
+          <option value="4">4 estrellas</option>
+          <option value="3">3 estrellas</option>
+          <option value="2">2 estrellas</option>
+          <option value="1">1 estrella</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="reviews-grid">
+      {{#each resenas}}
+      <div class="review-card" data-id="{{this.id}}" data-rating="{{this.calificacion}}">
+        <div class="review-header">
+          <div class="review-avatar">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="review-meta">
+            <h4 class="review-author">{{this.nombre_cliente}}</h4>
+            <div class="review-rating">
+              {{#times this.calificacion}}
+              <i class="bi bi-star-fill"></i>
+              {{/times}}
+              {{#times (minus 5 this.calificacion)}}
+              <i class="bi bi-star"></i>
+              {{/times}}
+            </div>
+          </div>
+          <div class="review-date" title="{{this.fecha}}">
+            {{this.fecha}}
+          </div>
+        </div>
+        <div class="review-content">
+          <p>{{this.comentario}}</p>
+        </div>
+        <div class="review-event">
+          <span class="event-type">{{this.tipo_evento}}</span>
+          {{#if this.numero_contrato}}
+          <span class="contract-number">Contrato: {{this.numero_contrato}}</span>
+          {{/if}}
+        </div>
+        <div class="review-likes">
+          <div class="likes-count">
+            <i class="bi bi-hand-thumbs-up"></i>
+            <span class="count">{{this.likes}}</span>
+          </div>
+        </div>
+        <div class="review-actions">
+          <div class="action-buttons">
+            <button class="btn-review-action edit" title="Editar" data-toggle="modal" data-target="#editReviewModal" data-id="{{this.id}}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn-review-action delete btn-delete" title="Eliminar" data-id="{{this.id}}" data-type="resenas" data-name="{{this.nombre_cliente}}">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <div class="review-status">
+            {{#if this.aprobada}}
+            <span class="badge-status confirmada">Aprobada</span>
+            <button class="btn-review-action disapprove" title="Desaprobar" data-id="{{this.id}}">
+              <i class="bi bi-x-circle"></i>
+            </button>
+            {{else}}
+            <span class="badge-status pendiente">Pendiente</span>
+            <button class="btn-review-action approve" title="Aprobar" data-id="{{this.id}}">
+              <i class="bi bi-check-circle"></i>
+            </button>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="empty-state">
+        <i class="bi bi-star"></i>
+        <p>No hay reseñas registradas</p>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Reseña -->
+<div class="modal" id="addReviewModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agregar Nueva Reseña</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addReviewForm" class="crud-form needs-validation" data-type="resenas" novalidate>
+          <div class="form-group">
+            <label for="nombre_cliente" class="form-label">Nombre del Cliente</label>
+            <input type="text" class="form-control" id="nombre_cliente" name="nombre_cliente" required>
+            <div class="invalid-feedback">Por favor ingresa el nombre del cliente.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="numero_contrato" class="form-label">Número de Contrato</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" placeholder="CONT-0000-000">
+              <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" id="verificarContrato">Verificar</button>
+              </div>
+            </div>
+            <div class="invalid-feedback">Por favor ingresa un número de contrato válido.</div>
+            <div id="contratoFeedback" class="mt-2"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="calificacion" class="form-label">Calificación</label>
+            <div class="rating-input">
+              <div class="stars">
+                <i class="bi bi-star star-icon" data-value="1"></i>
+                <i class="bi bi-star star-icon" data-value="2"></i>
+                <i class="bi bi-star star-icon" data-value="3"></i>
+                <i class="bi bi-star star-icon" data-value="4"></i>
+                <i class="bi bi-star star-icon" data-value="5"></i>
+              </div>
+              <input type="hidden" id="calificacion" name="calificacion" value="0" required>
+            </div>
+            <div class="invalid-feedback">Por favor selecciona una calificación.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="comentario" class="form-label">Comentario</label>
+            <textarea class="form-control" id="comentario" name="comentario" rows="4" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa un comentario.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="likes" class="form-label">Me gusta</label>
+            <input type="number" class="form-control" id="likes" name="likes" min="0" value="0">
+            <div class="form-text">Número de "me gusta" que ha recibido esta reseña.</div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="tipo_evento_id" class="form-label">Tipo de Evento</label>
+                <select class="form-control" id="tipo_evento_id" name="tipo_evento_id" required>
+                  <option value="">Seleccionar...</option>
+                  {{#each tiposEventos}}
+                  <option value="{{this.id}}">{{this.nombre}}</option>
+                  {{/each}}
+                </select>
+                <div class="invalid-feedback">Por favor selecciona un tipo de evento.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                <div class="invalid-feedback">Por favor selecciona una fecha.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="aprobada" name="aprobada" value="1" checked>
+              <label class="form-check-label" for="aprobada">Aprobar reseña</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Reseña</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Reseña -->
+<div class="modal" id="editReviewModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Reseña</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editReviewForm" class="crud-form needs-validation" data-type="resenas" data-id="" novalidate>
+          <input type="hidden" id="edit_id" name="id">
+          
+          <div class="form-group">
+            <label for="edit_nombre_cliente" class="form-label">Nombre del Cliente</label>
+            <input type="text" class="form-control" id="edit_nombre_cliente" name="nombre_cliente" required>
+            <div class="invalid-feedback">Por favor ingresa el nombre del cliente.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_numero_contrato" class="form-label">Número de Contrato</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="edit_numero_contrato" name="numero_contrato" placeholder="CONT-0000-000">
+              <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" id="edit_verificarContrato">Verificar</button>
+              </div>
+            </div>
+            <div class="invalid-feedback">Por favor ingresa un número de contrato válido.</div>
+            <div id="edit_contratoFeedback" class="mt-2"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_calificacion" class="form-label">Calificación</label>
+            <div class="rating-input">
+              <div class="stars" id="edit_stars">
+                <i class="bi bi-star star-icon" data-value="1"></i>
+                <i class="bi bi-star star-icon" data-value="2"></i>
+                <i class="bi bi-star star-icon" data-value="3"></i>
+                <i class="bi bi-star star-icon" data-value="4"></i>
+                <i class="bi bi-star star-icon" data-value="5"></i>
+              </div>
+              <input type="hidden" id="edit_calificacion" name="calificacion" value="0" required>
+            </div>
+            <div class="invalid-feedback">Por favor selecciona una calificación.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_comentario" class="form-label">Comentario</label>
+            <textarea class="form-control" id="edit_comentario" name="comentario" rows="4" required></textarea>
+            <div class="invalid-feedback">Por favor ingresa un comentario.</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_likes" class="form-label">Me gusta</label>
+            <input type="number" class="form-control" id="edit_likes" name="likes" min="0" value="0">
+            <div class="form-text">Número de "me gusta" que ha recibido esta reseña.</div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_tipo_evento_id" class="form-label">Tipo de Evento</label>
+                <select class="form-control" id="edit_tipo_evento_id" name="tipo_evento_id" required>
+                  <option value="">Seleccionar...</option>
+                  {{#each tiposEventos}}
+                  <option value="{{this.id}}">{{this.nombre}}</option>
+                  {{/each}}
+                </select>
+                <div class="invalid-feedback">Por favor selecciona un tipo de evento.</div>
+              </div>
+            </div>
+            
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="edit_fecha" name="fecha" required>
+                <div class="invalid-feedback">Por favor selecciona una fecha.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="edit_aprobada" name="aprobada" value="1">
+              <label class="form-check-label" for="edit_aprobada">Aprobar reseña</label>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Actualizar Reseña</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#section 'styles'}}
+<style>
+  /* Estilos para el encabezado de página */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .page-title {
+    color: var(--gold);
+    font-weight: 300;
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Estilos para la barra de herramientas */
+  .card-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--white-dimmer);
+  }
+  
+  .search-box input {
+    padding-left: 35px;
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    color: var(--white);
+    border-radius: 5px;
+    height: 38px;
+    width: 100%;
+  }
+  
+  .filter-box {
+    flex-shrink: 0;
+  }
+  
+  .filter-box select {
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    color: var(--white);
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  
+  /* Estilos para la cuadrícula de reseñas */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+  
+  .review-card {
+    background-color: var(--black-light);
+    border: 1px solid var(--gold-border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--gold);
+  }
+  
+  .review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--gold-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .review-avatar i {
+    color: var(--gold);
+    font-size: 1.5rem;
+  }
+  
+  .review-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .review-author {
+    color: var(--white);
+    font-weight: 500;
+    margin: 0 0 5px;
+    font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .review-rating {
+    color: var(--gold);
+    font-size: 1rem;
+    display: flex;
+    gap: 2px;
+  }
+  
+  .review-date {
+    color: var(--white-dimmer);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    cursor: help;
+  }
+  
+  .review-content {
+    margin-bottom: 15px;
+    color: var(--white-dim);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  
+  /* Estilos para likes */
+  .review-likes {
+    margin-bottom: 15px;
+  }
+  
+  .likes-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    color: var(--white-dimmer);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .likes-count i {
+    margin-right: 5px;
+    font-size: 1rem;
+  }
+  
+  .likes-count .count {
+    font-weight: 600;
+  }
+  
+  .likes-count:not(:empty) {
+    background-color: rgba(var(--gold-rgb), 0.1);
+    color: var(--gold);
+  }
+  
+  .review-event {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .event-type {
+    display: inline-block;
+    padding: 3px 10px;
+    background-color: var(--gold-light);
+    color: var(--gold);
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+  
+  .contract-number {
+    display: inline-block;
+    padding: 3px 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white-dim);
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+  
+  .review-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--gold-border);
+    padding-top: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-review-action {
+    background: none;
+    border: none;
+    color: var(--white-dim);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-review-action:hover {
+    background-color: var(--gold-light);
+    color: var(--gold);
+  }
+  
+  .btn-review-action.edit:hover {
+    color: var(--info);
+  }
+  
+  .btn-review-action.delete:hover {
+    color: var(--danger);
+  }
+  
+  .btn-review-action.approve:hover {
+    color: var(--success);
+  }
+  
+  .btn-review-action.disapprove:hover {
+    color: var(--warning);
+  }
+  
+  .review-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* Estilos para las estrellas de calificación */
+  .rating-input {
+    margin-top: 10px;
+  }
+  
+  .stars {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .star-icon {
+    font-size: 1.8rem;
+    color: var(--white-dimmer);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .star-icon:hover,
+  .star-icon.active {
+    color: var(--gold);
+  }
+  
+  /* Estilos para los badges de estado */
+  .badge-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .badge-status.pendiente {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: var(--warning);
+  }
+  
+  .badge-status.confirmada {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--success);
+  }
+  
+  /* Estilos para modales */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  
+  .modal.show {
+    display: block;
+  }
+  
+  .modal-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: var(--black-light);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .modal.show .modal-dialog {
+    transform: translateY(0);
+  }
+  
+  .modal-content {
+    position: relative;
+    width: 100%;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .modal-title {
+    color: var(--gold);
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--white-dimmer);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+  }
+  
+  .modal-close:hover {
+    color: var(--gold);
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--gold-border);
+  }
+  
+  /* Estilos para formularios */
+  .form-row {
+    display: flex;
+    margin: 0 -10px;
+    flex-wrap: wrap;
+  }
+  
+  .form-col {
+    padding: 0 10px;
+    width: 50%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--white);
+    font-weight: 500;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    color: var(--white);
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .form-control:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--gold-rgb), 0.25);
+  }
+  
+  .form-text {
+    font-size: 0.85rem;
+    color: var(--white-dimmer);
+    margin-top: 5px;
+  }
+  
+  .input-group {
+    display: flex;
+    width: 100%;
+  }
+  
+  .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    flex: 1;
+  }
+  
+  .input-group-append {
+    display: flex;
+  }
+  
+  .input-group-append .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .form-check-input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .form-check-label {
+    color: var(--white);
+    cursor: pointer;
+  }
+  
+  /* Estado vacío */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    color: var(--white-dimmer);
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold-light);
+  }
+  
+  .empty-state p {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  /* Feedback para verificación de contrato */
+  #contratoFeedback, #edit_contratoFeedback {
+    font-size: 0.9rem;
+  }
+  
+  .contrato-valido {
+    color: var(--success);
+    padding: 5px 10px;
+    background-color: rgba(40, 167, 69, 0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .contrato-invalido {
+    color: var(--danger);
+    padding: 5px 10px;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Estilos para móvil */
+  @media screen and (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+    
+    .btn-text {
+      display: none;
+    }
+    
+    .btn-primary {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .card-tools {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      gap: 10px;
+    }
+    
+    .search-box, .filter-box, .filter-box select {
+      width: 100%;
+    }
+    
+    .reviews-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .review-header {
+      flex-wrap: wrap;
+    }
+    
+    .review-date {
+      width: 100%;
+      margin-top: 5px;
+      text-align: right;
+    }
+    
+    .review-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .review-status {
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    
+    .form-col {
+      width: 100%;
+    }
+    
+    .star-icon {
+      font-size: 2rem; /* Más grande para móviles */
+    }
+    
+    /* Ajustes para modales en móvil */
+    .modal-dialog {
+      margin: 10px auto;
+      width: calc(100% - 20px);
+      max-width: none;
+    }
+    
+    .modal-body {
+      padding: 15px;
+    }
+    
+    .modal-footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-footer button {
+      width: 100%;
+    }
+  }
+  
+  /* Ajustes para orientación landscape */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .reviews-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .modal-dialog {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    
+    .modal-body {
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+    
+    .form-row {
+      flex-direction: row;
+    }
+    
+    .form-col {
+      width: 50%;
+    }
+    
+    .modal-footer {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+    
+    .modal-footer button {
+      width: auto;
+    }
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-width: 320px) {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .page-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+    
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .action-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .stars {
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+  
+  /* Ajustes para pantallas táctiles */
+  @media (hover: none) {
+    .btn-review-action {
+      width: 44px;
+      height: 44px;
+    }
+    
+    .star-icon {
+      padding: 5px;
+    }
+    
+    .form-check-input {
+      width: 22px;
+      height: 22px;
+    }
+  }
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Función para formatear fechas de manera relativa
+  function formatDateRelative(dateString) {
+    if (!dateString) return '';
+    
+    let date;
+    // Intentar convertir desde formato español
+    if (dateString.includes(' de ')) {
+      const parts = dateString.split(' de ');
+      if (parts.length === 3) {
+        const day = parts[0];
+        const monthNames = {
+          'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+          'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+        };
+        const month = monthNames[parts[1].toLowerCase()];
+        const year = parts[2];
+        
+        if (day && month !== undefined && year) {
+          date = new Date(year, month, day);
+        }
+      }
+    }
+    
+    // Si no se pudo convertir, intentar como fecha estándar
+    if (!date || isNaN(date.getTime())) {
+      date = new Date(dateString);
+    }
+    
+    // Si sigue sin ser válida, devolver el string original
+    if (isNaN(date.getTime())) {
+      return dateString;
+    }
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return 'Hoy';
+    } else if (diffDays === 1) {
+      return 'Ayer';
+    } else if (diffDays < 7) {
+      return `Hace ${diffDays} días`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `Hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `Hace ${months} ${months === 1 ? 'mes' : 'meses'}`;
+    } else {
+      const years = Math.floor(diffDays / 365);
+      return `Hace ${years} ${years === 1 ? 'año' : 'años'}`;
+    }
+  }
+  
+  // Actualizar fechas en la interfaz
+  document.querySelectorAll('.review-date').forEach(dateElement => {
+    const originalDate = dateElement.textContent.trim();
+    if (originalDate) {
+      dateElement.textContent = formatDateRelative(originalDate);
+    }
+  });
+  
+  // Función para abrir modales
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.classList.add('modal-open');
+    }
+  }
+  
+  // Función para cerrar modales
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  }
+  
+  // Abrir modal al hacer clic en botones con data-toggle="modal"
+  const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const targetModal = this.getAttribute('data-target').substring(1); // Quitar el #
+      openModal(targetModal);
+    });
+  });
+  
+  // Cerrar modal al hacer clic en botones con data-dismiss="modal"
+  const modalClosers = document.querySelectorAll('[data-dismiss="modal"]');
+  modalClosers.forEach(closer => {
+    closer.addEventListener('click', function() {
+      const modal = this.closest('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+      }
+    });
+  });
+  
+  // Cerrar modal al hacer clic fuera del contenido
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+      event.target.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+  });
+  
+  // Filtrar por calificación
+  const filterSelect = document.getElementById('filterRating');
+  const reviewCards = document.querySelectorAll('.review-card');
+  
+  if (filterSelect) {
+    filterSelect.addEventListener('change', function() {
+      const selectedValue = this.value;
+      
+      reviewCards.forEach(card => {
+        if (!selectedValue || card.getAttribute('data-rating') === selectedValue) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  // Búsqueda en tiempo real
+  const searchInput = document.querySelector('.table-search');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      reviewCards.forEach(card => {
+        const author = card.querySelector('.review-author').textContent.toLowerCase();
+        const content = card.querySelector('.review-content').textContent.toLowerCase();
+        const eventType = card.querySelector('.event-type').textContent.toLowerCase();
+        const contractNumber = card.querySelector('.contract-number') ? 
+                              card.querySelector('.contract-number').textContent.toLowerCase() : '';
+        
+        if (author.includes(searchTerm) || 
+            content.includes(searchTerm) || 
+            eventType.includes(searchTerm) ||
+            contractNumber.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  // Funcionalidad de calificación por estrellas
+  function initRatingStars(container, hiddenInput) {
+    if (!container || !hiddenInput) return;
+    
+    const stars = container.querySelectorAll('.star-icon');
+    
+    stars.forEach(star => {
+      star.addEventListener('click', function() {
+        const value = this.getAttribute('data-value');
+        hiddenInput.value = value;
+        
+        // Actualizar estrellas
+        stars.forEach(s => {
+          if (s.getAttribute('data-value') <= value) {
+            s.classList.remove('bi-star');
+            s.classList.add('bi-star-fill');
+            s.classList.add('active');
+          } else {
+            s.classList.remove('bi-star-fill');
+            s.classList.add('bi-star');
+            s.classList.remove('active');
+          }
+        });
+      });
+      
+      // Mejorar experiencia táctil
+      if ('ontouchstart' in window) {
+        star.style.padding = '8px';
+      }
+    });
+  }
+  
+  // Inicializar estrellas para agregar reseña
+  const addStarsContainer = document.querySelector('#addReviewForm .stars');
+  const addRatingInput = document.getElementById('calificacion');
+  initRatingStars(addStarsContainer, addRatingInput);
+  
+  // Inicializar estrellas para editar reseña
+  const editStarsContainer = document.querySelector('#editReviewForm .stars');
+  const editRatingInput = document.getElementById('edit_calificacion');
+  initRatingStars(editStarsContainer, editRatingInput);
+  
+  // Verificar formato de contrato
+  function validarFormatoContrato(numeroContrato) {
+    // Formato esperado: CONT-0000-000
+    const regex = /^CONT-\d{4}-\d{3}$/;
+    return regex.test(numeroContrato);
+  }
+  
+  // Verificar número de contrato
+  function verificarContrato(numeroContrato, feedbackElement, inputElement) {
+    if (!numeroContrato) {
+      feedbackElement.innerHTML = '';
+      inputElement.setCustomValidity('');
+      return;
+    }
+    
+    // Primero validar el formato
+    if (!validarFormatoContrato(numeroContrato)) {
+      feedbackElement.innerHTML = `
+        <div class="contrato-invalido">
+          <i class="bi bi-x-circle"></i> Formato inválido. Debe ser CONT-0000-000
+        </div>
+      `;
+      inputElement.setCustomValidity('Formato de contrato inválido');
+      return;
+    }
+    
+    // Si el formato es válido, verificar si ya está asignado a otra reseña
+    fetch(`/api/contratos/verificar/${numeroContrato}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          feedbackElement.innerHTML = `
+            <div class="contrato-valido">
+              <i class="bi bi-check-circle"></i> Número de contrato válido
+            </div>
+          `;
+          inputElement.setCustomValidity('');
+        } else {
+          feedbackElement.innerHTML = `
+            <div class="contrato-invalido">
+              <i class="bi bi-x-circle"></i> ${data.message}
+            </div>
+          `;
+          inputElement.setCustomValidity('Número de contrato inválido');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        feedbackElement.innerHTML = `
+          <div class="contrato-invalido">
+            <i class="bi bi-x-circle"></i> Error al verificar el contrato
+          </div>
+        `;
+        inputElement.setCustomValidity('Error al verificar');
+      });
+  }
+  
+  // Botón verificar contrato (agregar)
+  const btnVerificarContrato = document.getElementById('verificarContrato');
+  const inputContrato = document.getElementById('numero_contrato');
+  const contratoFeedback = document.getElementById('contratoFeedback');
+  
+  if (btnVerificarContrato && inputContrato && contratoFeedback) {
+    btnVerificarContrato.addEventListener('click', function() {
+      verificarContrato(inputContrato.value, contratoFeedback, inputContrato);
+    });
+    
+    inputContrato.addEventListener('blur', function() {
+      if (this.value) {
+        verificarContrato(this.value, contratoFeedback, inputContrato);
+      } else {
+        contratoFeedback.innerHTML = '';
+        inputContrato.setCustomValidity('');
+      }
+    });
+  }
+  
+  // Botón verificar contrato (editar)
+  const btnEditVerificarContrato = document.getElementById('edit_verificarContrato');
+  const inputEditContrato = document.getElementById('edit_numero_contrato');
+  const editContratoFeedback = document.getElementById('edit_contratoFeedback');
+  
+  if (btnEditVerificarContrato && inputEditContrato && editContratoFeedback) {
+    btnEditVerificarContrato.addEventListener('click', function() {
+      verificarContrato(inputEditContrato.value, editContratoFeedback, inputEditContrato);
+    });
+    
+    inputEditContrato.addEventListener('blur', function() {
+      if (this.value) {
+        verificarContrato(this.value, editContratoFeedback, inputEditContrato);
+      } else {
+        editContratoFeedback.innerHTML = '';
+        inputEditContrato.setCustomValidity('');
+      }
+    });
+  }
+  
+  // Aprobar/Desaprobar reseña
+  const approveButtons = document.querySelectorAll('.btn-review-action.approve');
+  const disapproveButtons = document.querySelectorAll('.btn-review-action.disapprove');
+  
+  function approveReview(reviewId, button) {
+    fetch(`/api/resenas/${reviewId}/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Actualizar UI
+        const reviewCard = button.closest('.review-card');
+        const statusBadge = reviewCard.querySelector('.badge-status');
+        
+        statusBadge.textContent = 'Aprobada';
+        statusBadge.classList.remove('pendiente');
+        statusBadge.classList.add('confirmada');
+        
+        // Reemplazar botón
+        const reviewStatus = button.closest('.review-status');
+        reviewStatus.innerHTML = `
+          <span class="badge-status confirmada">Aprobada</span>
+          <button class="btn-review-action disapprove" title="Desaprobar" data-id="${reviewId}">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        `;
+        
+        // Agregar evento al nuevo botón
+        reviewStatus.querySelector('.disapprove').addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          disapproveReview(id, this);
+        });
+        
+        if (window.showToast) {
+          window.showToast({
+            type: 'success',
+            title: 'Éxito',
+            message: 'Reseña aprobada correctamente.'
+          });
+        } else {
+          alert('Reseña aprobada correctamente.');
+        }
+      } else {
+        if (window.showToast) {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: data.message || 'No se pudo aprobar la reseña.'
+          });
+        } else {
+          alert('Error: ' + (data.message || 'No se pudo aprobar la reseña.'));
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      if (window.showToast) {
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al procesar la solicitud.'
+        });
+      } else {
+        alert('Error: Ocurrió un error al procesar la solicitud.');
+      }
+    });
+  }
+  
+  function disapproveReview(reviewId, button) {
+    fetch(`/api/resenas/${reviewId}/disapprove`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Actualizar UI
+        const reviewCard = button.closest('.review-card');
+        const statusBadge = reviewCard.querySelector('.badge-status');
+        
+        statusBadge.textContent = 'Pendiente';
+        statusBadge.classList.remove('confirmada');
+        statusBadge.classList.add('pendiente');
+        
+        // Reemplazar botón
+        const reviewStatus = button.closest('.review-status');
+        reviewStatus.innerHTML = `
+          <span class="badge-status pendiente">Pendiente</span>
+          <button class="btn-review-action approve" title="Aprobar" data-id="${reviewId}">
+            <i class="bi bi-check-circle"></i>
+          </button>
+        `;
+        
+        // Agregar evento al nuevo botón
+        reviewStatus.querySelector('.approve').addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          approveReview(id, this);
+        });
+        
+        if (window.showToast) {
+          window.showToast({
+            type: 'success',
+            title: 'Éxito',
+            message: 'Reseña desaprobada correctamente.'
+          });
+        } else {
+          alert('Reseña desaprobada correctamente.');
+        }
+      } else {
+        if (window.showToast) {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: data.message || 'No se pudo desaprobar la reseña.'
+          });
+        } else {
+          alert('Error: ' + (data.message || 'No se pudo desaprobar la reseña.'));
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      if (window.showToast) {
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al procesar la solicitud.'
+        });
+      } else {
+        alert('Error: Ocurrió un error al procesar la solicitud.');
+      }
+    });
+  }
+  
+  approveButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-id');
+      approveReview(reviewId, this);
+    });
+  });
+  
+  disapproveButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-id');
+      disapproveReview(reviewId, this);
+    });
+  });
+  
+  // Cargar datos para editar
+  const editButtons = document.querySelectorAll('.btn-review-action.edit');
+  
+  editButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-id');
+      
+      // Fetch review data
+      fetch(`/api/resenas/${reviewId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const resena = data.resena;
+            
+            // Set form data
+            document.getElementById('edit_id').value = resena.id;
+            document.getElementById('edit_nombre_cliente').value = resena.nombre_cliente;
+            document.getElementById('edit_numero_contrato').value = resena.numero_contrato || '';
+            document.getElementById('edit_calificacion').value = resena.calificacion;
+            document.getElementById('edit_comentario').value = resena.comentario;
+            document.getElementById('edit_tipo_evento_id').value = resena.tipo_evento_id;
+            document.getElementById('edit_likes').value = resena.likes || 0;
+            
+            // Verificar contrato si existe
+            if (resena.numero_contrato) {
+              verificarContrato(resena.numero_contrato, editContratoFeedback, inputEditContrato);
+            }
+            
+            // Format date
+            if (resena.fecha) {
+              // Intentar convertir la fecha en formato español a formato ISO
+              const fechaParts = resena.fecha.split(' de ');
+              if (fechaParts.length === 3) {
+                const dia = fechaParts[0];
+                const mes = {
+                  'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04',
+                  'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08',
+                  'septiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12'
+                }[fechaParts[1].toLowerCase()];
+                const anio = fechaParts[2];
+                
+                if (dia && mes && anio) {
+                  const fechaISO = `${anio}-${mes}-${dia.padStart(2, '0')}`;
+                  document.getElementById('edit_fecha').value = fechaISO;
+                } else {
+                  // Si no se puede convertir, usar la fecha actual
+                  document.getElementById('edit_fecha').value = new Date().toISOString().split('T')[0];
+                }
+              } else {
+                // Intentar convertir directamente si es una fecha válida
+                const fecha = new Date(resena.fecha);
+                if (!isNaN(fecha.getTime())) {
+                  document.getElementById('edit_fecha').value = fecha.toISOString().split('T')[0];
+                } else {
+                  // Si no se puede convertir, usar la fecha actual
+                  document.getElementById('edit_fecha').value = new Date().toISOString().split('T')[0];
+                }
+              }
+            } else {
+              // Si no hay fecha, usar la fecha actual
+              document.getElementById('edit_fecha').value = new Date().toISOString().split('T')[0];
+            }
+            
+            document.getElementById('edit_aprobada').checked = resena.aprobada === 1 || resena.verificado === 1;
+            
+            // Update stars
+            const stars = document.querySelectorAll('#edit_stars .star-icon');
+            stars.forEach(star => {
+              const value = star.getAttribute('data-value');
+              if (value <= resena.calificacion) {
+                star.classList.remove('bi-star');
+                star.classList.add('bi-star-fill');
+                star.classList.add('active');
+              } else {
+                star.classList.remove('bi-star-fill');
+                star.classList.add('bi-star');
+                star.classList.remove('active');
+              }
+            });
+            
+            // Update form action
+            const form = document.getElementById('editReviewForm');
+            form.setAttribute('data-id', resena.id);
+          } else {
+            if (window.showToast) {
+              window.showToast({
+                type: 'error',
+                title: 'Error',
+                message: data.message || 'No se pudo cargar la información de la reseña.'
+              });
+            } else {
+              alert('Error: ' + (data.message || 'No se pudo cargar la información de la reseña.'));
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          if (window.showToast) {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: 'Ocurrió un error al cargar la información de la reseña.'
+            });
+          } else {
+            alert('Error: Ocurrió un error al cargar la información de la reseña.');
+          }
+        });
+    });
+  });
+  
+  // Manejar envío de formularios
+  const addForm = document.getElementById('addReviewForm');
+  const editForm = document.getElementById('editReviewForm');
+  
+  if (addForm) {
+    addForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Convertir checkbox a booleano
+      data.aprobada = formData.has('aprobada');
+      
+      fetch('/api/resenas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          if (window.showToast) {
+            window.showToast({
+              type: 'success',
+              title: 'Éxito',
+              message: 'Reseña creada correctamente'
+            });
+          } else {
+            alert('Reseña creada correctamente');
+          }
+          
+          // Cerrar modal y recargar página
+          closeModal('addReviewModal');
+          window.location.reload();
+        } else {
+          if (window.showToast) {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: result.message || 'Error al crear la reseña'
+            });
+          } else {
+            alert('Error: ' + (result.message || 'Error al crear la reseña'));
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        if (window.showToast) {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Ocurrió un error al procesar la solicitud'
+          });
+        } else {
+          alert('Error: Ocurrió un error al procesar la solicitud');
+        }
+      });
+    });
+  }
+  
+  if (editForm) {
+    editForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      const id = this.getAttribute('data-id');
+      
+      // Convertir checkbox a booleano
+      data.aprobada = formData.has('aprobada');
+      
+      fetch(`/api/resenas/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          if (window.showToast) {
+            window.showToast({
+              type: 'success',
+              title: 'Éxito',
+              message: 'Reseña actualizada correctamente'
+            });
+          } else {
+            alert('Reseña actualizada correctamente');
+          }
+          
+          // Cerrar modal y recargar página
+          closeModal('editReviewModal');
+          window.location.reload();
+        } else {
+          if (window.showToast) {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: result.message || 'Error al actualizar la reseña'
+            });
+          } else {
+            alert('Error: ' + (result.message || 'Error al actualizar la reseña'));
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        if (window.showToast) {
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Ocurrió un error al procesar la solicitud'
+          });
+        } else {
+          alert('Error: Ocurrió un error al procesar la solicitud');
+        }
+      });
+    });
+  }
+  
+  // Eliminar reseña
+  const deleteButtons = document.querySelectorAll('.btn-review-action.delete');
+  
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const reviewId = this.getAttribute('data-id');
+      const reviewName = this.getAttribute('data-name');
+      
+      if (confirm(`¿Estás seguro de que deseas eliminar la reseña de ${reviewName}?`)) {
+        fetch(`/api/resenas/${reviewId}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            if (window.showToast) {
+              window.showToast({
+                type: 'success',
+                title: 'Éxito',
+                message: 'Reseña eliminada correctamente'
+              });
+            } else {
+              alert('Reseña eliminada correctamente');
+            }
+            
+            // Eliminar tarjeta de reseña
+            const reviewCard = this.closest('.review-card');
+            reviewCard.remove();
+            
+            // Mostrar mensaje si no hay reseñas
+            if (document.querySelectorAll('.review-card').length === 0) {
+              const emptyState = document.createElement('div');
+              emptyState.className = 'empty-state';
+              emptyState.innerHTML = `
+                <i class="bi bi-star"></i>
+                <p>No hay reseñas registradas</p>
+              `;
+              document.querySelector('.reviews-grid').appendChild(emptyState);
+            }
+          } else {
+            if (window.showToast) {
+              window.showToast({
+                type: 'error',
+                title: 'Error',
+                message: data.message || 'No se pudo eliminar la reseña'
+              });
+            } else {
+              alert('Error: ' + (data.message || 'No se pudo eliminar la reseña'));
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          if (window.showToast) {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: 'Ocurrió un error al procesar la solicitud'
+            });
+          } else {
+            alert('Error: Ocurrió un error al procesar la solicitud');
+          }
+        });
+      }
+    });
+  });
+  
+  // Función para ajustar elementos según el tamaño de pantalla
+  function adjustResponsiveElements() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    
+    // Ajustar altura de modales en landscape
+    if (isLandscape && width <= 992) {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = (height - 150) + 'px';
+      });
+    } else {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = '';
+      });
+    }
+  }
+  
+  // Ejecutar al cargar
+  adjustResponsiveElements();
+  
+  // Ejecutar al cambiar tamaño o orientación
+  window.addEventListener('resize', adjustResponsiveElements);
+  window.addEventListener('orientationchange', adjustResponsiveElements);
+  
+  // Mejorar experiencia en dispositivos táctiles
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.btn-review-action, .form-check-input').forEach(el => {
+      el.style.padding = '10px';  // Aumentar área táctil
+    });
+    
+    document.querySelectorAll('.form-check-input').forEach(el => {
+      el.style.width = '22px';  // Aumentar tamaño del checkbox
+      el.style.height = '22px';
+    });
+  }
+  
+  // Establecer fecha actual en el formulario de agregar
+  const fechaInput = document.getElementById('fecha');
+  if (fechaInput) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    fechaInput.value = `${year}-${month}-${day}`;
+  }
+  
+  // Actualizar visualización de likes
+  document.querySelectorAll('.likes-count').forEach(likesElement => {
+    const countElement = likesElement.querySelector('.count');
+    if (countElement) {
+      const count = parseInt(countElement.textContent);
+      if (count > 0) {
+        likesElement.classList.add('has-likes');
+      } else {
+        countElement.textContent = '0';
+      }
+    }
+  });
+});
+</script>
+{{/section}}

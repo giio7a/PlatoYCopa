@@ -1,0 +1,92 @@
+<!-- Botón de volver arriba - Parcial para incluir en todas las páginas -->
+<button id="backToTopBtn" class="back-to-top-btn" aria-label="Volver arriba">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<style>
+/* Estilos para el botón de subida - POSICIÓN CENTRADA */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 98;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease, bottom 0.3s ease;
+}
+
+.back-to-top-btn.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top-btn:hover {
+  background: var(--black);
+  color: var(--gold);
+  transform: translateX(-50%) translateY(-5px);
+}
+
+
+/* Ajustes para móvil */
+@media (max-width: 991.98px) {
+  .back-to-top-btn {
+    width: 45px;
+    height: 45px;
+    bottom: 100px;
+  }
+}
+/* Ajustes para móvil */
+@media (max-width: 768px) {
+  .back-to-top-btn {
+    width: 45px;
+    height: 45px;
+    bottom: 80px;
+  }
+}
+
+/* Ajuste para evitar superposición con el footer */
+@media (max-height: 500px) {
+  .back-to-top-btn {
+    bottom: 100px;
+  }
+}
+</style>
+
+<script>
+// Funcionalidad del botón de subida
+document.addEventListener('DOMContentLoaded', function() {
+  var backToTopBtn = document.getElementById('backToTopBtn');
+  
+  if (backToTopBtn) {
+    // Mostrar/ocultar botón según la posición de scroll
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 600) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+    
+    // Acción al hacer clic en el botón
+    backToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+});
+</script>

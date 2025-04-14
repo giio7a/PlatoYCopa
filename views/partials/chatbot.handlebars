@@ -1,0 +1,1614 @@
+<!-- Chatbot Parcial - Se incluye en todas las páginas -->
+<div id="chatbotContainer" class="chatbot-container">
+    <!-- Botón flotante para abrir el chat -->
+    <button id="chatbotToggle" class="chatbot-toggle" aria-label="Abrir chat">
+        <i class="bi bi-chat-dots-fill"></i>
+        <span class="chatbot-notification-badge" id="chatbotNotification">1</span>
+    </button>
+
+    <!-- Ventana del chat -->
+    <div id="chatbotBox" class="chatbot-box">
+        <!-- Encabezado del chat -->
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-logo">
+                    <img src="/img/Plato_y_copa_logo.jpg" alt="Plato y Copa Logo">
+                </div>
+                <div class="chatbot-title-container">
+                    <h3 class="chatbot-title">Asistente Virtual</h3>
+                    <div class="chatbot-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">En línea</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-controls">
+                <button id="chatbotMinimize" class="chatbot-control-btn" aria-label="Minimizar chat">
+                    <i class="bi bi-dash-lg"></i>
+                </button>
+                <button id="chatbotClose" class="chatbot-control-btn" aria-label="Cerrar chat">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cuerpo del chat -->
+        <div id="chatbotMessages" class="chatbot-messages">
+            <!-- Los mensajes se agregarán dinámicamente aquí -->
+        </div>
+
+        <!-- Pie del chat con formulario de entrada -->
+        <div class="chatbot-footer">
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbotInput" class="chatbot-input" placeholder="Escribe tu mensaje..." aria-label="Mensaje">
+                <button id="chatbotEmoji" class="chatbot-emoji-btn" aria-label="Insertar emoji">
+                    <i class="bi bi-emoji-smile"></i>
+                </button>
+                <button id="chatbotSend" class="chatbot-send-btn" aria-label="Enviar mensaje">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+            
+            <!-- Menú de ayuda colapsable -->
+            <div class="chatbot-help-menu">
+                <button id="chatbotHelpToggle" class="chatbot-help-toggle">
+                    <i class="bi bi-question-circle"></i> Ayuda rápida
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </button>
+                
+                <div id="chatbotHelpContent" class="chatbot-help-content">
+                    <!-- Sugerencias rápidas -->
+                    <div class="chatbot-suggestions">
+                        <h4 class="suggestions-title">Preguntas frecuentes</h4>
+                        <div class="suggestions-container">
+                            <button class="suggestion-btn" data-query="¿Qué servicios ofrecen?">
+                                <i class="bi bi-question-circle"></i> Servicios
+                            </button>
+                            <button class="suggestion-btn" data-query="¿Cuánto cuesta el servicio?">
+                                <i class="bi bi-cash-coin"></i> Precios
+                            </button>
+                            <button class="suggestion-btn" data-query="¿Cómo reservo?">
+                                <i class="bi bi-calendar-check"></i> Reservas
+                            </button>
+                            <button class="suggestion-btn" data-query="¿Dónde están ubicados?">
+                                <i class="bi bi-geo-alt"></i> Ubicación
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Acciones rápidas -->
+                    <div class="chatbot-quick-actions">
+                        <h4 class="quick-actions-title">Acciones rápidas</h4>
+                        <div class="quick-actions-container">
+                            <button class="quick-action-btn" data-action="cotizar">
+                                <i class="bi bi-calculator"></i> Cotizar
+                            </button>
+                            <button class="quick-action-btn" data-action="reservar">
+                                <i class="bi bi-calendar-plus"></i> Reservar
+                            </button>
+                            <button class="quick-action-btn" data-action="contacto">
+                                <i class="bi bi-envelope"></i> Contacto
+                            </button>
+                            <button class="quick-action-btn" data-action="ubicacion">
+                                <i class="bi bi-pin-map"></i> Ubicación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chatbot-branding">
+                <span>Plato y Copa - Servicio de Meseros</span>
+                <a href="tel:+522223780903" class="chatbot-phone-link">
+                    <i class="bi bi-telephone-fill"></i> (222) 378-0903
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+/* Estilos mejorados para el chatbot */
+.chatbot-container {
+    position: fixed;
+    z-index: 100;
+    /* Posición fija en la esquina inferior derecha */
+    bottom: 30px;
+    right: 30px;
+    font-family: inherit;
+    transition: bottom 0.3s ease;
+}
+
+/* Botón flotante del chatbot */
+.chatbot-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    display: flex;
+    top:0px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+}
+
+.chatbot-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(229, 199, 107, 0.4);
+}
+
+.chatbot-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Badge de notificación */
+.chatbot-notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Ventana del chatbot */
+.chatbot-box {
+    position: fixed;
+    bottom: 70px;
+    right: 100px !important;
+    width: 350px;
+    height: 500px;
+    background-color: var(--black);
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+    border: 1px solid var(--gold-border);
+    max-height: 80vh; /* Asegura que no salga de la pantalla */
+}
+
+.chatbot-box.active {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Encabezado del chatbot */
+.chatbot-header {
+    background: linear-gradient(to right, var(--black), #111);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--gold);
+}
+
+.chatbot-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chatbot-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--gold);
+}
+
+.chatbot-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chatbot-title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbot-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.chatbot-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: inline-block;
+}
+
+.chatbot-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.chatbot-control-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.chatbot-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* Cuerpo del chatbot */
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: rgba(0, 0, 0, 0.8);
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) rgba(0, 0, 0, 0.3);
+}
+
+  
+  .chatbot-messages::before {
+    content: "";
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 90%;
+    height: 40vh;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e5c76b; stop-opacity:0.15'/%3E%3Cstop offset='100%25' style='stop-color:%23ffffff; stop-opacity:0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0 80 Q 75 160, 150 80 T 300 80' stroke='%23e5c76b' stroke-width='1.5' fill='none' opacity='0.2'/%3E%3Cpath d='M 0 180 Q 75 260, 150 180 T 300 180' stroke='%23e5c76b' stroke-width='1' fill='none' opacity='0.15'/%3E%3Ccircle cx='80' cy='250' r='10' fill='%23e5c76b' opacity='0.2'/%3E%3Ccircle cx='220' cy='50' r='8' fill='%23e5c76b' opacity='0.15'/%3E%3Ccircle cx='270' cy='270' r='6' fill='%23e5c76b' opacity='0.1'/%3E%3Crect x='120' y='120' width='18' height='18' fill='%23e5c76b' opacity='0.1'/%3E%3Crect x='30' y='30' width='12' height='12' fill='%23e5c76b' opacity='0.12'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: 1;
+    z-index: 0;
+  }
+
+.chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background-color: var(--gold);
+    border-radius: 10px;
+}
+
+/* Mensajes */
+.message {
+    max-width: 85%;
+    padding: 12px 15px;
+    border-radius: 15px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    line-height: 1.5;
+}
+
+.message.bot {
+    align-self: flex-start;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-bottom-left-radius: 5px;
+    border-left: 2px solid var(--gold);
+}
+
+.message.bot.with-avatar {
+    margin-left: 40px;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    position: absolute;
+    left: -40px;
+    top: 0;
+    border: 1px solid var(--gold);
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: var(--gold);
+    color: var(--black);
+    border-bottom-right-radius: 5px;
+}
+
+.message-text {
+    word-break: break-word;
+}
+
+.message-time {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message.user .message-time {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Indicador de escritura */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border-bottom-left-radius: 5px;
+    width: fit-content;
+    margin-left: 40px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--gold);
+    border-radius: 50%;
+    animation: typingAnimation 1.5s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes typingAnimation {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Pie del chatbot */
+.chatbot-footer {
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-top: 1px solid rgba(229, 199, 107, 0.2);
+}
+
+.chatbot-input-container {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+    border: 1px solid var(--gold-border);
+    transition: all 0.3s ease;
+}
+
+.chatbot-input-container:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(229, 199, 107, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.chatbot-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 0;
+    font-size: 14px;
+    outline: none;
+}
+
+.chatbot-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.chatbot-emoji-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.chatbot-emoji-btn:hover {
+    transform: scale(1.2);
+}
+
+.chatbot-send-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.chatbot-send-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Menú de ayuda colapsable */
+.chatbot-help-menu {
+    margin-bottom: 10px;
+}
+
+.chatbot-help-toggle {
+    width: 100%;
+    background-color: rgba(229, 199, 107, 0.2);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.chatbot-help-toggle:hover {
+    background-color: rgba(229, 199, 107, 0.3);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.toggle-icon.active {
+    transform: rotate(180deg);
+}
+
+.chatbot-help-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+.chatbot-help-content.active {
+    max-height: 175px;
+    overflow-y: auto;
+}
+
+/* Sugerencias */
+.chatbot-suggestions {
+    padding: 10px;
+}
+
+.suggestions-title {
+    font-size: 14px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggestion-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--gold-border);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.suggestion-btn:hover {
+    background-color: var(--gold);
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+.suggestion-btn i {
+    color: var(--gold);
+}
+
+.suggestion-btn:hover i {
+    color: var(--black);
+}
+
+/* Acciones rápidas */
+.chatbot-quick-actions {
+    padding: 10px;
+    border-top: 1px solid rgba(229, 199, 107, 0.1);
+}
+
+.quick-actions-title {
+    font-size: 14px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.quick-actions-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.quick-action-btn {
+    background-color: rgba(229, 199, 107, 0.2);
+    border: 1px solid var(--gold-border);
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.quick-action-btn:hover {
+    background-color: var(--gold);
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+.quick-action-btn i {
+    color: var(--gold);
+    font-size: 16px;
+}
+
+.quick-action-btn:hover i {
+    color: var(--black);
+}
+
+.chatbot-branding {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 10px;
+}
+
+.chatbot-phone-link {
+    color: var(--gold);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.chatbot-phone-link:hover {
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Selector de emojis */
+.emoji-selector {
+    position: absolute;
+    bottom: 60px;
+    left: 15px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--gold-border);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 250px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para enlaces y elementos interactivos en mensajes */
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background-color: var(--gold);
+    color: var(--black) !important;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 5px;
+    transition: all 0.2s ease;
+}
+
+.action-link:hover {
+    background-color: var(--black);
+    color: var(--gold) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.whatsapp-link {
+    background-color: #25D366;
+    color: white !important;
+}
+
+.whatsapp-link:hover {
+    background-color: #128C7E;
+    color: white !important;
+}
+
+.map-link {
+    background-color: #4285F4;
+    color: white !important;
+}
+
+.map-link:hover {
+    background-color: #3367D6;
+    color: white !important;
+}
+
+.contact-info-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-left: 3px solid var(--gold);
+}
+
+.contact-info-card div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.contact-info-card i {
+    color: var(--gold);
+}
+
+.contact-info-card a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.contact-info-card a:hover {
+    color: var(--gold);
+    text-decoration: underline;
+}
+
+@media (max-width: 991.98px) {
+    .chatbot-toggle{
+      top:-85px
+    }
+    .chatbot-box{
+      left: 210px;
+      bottom: 120px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chatbot-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .chatbot-toggle {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        top:-70px;
+    }
+    
+    .chatbot-box {
+        width: 300px;
+        height: 450px;
+        bottom: 150px;
+        right: 20px;
+    }
+    
+    .quick-actions-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .chatbot-box {
+        width: calc(100vw - 40px);
+        height: 400px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .chatbot-toggle {
+        width: 45px;
+        height: 45px;
+        top: -60px;
+    }
+    
+    /* Ajuste para evitar superposición con otros elementos */
+    body.page-reviews .chatbot-container {
+        bottom: 80px;
+    }
+}
+
+/* Ajuste para páginas específicas - solo movimiento vertical */
+.chatbot-container.adjust-position {
+    bottom: 100px;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .chatbot-box {
+        background-color: #111;
+    }
+    
+    .message.bot {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+}
+
+/* Estilos para accesibilidad */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+</style>
+<script>
+/**
+ * Chatbot mejorado para Plato y Copa
+ * Este script maneja la funcionalidad del chatbot interactivo con diseño ergonómico
+ * Versión: 3.0 - Implementación optimizada para todo el sitio con mejor UX/UI
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  // Referencias a elementos del DOM
+  const chatbotToggle = document.getElementById("chatbotToggle");
+  const chatbotBox = document.getElementById("chatbotBox");
+  const chatbotClose = document.getElementById("chatbotClose");
+  const chatbotMinimize = document.getElementById("chatbotMinimize");
+  const chatbotMessages = document.getElementById("chatbotMessages");
+  const chatbotInput = document.getElementById("chatbotInput");
+  const chatbotSend = document.getElementById("chatbotSend");
+  const chatbotNotification = document.getElementById("chatbotNotification");
+  const chatbotContainer = document.getElementById("chatbotContainer");
+  const suggestionButtons = document.querySelectorAll(".suggestion-btn");
+  const quickActionButtons = document.querySelectorAll(".quick-action-btn");
+  const chatbotEmoji = document.getElementById("chatbotEmoji");
+
+  // Estado del chatbot
+  let isTyping = false;
+  let chatHistory = [];
+  let isMinimized = false;
+  const currentPage = window.location.pathname;
+  
+  // Variable para controlar si el chatbot debe abrirse automáticamente
+  // Inicializada como false para evitar que se abra al cargar la página
+  let shouldOpenChatbot = false;
+
+  // Detectar si necesitamos ajustar la posición vertical del chatbot
+  function detectPositionAdjustment() {
+    // Verificar si estamos en la página de reseñas
+    if (currentPage.includes("/resenas")) {
+      document.body.classList.add("page-reviews");
+
+      // Ajustar posición vertical con transición suave
+      chatbotContainer.style.bottom = "100px";
+    } else {
+      // Restaurar posición predeterminada
+      chatbotContainer.style.bottom = "30px";
+    }
+
+    // Verificar si hay un footer grande o elementos en la parte inferior
+    const footerHeight = document.querySelector("footer")?.offsetHeight || 0;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    if (documentHeight - windowHeight < 100 && footerHeight > 0) {
+      // Mover el chatbot más arriba para evitar superposición con el footer
+      chatbotContainer.style.bottom = footerHeight + 20 + "px";
+    }
+  }
+
+  // Llamar a la función de detección al cargar la página
+  detectPositionAdjustment();
+
+  // Volver a verificar cuando cambie el tamaño de la ventana
+  window.addEventListener("resize", detectPositionAdjustment);
+
+  // Base de conocimiento para respuestas
+  const knowledgeBase = {
+    hola: "¡Hola! Soy el asistente virtual de Plato y Copa. ¿En qué puedo ayudarte hoy?",
+    "buenos días": "¡Buenos días! Soy el asistente virtual de Plato y Copa. ¿En qué puedo ayudarte hoy?",
+    "buenas tardes": "¡Buenas tardes! Soy el asistente virtual de Plato y Copa. ¿En qué puedo ayudarte hoy?",
+    "buenas noches": "¡Buenas noches! Soy el asistente virtual de Plato y Copa. ¿En qué puedo ayudarte hoy?",
+    servicios:
+      "Ofrecemos servicios de meseros profesionales para todo tipo de eventos: bodas, XV años, eventos corporativos, fiestas privadas y más. También contamos con servicios adicionales como lavalozas, cuidacoches y montaje/desmontaje.",
+    "¿qué servicios ofrecen?":
+      "Ofrecemos servicios de meseros profesionales para todo tipo de eventos: bodas, XV años, eventos corporativos, fiestas privadas y más. También contamos con servicios adicionales como lavalozas, cuidacoches y montaje/desmontaje.",
+    precios:
+      "El costo base es de $350 por mesero para 6 horas de servicio, o $450 por mesero para 8 horas. También ofrecemos servicios adicionales como lavalozas ($300), cuidacoches ($400) y montaje/desmontaje ($80 por mesero). Puedes usar nuestra calculadora de cotización para obtener un precio exacto.",
+    "¿cuánto cuesta el servicio?":
+      "El costo base es de $350 por mesero para 6 horas de servicio, o $450 por mesero para 8 horas. También ofrecemos servicios adicionales como lavalozas ($300), cuidacoches ($400) y montaje/desmontaje ($80 por mesero). Puedes usar nuestra calculadora de cotización para obtener un precio exacto.",
+    reservar:
+      "Para reservar nuestros servicios, puedes utilizar nuestra calculadora de cotización y hacer clic en 'Reservar ahora', o contactarnos directamente por WhatsApp al +52 (222) 378-0903.",
+    "¿cómo reservo?":
+      "Para reservar nuestros servicios, puedes utilizar nuestra calculadora de cotización y hacer clic en 'Reservar ahora', o contactarnos directamente por WhatsApp al +52 (222) 378-0903.",
+    contacto:
+      "Puedes contactarnos por teléfono al +52 (222) 378-0903, por correo electrónico a platoycopa.oficial@gmail.com, o a través del formulario de contacto en nuestra página web.",
+    ubicación:
+      "Estamos ubicados en Puebla, Puebla. Ofrecemos servicios tanto locales como foráneos con un cargo adicional por transporte.",
+    horario:
+      "Nuestro horario de atención es de lunes a viernes de 9:00 AM a 7:00 PM, y sábados de 10:00 AM a 3:00 PM. Sin embargo, nuestros servicios están disponibles 24/7 según la programación de tu evento.",
+    experiencia:
+      "Contamos con más de 5 años de experiencia en el servicio de meseros para todo tipo de eventos, desde pequeñas reuniones familiares hasta grandes eventos corporativos y bodas de lujo.",
+    cancelación:
+      "Nuestra política de cancelación permite cambios o cancelaciones hasta 72 horas antes del evento sin cargo. Para más detalles, por favor contáctanos directamente.",
+    gracias: "¡De nada! Estamos para servirte. Si tienes más preguntas, no dudes en consultarme.",
+    adiós:
+      "¡Hasta pronto! Esperamos poder atenderte pronto en tu próximo evento. Si necesitas más información, no dudes en contactarnos.",
+    disponibilidad:
+      "Nuestra disponibilidad varía según la temporada y demanda. Te recomendamos reservar con al menos 2 semanas de anticipación para eventos pequeños y 1 mes para eventos grandes. Contáctanos para verificar disponibilidad en tu fecha específica.",
+    "¿tienen disponibilidad?":
+      "Nuestra disponibilidad varía según la temporada y demanda. Te recomendamos reservar con al menos 2 semanas de anticipación para eventos pequeños y 1 mes para eventos grandes. Contáctanos para verificar disponibilidad en tu fecha específica.",
+    cotizar:
+      "Puedes obtener una cotización personalizada utilizando nuestra calculadora en la sección 'Cotiza tu Servicio'. Ingresa el número de meseros, duración, ubicación y servicios adicionales para obtener un precio estimado al instante.",
+    eventos:
+      "Atendemos todo tipo de eventos: bodas, XV años, bautizos, graduaciones, eventos corporativos, fiestas privadas, conferencias, y más. Nuestro servicio se adapta a las necesidades específicas de cada tipo de evento.",
+    meseros:
+      "Nuestros meseros son profesionales capacitados con experiencia en servicio de alta calidad. Todos cuentan con uniforme formal, conocimientos de protocolo y etiqueta, y están entrenados para brindar un servicio excepcional.",
+    pago: "Aceptamos diversos métodos de pago: efectivo, transferencia bancaria, tarjetas de crédito/débito y depósitos. Para reservar la fecha, solicitamos un anticipo del 30% y el resto puede liquidarse el día del evento o hasta 3 días antes.",
+    uniforme:
+      "Nuestros meseros utilizan uniforme formal que incluye camisa blanca, chaleco negro, moño, pantalón negro y zapatos negros. Si deseas un uniforme específico para tu evento, podemos adaptarnos a tus necesidades con previo aviso.",
+    reseñas:
+      "Puedes ver las reseñas de nuestros clientes en la sección 'Lo que dicen nuestros clientes' en nuestra página principal o visitar la sección completa de reseñas para conocer las experiencias de quienes han contratado nuestros servicios.",
+    "¿qué opinan sus clientes?":
+      "Nuestros clientes destacan nuestra puntualidad, profesionalismo y atención al detalle. Puedes leer sus testimonios completos en nuestra sección de reseñas.",
+    covid:
+      "Seguimos todos los protocolos sanitarios vigentes. Nuestro personal está capacitado en medidas de higiene y seguridad, utilizando equipo de protección cuando es requerido y siguiendo las normativas locales para eventos.",
+    "medidas sanitarias":
+      "Implementamos rigurosos protocolos de higiene y seguridad. Todo nuestro personal está capacitado en medidas sanitarias y seguimos las normativas vigentes para garantizar un servicio seguro en tu evento.",
+    default:
+      "Gracias por tu mensaje. Para información más específica, te recomendamos contactarnos directamente por teléfono al +52 (222) 378-0903 o por correo a platoycopa.oficial@gmail.com.",
+  };
+
+  // Acciones rápidas
+  const quickActions = {
+    cotizar: {
+      response:
+        "Puedes utilizar nuestra calculadora de cotización en la sección 'Cotiza tu Servicio'. ¿Te gustaría que te dirija allí?",
+      action: () => {
+        // Verificar si estamos en la página principal
+        if (currentPage === "/" || currentPage.includes("/home")) {
+          const cotizacionSection = document.querySelector('a[href="#cotizacion"]');
+          if (cotizacionSection) {
+            cotizacionSection.click();
+            addBotMessage(
+              "Te he dirigido a nuestra calculadora de cotización. Si necesitas ayuda para completarla, no dudes en preguntar.",
+            );
+          }
+        } else {
+          addBotMessage(
+            "Puedes acceder a nuestra calculadora de cotización en la página principal. ¿Deseas que te redirija allí?",
+          );
+          setTimeout(() => {
+            addBotMessage(
+              '<a href="/#cotizacion" class="action-link"><i class="bi bi-calculator"></i> Ir a la calculadora de cotización</a>',
+              true,
+            );
+          }, 1000);
+        }
+      },
+    },
+    reservar: {
+      response:
+        "Para reservar nuestros servicios, puedes contactarnos por WhatsApp o utilizar el botón 'Reservar ahora' después de completar la cotización. ¿Deseas que te dirija a alguna de estas opciones?",
+      action: () => {
+        addBotMessage("Puedes reservar directamente por WhatsApp en el siguiente enlace:");
+        addBotMessage(
+          '<a href="https://wa.me/5212223780903" target="_blank" class="whatsapp-link"><i class="bi bi-whatsapp"></i> Reservar por WhatsApp</a>',
+          true,
+        );
+
+        // Si estamos en la página principal, también ofrecer la opción de ir a la calculadora
+        if (currentPage === "/" || currentPage.includes("/home")) {
+          setTimeout(() => {
+            addBotMessage("O puedes utilizar nuestra calculadora de cotización y hacer clic en 'Reservar ahora':");
+            addBotMessage(
+              '<a href="/#cotizacion" class="action-link"><i class="bi bi-calculator"></i> Ir a la calculadora</a>',
+              true,
+            );
+          }, 1500);
+        }
+      },
+    },
+    contacto: {
+      response:
+        "Puedes contactarnos por teléfono, correo electrónico o a través de nuestro formulario de contacto. ¿Qué método prefieres?",
+      action: () => {
+        // Verificar si estamos en la página principal
+        if (currentPage === "/" || currentPage.includes("/home")) {
+          const contactoSection = document.querySelector('a[href="#contacto"]');
+          if (contactoSection) {
+            contactoSection.click();
+            addBotMessage(
+              "Te he dirigido a nuestra sección de contacto. Allí encontrarás todas nuestras vías de comunicación.",
+            );
+          }
+        } else {
+          addBotMessage("Aquí tienes nuestros datos de contacto:");
+          setTimeout(() => {
+            addBotMessage(
+              `
+              <div class="contact-info-card">
+                  <div><i class="bi bi-telephone-fill"></i> <a href="tel:+522223780903">+52 (222) 378-0903</a></div>
+                  <div><i class="bi bi-envelope-fill"></i> <a href="mailto:platoycopa.oficial@gmail.com">platoycopa.oficial@gmail.com</a></div>
+                  <div><i class="bi bi-geo-alt-fill"></i> Puebla, Puebla</div>
+              </div>
+              `,
+              true,
+            );
+          }, 1000);
+        }
+      },
+    },
+    ubicacion: {
+      response:
+        "Estamos ubicados en Puebla, Puebla. Ofrecemos servicios tanto locales como foráneos con un cargo adicional por transporte.",
+      action: () => {
+        addBotMessage("Puedes encontrarnos en Puebla, Puebla. Aquí tienes un enlace a nuestra ubicación:");
+        addBotMessage(
+          '<a href="https://www.google.com/maps/search/?api=1&query=Puebla,+Puebla" target="_blank" class="map-link"><i class="bi bi-geo-alt"></i> Ver en Google Maps</a>',
+          true,
+        );
+      },
+    },
+  };
+
+  // Emojis para el selector
+  const emojis = ["😊", "👍", "🎉", "🥂", "🍽️", "👨‍🍳", "🎂", "💼", "💍", "🎊", "👏", "❤️", "✨", "🙏", "👌"];
+
+  // Función para abrir el chatbot
+  function openChatbot() {
+    if (!chatbotBox) return;
+    
+    chatbotBox.classList.add("active");
+    if (chatbotNotification) {
+      chatbotNotification.style.display = "none";
+    }
+    isMinimized = false;
+
+    // Restaurar altura normal si estaba minimizado
+    chatbotBox.style.height = "";
+    chatbotBox.style.overflow = "";
+
+    // Asegurar que el chatbot esté completamente visible en la pantalla
+    ensureChatbotVisibility();
+
+    // Si no hay mensajes, mostrar mensaje de bienvenida
+    if (chatbotMessages && chatbotMessages.children.length === 0) {
+      setTimeout(() => {
+        addBotMessage("¡Hola! Soy el asistente virtual de Plato y Copa. ¿En qué puedo ayudarte hoy?");
+        setTimeout(() => {
+          addBotMessage(
+            "Puedes preguntarme sobre nuestros servicios, precios, o usar el menú de ayuda rápida para navegar más fácilmente.",
+          );
+        }, 1000);
+      }, 500);
+    }
+
+    // Enfocar el campo de entrada
+    setTimeout(() => {
+      if (chatbotInput) {
+        chatbotInput.focus();
+      }
+    }, 500);
+
+    // Guardar preferencia en localStorage
+    localStorage.setItem("chatbotOpen", "true");
+  }
+
+  // Función para asegurar que el chatbot esté completamente visible
+  function ensureChatbotVisibility() {
+    if (!chatbotBox) return;
+
+    // Obtener dimensiones de la ventana
+    const windowHeight = window.innerHeight;
+
+    // Obtener dimensiones y posición del chatbot
+    const chatbotRect = chatbotBox.getBoundingClientRect();
+
+    // Verificar si el chatbot sale por la parte superior
+    if (chatbotRect.top < 0) {
+      // Ajustar posición para que esté completamente visible
+      chatbotBox.style.bottom = "auto";
+      chatbotBox.style.top = "20px";
+      chatbotBox.style.maxHeight = `${windowHeight - 40}px`;
+    } else {
+      // Verificar si el chatbot sale por la parte inferior
+      if (chatbotRect.bottom > windowHeight) {
+        chatbotBox.style.maxHeight = `${windowHeight - chatbotRect.top - 20}px`;
+      }
+    }
+  }
+
+  // Función para cerrar el chatbot
+  function closeChatbot() {
+    if (!chatbotBox) return;
+    
+    chatbotBox.classList.remove("active");
+
+    // Guardar preferencia en localStorage
+    localStorage.setItem("chatbotOpen", "false");
+  }
+
+  // Función para minimizar el chatbot
+  function minimizeChatbot() {
+    if (!chatbotBox) return;
+    
+    if (!isMinimized) {
+      chatbotBox.style.height = "60px";
+      chatbotBox.style.overflow = "hidden";
+      if (chatbotMinimize) {
+        chatbotMinimize.innerHTML = '<i class="bi bi-arrows-angle-expand"></i>';
+      }
+      isMinimized = true;
+    } else {
+      chatbotBox.style.height = "";
+      chatbotBox.style.overflow = "";
+      if (chatbotMinimize) {
+        chatbotMinimize.innerHTML = '<i class="bi bi-dash-lg"></i>';
+      }
+      isMinimized = false;
+    }
+
+    // Guardar estado en localStorage
+    localStorage.setItem("chatbotMinimized", isMinimized.toString());
+  }
+
+  // Función para mostrar indicador de escritura
+  function showTypingIndicator() {
+    if (isTyping || !chatbotMessages) return;
+
+    isTyping = true;
+
+    const typingDiv = document.createElement("div");
+    typingDiv.className = "typing-indicator";
+    typingDiv.id = "typingIndicator";
+
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement("div");
+      dot.className = "typing-dot";
+      typingDiv.appendChild(dot);
+    }
+
+    chatbotMessages.appendChild(typingDiv);
+    scrollToBottom();
+  }
+
+  // Función para ocultar indicador de escritura
+  function hideTypingIndicator() {
+    const indicator = document.getElementById("typingIndicator");
+    if (indicator) {
+      indicator.remove();
+    }
+    isTyping = false;
+  }
+
+  // Función para agregar un mensaje del bot
+  function addBotMessage(text, isHTML = false) {
+    if (!chatbotMessages) return;
+    
+    hideTypingIndicator();
+
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "message bot with-avatar";
+
+    // Agregar avatar
+    const avatar = document.createElement("img");
+    avatar.src = "/img/Plato_y_copa_logo.jpg";
+    avatar.alt = "Bot Avatar";
+    avatar.className = "message-avatar";
+    messageDiv.appendChild(avatar);
+
+    const messageText = document.createElement("div");
+    messageText.className = "message-text";
+
+    if (isHTML) {
+      messageText.innerHTML = text;
+    } else {
+      messageText.textContent = text;
+    }
+
+    const messageTime = document.createElement("div");
+    messageTime.className = "message-time";
+    messageTime.textContent = getCurrentTime();
+
+    messageDiv.appendChild(messageText);
+    messageDiv.appendChild(messageTime);
+
+    chatbotMessages.appendChild(messageDiv);
+    scrollToBottom();
+
+    // Guardar en el historial
+    chatHistory.push({
+      sender: "bot",
+      message: text,
+      time: new Date(),
+      isHTML: isHTML,
+    });
+
+    // Guardar historial en localStorage
+    saveHistoryToStorage();
+
+    // Simular escritura del bot
+    messageDiv.style.opacity = "0";
+    setTimeout(() => {
+      messageDiv.style.opacity = "1";
+    }, 200);
+  }
+
+  // Función para agregar un mensaje del usuario
+  function addUserMessage(text) {
+    if (!chatbotMessages) return;
+    
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "message user";
+
+    const messageText = document.createElement("div");
+    messageText.className = "message-text";
+    messageText.textContent = text;
+
+    const messageTime = document.createElement("div");
+    messageTime.className = "message-time";
+    messageTime.textContent = getCurrentTime();
+
+    messageDiv.appendChild(messageText);
+    messageDiv.appendChild(messageTime);
+
+    chatbotMessages.appendChild(messageDiv);
+    scrollToBottom();
+
+    // Guardar en el historial
+    chatHistory.push({
+      sender: "user",
+      message: text,
+      time: new Date(),
+    });
+
+    // Guardar historial en localStorage
+    saveHistoryToStorage();
+  }
+
+  // Función para guardar historial en localStorage
+  function saveHistoryToStorage() {
+    // Limitar a los últimos 50 mensajes para no sobrecargar el localStorage
+    const limitedHistory = chatHistory.slice(-50);
+    localStorage.setItem("chatbotHistory", JSON.stringify(limitedHistory));
+  }
+
+  // Función para cargar historial desde localStorage
+  function loadHistoryFromStorage() {
+    const savedHistory = localStorage.getItem("chatbotHistory");
+    if (savedHistory && chatbotMessages) {
+      try {
+        const parsedHistory = JSON.parse(savedHistory);
+
+        // Verificar si el historial tiene el formato correcto
+        if (Array.isArray(parsedHistory) && parsedHistory.length > 0) {
+          chatHistory = parsedHistory;
+
+          // Mostrar los últimos 10 mensajes como máximo para no sobrecargar la interfaz
+          const recentMessages = parsedHistory.slice(-10);
+
+          recentMessages.forEach((msg) => {
+            if (msg.sender === "bot") {
+              // Verificar si el mensaje contiene HTML
+              addBotMessage(msg.message, msg.isHTML || false);
+            } else {
+              addUserMessage(msg.message);
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error al cargar el historial del chatbot:", e);
+        // Si hay un error, limpiar el historial corrupto
+        localStorage.removeItem("chatbotHistory");
+      }
+    }
+  }
+
+  // Función para obtener la hora actual en formato HH:MM
+  function getCurrentTime() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+
+    // Añadir ceros iniciales si es necesario
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    return `${hours}:${minutes}`;
+  }
+
+  // Función para desplazarse al final de los mensajes
+  function scrollToBottom() {
+    if (chatbotMessages) {
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+  }
+
+  // Función para procesar la entrada del usuario y generar una respuesta
+  function processUserInput(userInput) {
+    // Convertir a minúsculas para facilitar la comparación
+    const input = userInput.toLowerCase().trim();
+
+    // Mostrar indicador de escritura
+    showTypingIndicator();
+
+    // Buscar en la base de conocimiento
+    let response = null;
+    const delay = Math.floor(Math.random() * 500) + 800; // Delay aleatorio entre 800ms y 1300ms
+
+    // Buscar coincidencias exactas primero
+    if (knowledgeBase[input]) {
+      response = knowledgeBase[input];
+    } else {
+      // Buscar coincidencias parciales
+      for (const key in knowledgeBase) {
+        if (input.includes(key) || key.includes(input)) {
+          response = knowledgeBase[key];
+          break;
+        }
+      }
+
+      // Si no hay coincidencias, usar respuesta por defecto
+      if (!response) {
+        response = knowledgeBase["default"];
+      }
+    }
+
+    // Simular tiempo de respuesta del bot
+    setTimeout(() => {
+      addBotMessage(response);
+
+      // Verificar si hay acciones rápidas relacionadas
+      for (const key in quickActions) {
+        if (input.includes(key)) {
+          setTimeout(() => {
+            quickActions[key].action();
+          }, 1000);
+          break;
+        }
+      }
+    }, delay);
+  }
+
+  // Función para manejar el envío de mensajes
+  function handleSendMessage() {
+    if (!chatbotInput) return;
+    
+    const userInput = chatbotInput.value.trim();
+
+    if (userInput) {
+      // Agregar mensaje del usuario
+      addUserMessage(userInput);
+
+      // Limpiar el campo de entrada
+      chatbotInput.value = "";
+
+      // Procesar la entrada y generar respuesta
+      processUserInput(userInput);
+    }
+  }
+
+  // Función para manejar acciones rápidas
+  function handleQuickAction(action) {
+    addUserMessage(action.charAt(0).toUpperCase() + action.slice(1));
+    showTypingIndicator();
+
+    setTimeout(() => {
+      addBotMessage(quickActions[action].response);
+      setTimeout(() => {
+        quickActions[action].action();
+      }, 1000);
+    }, 800);
+  }
+
+  // Función para mostrar selector de emojis
+  function showEmojiSelector() {
+    // Verificar si ya existe el selector
+    if (document.getElementById("emojiSelector")) {
+      document.getElementById("emojiSelector").remove();
+      return;
+    }
+
+    const emojiSelector = document.createElement("div");
+    emojiSelector.id = "emojiSelector";
+    emojiSelector.className = "emoji-selector";
+
+    // Agregar emojis
+    emojis.forEach((emoji) => {
+      const emojiBtn = document.createElement("button");
+      emojiBtn.textContent = emoji;
+      emojiBtn.style.background = "none";
+      emojiBtn.style.border = "none";
+      emojiBtn.style.fontSize = "1.5rem";
+      emojiBtn.style.cursor = "pointer";
+      emojiBtn.style.padding = "5px";
+      emojiBtn.style.transition = "all 0.2s ease";
+
+      emojiBtn.addEventListener("mouseover", () => {
+        emojiBtn.style.backgroundColor = "rgba(229, 199, 107, 0.2)";
+        emojiBtn.style.transform = "scale(1.1)";
+      });
+
+      emojiBtn.addEventListener("mouseout", () => {
+        emojiBtn.style.backgroundColor = "transparent";
+        emojiBtn.style.transform = "scale(1)";
+      });
+
+      emojiBtn.addEventListener("click", () => {
+        if (chatbotInput) {
+          chatbotInput.value += emoji;
+          chatbotInput.focus();
+        }
+        emojiSelector.remove();
+      });
+
+      emojiSelector.appendChild(emojiBtn);
+    });
+
+    // Agregar al DOM
+    const inputContainer = document.querySelector(".chatbot-input-container");
+    if (inputContainer) {
+      inputContainer.appendChild(emojiSelector);
+    }
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (e.target !== chatbotEmoji && !emojiSelector.contains(e.target)) {
+          emojiSelector.remove();
+        }
+      },
+      { once: true },
+    );
+  }
+
+  // Función para manejar el menú de ayuda colapsable
+  function setupHelpMenu() {
+    const helpToggle = document.getElementById("chatbotHelpToggle");
+    const helpContent = document.getElementById("chatbotHelpContent");
+    
+    if (helpToggle && helpContent) {
+      const toggleIcon = helpToggle.querySelector(".toggle-icon");
+
+      helpToggle.addEventListener("click", () => {
+        helpContent.classList.toggle("active");
+        if (toggleIcon) {
+          toggleIcon.classList.toggle("active");
+        }
+      });
+    }
+  }
+
+  // Inicializar el chatbot después de un pequeño retraso para evitar problemas durante la navegación
+  setTimeout(() => {
+    // Verificar si los elementos del chatbot existen
+    if (!chatbotToggle || !chatbotBox) return;
+    
+    // Event listeners
+    if (chatbotToggle) {
+      chatbotToggle.addEventListener("click", openChatbot);
+    }
+
+    if (chatbotClose) {
+      chatbotClose.addEventListener("click", closeChatbot);
+    }
+
+    if (chatbotMinimize) {
+      chatbotMinimize.addEventListener("click", minimizeChatbot);
+    }
+
+    if (chatbotSend) {
+      chatbotSend.addEventListener("click", handleSendMessage);
+    }
+
+    if (chatbotInput) {
+      chatbotInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          handleSendMessage();
+        }
+      });
+    }
+
+    // Event listeners para los botones de sugerencia
+    suggestionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const query = button.getAttribute("data-query");
+        if (chatbotInput) {
+          chatbotInput.value = query;
+          handleSendMessage();
+        }
+      });
+    });
+
+    // Event listeners para los botones de acción rápida
+    quickActionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const action = button.getAttribute("data-action");
+        handleQuickAction(action);
+      });
+    });
+
+    // Event listener para el botón de emojis
+    if (chatbotEmoji) {
+      chatbotEmoji.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showEmojiSelector();
+      });
+    }
+
+    // Mostrar notificación después de 5 segundos si el chatbot no está abierto
+    setTimeout(() => {
+      if (chatbotBox && !chatbotBox.classList.contains("active") && chatbotNotification) {
+        chatbotNotification.style.display = "flex";
+      }
+    }, 5000);
+
+    // Agregar evento para cerrar el selector de emojis al hacer clic fuera
+    document.addEventListener("click", (e) => {
+      const emojiSelector = document.getElementById("emojiSelector");
+      if (emojiSelector && e.target !== chatbotEmoji && !emojiSelector.contains(e.target)) {
+        emojiSelector.remove();
+      }
+    });
+
+    // Función para adaptar el chatbot a diferentes dispositivos
+    function adaptToDifferentDevices() {
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+
+      if (chatbotBox) {
+        if (isMobile) {
+          // Ajustes para móviles
+          chatbotBox.style.width = "90vw";
+          chatbotBox.style.height = "70vh";
+          chatbotBox.style.right = "5vw";
+          chatbotBox.style.left = "5vw";
+
+          // En móviles muy pequeños, reducir aún más la altura
+          if (window.innerHeight < 600) {
+            chatbotBox.style.height = "60vh";
+          }
+        } else if (isTablet) {
+          // Ajustes para tablets
+          chatbotBox.style.width = "350px";
+          chatbotBox.style.height = "500px";
+          chatbotBox.style.right = "30px";
+          chatbotBox.style.left = "auto";
+        } else {
+          // Ajustes para escritorio
+          chatbotBox.style.width = "380px";
+          chatbotBox.style.height = "550px";
+          chatbotBox.style.right = "30px";
+          chatbotBox.style.left = "auto";
+        }
+      }
+    }
+
+    // Adaptar al cargar la página y cuando cambie el tamaño de la ventana
+    adaptToDifferentDevices();
+    window.addEventListener("resize", adaptToDifferentDevices);
+
+    // Configurar el menú de ayuda colapsable
+    setupHelpMenu();
+
+    // Añadir event listener para el redimensionamiento de la ventana
+    window.addEventListener("resize", ensureChatbotVisibility);
+
+    // Restaurar estado del chatbot
+    loadHistoryFromStorage();
+    
+    // Verificar si el chatbot estaba abierto en la sesión anterior
+    const wasOpen = localStorage.getItem("chatbotOpen") === "true";
+    
+    // Solo abrir el chatbot si estaba abierto anteriormente y shouldOpenChatbot es true
+    if (wasOpen && shouldOpenChatbot) {
+      openChatbot();
+      const wasMinimized = localStorage.getItem("chatbotMinimized") === "true";
+      if (wasMinimized) {
+        minimizeChatbot();
+      }
+    }
+    
+    // Establecer shouldOpenChatbot a true después de la carga inicial
+    // Esto evita que el chatbot se abra automáticamente durante las navegaciones
+    shouldOpenChatbot = true;
+  }, 300); // Pequeño retraso para evitar problemas durante la navegación
+});
+</script>
+

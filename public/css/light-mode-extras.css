@@ -1,0 +1,901 @@
+/**
+ * Plato y Copa - Extras para Modo Claro
+ *
+ * Este archivo contiene estilos adicionales específicos para el modo claro
+ * que mejoran la experiencia visual y la coherencia del diseño.
+ */
+
+/* Efectos de profundidad y elevación */
+.light-mode .depth-effect {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .light-mode .depth-effect::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: inherit !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    opacity: 0 !important;
+    transition: opacity var(--transition-normal) !important;
+    z-index: -1 !important;
+  }
+  
+  .light-mode .depth-effect:hover::before {
+    opacity: 1 !important;
+  }
+  
+  /* Efectos de brillo para elementos dorados */
+  .light-mode .gold-shimmer {
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  .light-mode .gold-shimmer::after {
+    content: "" !important;
+    position: absolute !important;
+    top: -100% !important;
+    left: -100% !important;
+    width: 50% !important;
+    height: 300% !important;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%
+    ) !important;
+    transform: rotate(30deg) !important;
+    animation: shimmer 4s infinite linear !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+  }
+  
+  .light-mode .gold-shimmer:hover::after {
+    opacity: 1 !important;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%) rotate(30deg);
+    }
+    100% {
+      transform: translateX(200%) rotate(30deg);
+    }
+  }
+  
+  /* Mejoras para botones y elementos interactivos */
+  .light-mode .interactive-element {
+    transition: all var(--transition-normal) !important;
+    will-change: transform, box-shadow !important;
+  }
+  
+  .light-mode .interactive-element:hover {
+    transform: translateY(-2px) !important;
+  }
+  
+  .light-mode .interactive-element:active {
+    transform: translateY(1px) !important;
+  }
+  
+  /* Efectos de enfoque para elementos interactivos */
+  .light-mode .focus-effect:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(201, 169, 77, 0.25) !important;
+  }
+  
+  /* Efectos de gradiente para bordes */
+  .light-mode .gradient-border {
+    position: relative !important;
+    border: none !important;
+    background-clip: padding-box !important;
+  }
+  
+  .light-mode .gradient-border::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: -1px !important;
+    border-radius: inherit !important;
+    background: linear-gradient(45deg, var(--gold-light), var(--gold), var(--gold-dark)) !important;
+    z-index: -1 !important;
+    opacity: 0.3 !important;
+    transition: opacity var(--transition-normal) !important;
+  }
+  
+  .light-mode .gradient-border:hover::before {
+    opacity: 0.6 !important;
+  }
+  
+  /* Efectos de texto para títulos */
+  .light-mode .fancy-title {
+    position: relative !important;
+    display: inline-block !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .light-mode .fancy-title::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: -5px !important;
+    width: 100% !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light)) !important;
+    transform: scaleX(0.3) !important;
+    transform-origin: left !important;
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .fancy-title:hover::after {
+    transform: scaleX(1) !important;
+  }
+  
+  /* Efectos de tarjeta con borde brillante */
+  .light-mode .glowing-card {
+    position: relative !important;
+    border-radius: var(--border-radius-lg) !important;
+    overflow: hidden !important;
+  }
+  
+  .light-mode .glowing-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: inherit !important;
+    padding: 1px !important;
+    background: linear-gradient(45deg, transparent, rgba(201, 169, 77, 0.3), transparent) !important;
+    -webkit-mask-composite: xor !important;
+    mask-composite: exclude !important;
+    opacity: 0 !important;
+    transition: opacity var(--transition-normal) !important;
+  }
+  
+  .light-mode .glowing-card:hover::before {
+    opacity: 1 !important;
+  }
+  
+  /* Efectos de sombra para elementos flotantes */
+  .light-mode .floating-element {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .floating-element:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 0 10px rgba(201, 169, 77, 0.2) !important;
+    transform: translateY(-5px) !important;
+  }
+  
+  /* Efectos de botón con ondas */
+  .light-mode .wave-button {
+    position: relative !important;
+    overflow: hidden !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+  
+  .light-mode .wave-button::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    pointer-events: none !important;
+    background-image: radial-gradient(circle, rgba(201, 169, 77, 0.3) 10%, transparent 10.01%) !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+    transform: scale(10, 10) !important;
+    opacity: 0 !important;
+    transition: transform 0.5s, opacity 1s !important;
+  }
+  
+  .light-mode .wave-button:active::after {
+    transform: scale(0, 0) !important;
+    opacity: 0.3 !important;
+    transition: 0s !important;
+  }
+  
+  /* Efectos de desenfoque para fondos */
+  .light-mode .blur-bg {
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  .light-mode .blur-bg::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: -10px !important;
+    right: -10px !important;
+    bottom: -10px !important;
+    background: inherit !important;
+    filter: blur(10px) !important;
+    opacity: 0.7 !important;
+    z-index: -1 !important;
+  }
+  
+  /* Efectos de transición para cambios de estado */
+  .light-mode .state-transition {
+    transition: all var(--transition-normal) !important;
+  }
+  
+  .light-mode .state-transition.active {
+    background-color: rgba(201, 169, 77, 0.15) !important;
+    color: var(--text-accent) !important;
+    border-color: var(--gold-border) !important;
+  }
+  
+  /* Efectos de escala para elementos interactivos */
+  .light-mode .scale-effect {
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .scale-effect:hover {
+    transform: scale(1.05) !important;
+  }
+  
+  .light-mode .scale-effect:active {
+    transform: scale(0.98) !important;
+  }
+  
+  /* Efectos de rotación para iconos */
+  .light-mode .rotate-icon {
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .rotate-icon:hover {
+    transform: rotate(15deg) !important;
+  }
+  
+  /* Efectos de desplazamiento para elementos de navegación */
+  .light-mode .slide-effect {
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  .light-mode .slide-effect::after {
+    content: "" !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 2px !important;
+    background-color: var(--gold) !important;
+    transform: translateX(-100%) !important;
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .slide-effect:hover::after {
+    transform: translateX(0) !important;
+  }
+  
+  /* Efectos de pulsación para elementos destacados */
+  .light-mode .pulse-effect {
+    position: relative !important;
+  }
+  
+  .light-mode .pulse-effect::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: inherit !important;
+    box-shadow: 0 0 0 0 rgba(201, 169, 77, 0.5) !important;
+    animation: pulse 2s infinite !important;
+    opacity: 0 !important;
+    transition: opacity var(--transition-normal) !important;
+  }
+  
+  .light-mode .pulse-effect:hover::before {
+    opacity: 1 !important;
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(201, 169, 77, 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(201, 169, 77, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(201, 169, 77, 0);
+    }
+  }
+  
+  /* Efectos de desvanecimiento para elementos que aparecen */
+  .light-mode .fade-in {
+    animation: fadeIn 0.5s ease-in-out !important;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Efectos de desvanecimiento para elementos que desaparecen */
+  .light-mode .fade-out {
+    animation: fadeOut 0.5s ease-in-out !important;
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  
+  /* Efectos de rebote para elementos interactivos */
+  .light-mode .bounce-effect:hover {
+    animation: bounce 0.5s ease-in-out !important;
+  }
+  
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* Efectos de sacudida para elementos de alerta */
+  .light-mode .shake-effect:hover {
+    animation: shake 0.5s ease-in-out !important;
+  }
+  
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-2px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(2px);
+    }
+  }
+  
+  /* Efectos de zoom para elementos de imagen */
+  .light-mode .zoom-effect {
+    overflow: hidden !important;
+  }
+  
+  .light-mode .zoom-effect img {
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .zoom-effect:hover img {
+    transform: scale(1.1) !important;
+  }
+  
+  /* Efectos de desenfoque para elementos de fondo */
+  .light-mode .blur-effect {
+    transition: filter var(--transition-normal) !important;
+  }
+  
+  .light-mode .blur-effect:hover {
+    filter: blur(2px) !important;
+  }
+  
+  /* Efectos de saturación para elementos de imagen */
+  .light-mode .saturate-effect img {
+    transition: filter var(--transition-normal) !important;
+    filter: saturate(0.8) !important;
+  }
+  
+  .light-mode .saturate-effect:hover img {
+    filter: saturate(1.2) !important;
+  }
+  
+  /* Efectos de brillo para elementos de imagen */
+  .light-mode .brightness-effect img {
+    transition: filter var(--transition-normal) !important;
+    filter: brightness(0.9) !important;
+  }
+  
+  .light-mode .brightness-effect:hover img {
+    filter: brightness(1.1) !important;
+  }
+  
+  /* Efectos de contraste para elementos de imagen */
+  .light-mode .contrast-effect img {
+    transition: filter var(--transition-normal) !important;
+    filter: contrast(0.9) !important;
+  }
+  
+  .light-mode .contrast-effect:hover img {
+    filter: contrast(1.1) !important;
+  }
+  
+  /* Efectos de sepia para elementos de imagen */
+  .light-mode .sepia-effect img {
+    transition: filter var(--transition-normal) !important;
+    filter: sepia(0.2) !important;
+  }
+  
+  .light-mode .sepia-effect:hover img {
+    filter: sepia(0) !important;
+  }
+  
+  /* Efectos de escala de grises para elementos de imagen */
+  .light-mode .grayscale-effect img {
+    transition: filter var(--transition-normal) !important;
+    filter: grayscale(0.5) !important;
+  }
+  
+  .light-mode .grayscale-effect:hover img {
+    filter: grayscale(0) !important;
+  }
+  
+  /* Efectos de sombra para texto */
+  .light-mode .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Efectos de sombra para texto con color dorado */
+  .light-mode .gold-text-shadow {
+    text-shadow: 0 1px 2px rgba(201, 169, 77, 0.3) !important;
+  }
+  
+  /* Efectos de texto con gradiente */
+  .light-mode .gradient-text {
+    background: linear-gradient(45deg, var(--gold-dark), var(--gold), var(--gold-light)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+  }
+  
+  /* Efectos de texto con borde */
+  .light-mode .outline-text {
+    -webkit-text-stroke: 1px var(--gold) !important;
+    color: transparent !important;
+  }
+  
+  /* Efectos de texto con espaciado */
+  .light-mode .spaced-text {
+    letter-spacing: 2px !important;
+  }
+  
+  /* Efectos de texto con transformación */
+  .light-mode .transform-text {
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .transform-text:hover {
+    transform: skewX(-5deg) !important;
+  }
+  
+  /* Efectos de texto con subrayado */
+  .light-mode .underline-text {
+    position: relative !important;
+    display: inline-block !important;
+  }
+  
+  .light-mode .underline-text::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: -2px !important;
+    width: 100% !important;
+    height: 1px !important;
+    background-color: var(--gold) !important;
+    transform: scaleX(0) !important;
+    transform-origin: right !important;
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .underline-text:hover::after {
+    transform: scaleX(1) !important;
+    transform-origin: left !important;
+  }
+  
+  /* Efectos de texto con tachado */
+  .light-mode .strikethrough-text {
+    position: relative !important;
+    display: inline-block !important;
+  }
+  
+  .light-mode .strikethrough-text::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    width: 100% !important;
+    height: 1px !important;
+    background-color: var(--gold) !important;
+    transform: scaleX(0) !important;
+    transform-origin: right !important;
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .strikethrough-text:hover::after {
+    transform: scaleX(1) !important;
+    transform-origin: left !important;
+  }
+  
+  /* Efectos de texto con resaltado */
+  .light-mode .highlight-text {
+    position: relative !important;
+    display: inline-block !important;
+  }
+  
+  .light-mode .highlight-text::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 30% !important;
+    background-color: rgba(201, 169, 77, 0.2) !important;
+    z-index: -1 !important;
+    transform: scaleY(0) !important;
+    transform-origin: bottom !important;
+    transition: transform var(--transition-normal) !important;
+  }
+  
+  .light-mode .highlight-text:hover::after {
+    transform: scaleY(1) !important;
+  }
+  
+  /* Efectos de texto con sombra interna */
+  .light-mode .inner-shadow-text {
+    text-shadow:
+      1px 1px 0 var(--bg-secondary),
+      -1px -1px 0 var(--bg-secondary),
+      1px -1px 0 var(--bg-secondary),
+      -1px 1px 0 var(--bg-secondary),
+      0 1px 0 var(--bg-secondary),
+      1px 0 0 var(--bg-secondary),
+      0 -1px 0 var(--bg-secondary),
+      -1px 0 0 var(--bg-secondary),
+      inset 1px 1px 1px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Efectos de texto con sombra 3D */
+  .light-mode .text-3d {
+    text-shadow: 0 1px 0 rgba(201, 169, 77, 0.3), 0 2px 0 rgba(201, 169, 77, 0.2), 0 3px 0 rgba(201, 169, 77, 0.1), 0 4px
+      0 rgba(201, 169, 77, 0.05), 0 5px 5px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Efectos de texto con brillo */
+  .light-mode .glow-text {
+    text-shadow: 0 0 5px rgba(201, 169, 77, 0.5) !important;
+  }
+  
+  /* Efectos de texto con animación de escritura */
+  .light-mode .typing-text {
+    overflow: hidden !important;
+    border-right: 2px solid var(--gold) !important;
+    white-space: nowrap !important;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite !important;
+  }
+  
+  @keyframes typing {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+  
+  @keyframes blink-caret {
+    from,
+    to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: var(--gold);
+    }
+  }
+  
+  /* Efectos de texto con animación de desvanecimiento */
+  .light-mode .fade-text {
+    animation: fadeText 2s infinite !important;
+  }
+  
+  @keyframes fadeText {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  /* Efectos de texto con animación de rebote */
+  .light-mode .bounce-text {
+    animation: bounceText 2s infinite !important;
+  }
+  
+  @keyframes bounceText {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* Efectos de texto con animación de sacudida */
+  .light-mode .shake-text {
+    animation: shakeText 2s infinite !important;
+  }
+  
+  @keyframes shakeText {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-2px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(2px);
+    }
+  }
+  
+  /* Efectos de texto con animación de rotación */
+  .light-mode .rotate-text {
+    animation: rotateText 2s infinite !important;
+  }
+  
+  @keyframes rotateText {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(5deg);
+    }
+  }
+  
+  /* Efectos de texto con animación de escala */
+  .light-mode .scale-text {
+    animation: scaleText 2s infinite !important;
+  }
+  
+  @keyframes scaleText {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  
+  /* Efectos de texto con animación de desplazamiento */
+  .light-mode .slide-text {
+    animation: slideText 2s infinite !important;
+  }
+  
+  @keyframes slideText {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+  }
+  
+  /* Efectos de texto con animación de desvanecimiento */
+  .light-mode .blur-text {
+    animation: blurText 2s infinite !important;
+  }
+  
+  @keyframes blurText {
+    0%,
+    100% {
+      filter: blur(0);
+    }
+    50% {
+      filter: blur(1px);
+    }
+  }
+  
+  /* Efectos de texto con animación de color */
+  .light-mode .color-text {
+    animation: colorText 2s infinite !important;
+  }
+  
+  @keyframes colorText {
+    0%,
+    100% {
+      color: var(--text-primary);
+    }
+    50% {
+      color: var(--gold);
+    }
+  }
+  
+  /* Efectos de texto con animación de sombra */
+  .light-mode .shadow-text {
+    animation: shadowText 2s infinite !important;
+  }
+  
+  @keyframes shadowText {
+    0%,
+    100% {
+      text-shadow: 0 0 0 rgba(201, 169, 77, 0);
+    }
+    50% {
+      text-shadow: 0 0 5px rgba(201, 169, 77, 0.5);
+    }
+  }
+  
+  /* Efectos de texto con animación de espaciado */
+  .light-mode .spacing-text {
+    animation: spacingText 2s infinite !important;
+  }
+  
+  @keyframes spacingText {
+    0%,
+    100% {
+      letter-spacing: 0;
+    }
+    50% {
+      letter-spacing: 2px;
+    }
+  }
+  
+  /* Efectos de texto con animación de transformación */
+  .light-mode .transform-text {
+    animation: transformText 2s infinite !important;
+  }
+  
+  @keyframes transformText {
+    0%,
+    100% {
+      transform: skewX(0);
+    }
+    50% {
+      transform: skewX(5deg);
+    }
+  }
+  
+  /* Efectos de texto con animación de subrayado */
+  .light-mode .underline-anim-text {
+    position: relative !important;
+    display: inline-block !important;
+  }
+  
+  .light-mode .underline-anim-text::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: -2px !important;
+    width: 100% !important;
+    height: 1px !important;
+    background-color: var(--gold) !important;
+    animation: underlineText 2s infinite !important;
+  }
+  
+  @keyframes underlineText {
+    0%,
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
+    50% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+  
+  /* Efectos de texto con animación de resaltado */
+  .light-mode .highlight-anim-text {
+    position: relative !important;
+    display: inline-block !important;
+  }
+  
+  .light-mode .highlight-anim-text::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 30% !important;
+    background-color: rgba(201, 169, 77, 0.2) !important;
+    z-index: -1 !important;
+    animation: highlightText 2s infinite !important;
+  }
+  
+  @keyframes highlightText {
+    0%,
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: bottom;
+    }
+  }
+  
+  /* Efectos de texto con animación de brillo */
+  .light-mode .glow-anim-text {
+    animation: glowText 2s infinite !important;
+  }
+  
+  @keyframes glowText {
+    0%,
+    100% {
+      text-shadow: 0 0 0 rgba(201, 169, 77, 0);
+    }
+    50% {
+      text-shadow: 0 0 5px rgba(201, 169, 77, 0.5);
+    }
+  }
+  
+  /* Efectos de texto con animación de escritura */
+  .light-mode .typing-anim-text {
+    overflow: hidden !important;
+    border-right: 2px solid var(--gold) !important;
+    white-space: nowrap !important;
+    animation: typingText 3.5s steps(40, end) infinite, blinkCaretText 0.75s step-end infinite !important;
+  }
+  
+  @keyframes typingText {
+    0% {
+      width: 0;
+    }
+    50% {
+      width: 100%;
+    }
+    100% {
+      width: 0;
+    }
+  }
+  
+  @keyframes blinkCaretText {
+    from,
+    to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: var(--gold);
+    }
+  }
+  

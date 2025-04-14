@@ -1,0 +1,317 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <img src="/img/Plato_y_copa_logo.jpg" alt="Plato y Copa Logo">
+        </div>
+        
+        {{#if error}}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {{/if}}
+        
+        {{#if success}}
+        <div class="alert alert-success" role="alert">
+            {{success}}
+        </div>
+        {{/if}}
+        
+        <div id="loginForm" class="{{#unless isLogin}}d-none{{/unless}}">
+            <h2 class="auth-title">Acceso Administrativo</h2>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <i class="bi bi-envelope form-icon"></i>
+                    <input type="email" class="form-control" id="loginEmail" name="email" placeholder="Correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <i class="bi bi-lock form-icon"></i>
+                    <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Contraseña" required>
+                    <i class="bi bi-eye-slash toggle-password" onclick="togglePassword('loginPassword', this)"></i>
+                </div>
+                <div class="forgot-password">
+                    <a href="/password-recovery">¿Olvidaste tu contraseña?</a>
+                </div>
+                <button type="submit" class="btn btn-auth btn-gold">Iniciar Sesión</button>
+            </form>
+            <div class="auth-switch">
+                <p>¿No tienes una cuenta? <a href="javascript:void(0);" onclick="document.getElementById('loginForm').classList.add('d-none'); document.getElementById('registerForm').classList.remove('d-none');">Registrarse</a></p>
+            </div>
+        </div>
+        
+        <div id="registerForm" class="{{#if isLogin}}d-none{{/if}}">
+            <h2 class="auth-title">Registro Administrativo</h2>
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <i class="bi bi-person form-icon"></i>
+                    <input type="text" class="form-control" id="registerName" name="nombre" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <i class="bi bi-envelope form-icon"></i>
+                    <input type="email" class="form-control" id="registerEmail" name="email" placeholder="Correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <i class="bi bi-lock form-icon"></i>
+                    <input type="password" class="form-control" id="registerPassword" name="password" placeholder="Contraseña" required>
+                    <i class="bi bi-eye-slash toggle-password" onclick="togglePassword('registerPassword', this)"></i>
+                </div>
+                <div class="form-group">
+                    <i class="bi bi-lock-fill form-icon"></i>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" required>
+                    <i class="bi bi-eye-slash toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
+                </div>
+                <button type="submit" class="btn btn-auth btn-gold">Registrarse</button>
+            </form>
+            <div class="auth-switch">
+                <p>¿Ya tienes una cuenta? <a href="javascript:void(0);" onclick="document.getElementById('registerForm').classList.add('d-none'); document.getElementById('loginForm').classList.remove('d-none');">Iniciar Sesión</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para la página de autenticación */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+    background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(0, 0, 0, 0.95));
+    border-radius: var(--border-radius);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    padding: 40px 30px;
+    border: 1px solid var(--gold-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, var(--gold), var(--gold-dark));
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo img {
+    height: 80px;
+    border-radius: 10px;
+    border: 2px solid var(--gold-border);
+    transition: all 0.3s ease;
+}
+
+.auth-logo img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(229, 199, 107, 0.4);
+}
+
+.auth-title {
+    color: var(--gold);
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1.2rem;
+}
+
+.form-control {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--gold-border);
+    border-radius: 30px;
+    color: var(--white);
+    padding: 12px 15px 12px 45px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.3);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: var(--white-dim);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: var(--gold);
+    text-decoration: underline;
+}
+
+.btn-auth {
+    width: 100%;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+
+.auth-switch {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-switch p {
+    color: var(--white-dim);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.auth-switch a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    border-radius: var(--border-radius);
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff6b6b;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #51cf66;
+    border-left: 4px solid #28a745;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#loginForm, #registerForm {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+    }
+    
+    .auth-logo img {
+        height: 60px;
+    }
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: var(--gold-dark);
+}
+</style>
+
+<script>
+    // Función para mostrar/ocultar contraseña
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    }
+</script>
+
+{{#section 'scripts'}}
+<script>
+    // Validación del formulario de registro
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        const registerFormElement = registerForm.querySelector('form');
+        if (registerFormElement) {
+            registerFormElement.addEventListener('submit', function(e) {
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden');
+                    return false;
+                }
+            });
+        }
+    }
+</script>
+{{/section}}
+

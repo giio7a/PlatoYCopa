@@ -1,0 +1,916 @@
+<div class="search-results-page">
+  <div class="search-hero">
+    <div class="container">
+      <div class="search-header">
+        <h1 class="search-title">Resultados de búsqueda</h1>
+        <div class="search-form-container">
+          <form action="/buscar" method="GET" class="search-form">
+            <div class="search-input-wrapper">
+              <i class="bi bi-search"></i>
+              <input 
+                type="text" 
+                name="q" 
+                id="searchQueryInput" 
+                value="{{query}}" 
+                placeholder="Buscar servicios, eventos..." 
+                aria-label="Buscar en el sitio"
+                autocomplete="off"
+              >
+              <button type="button" id="clearSearchBtn" class="clear-search-btn {{#unless query}}hidden{{/unless}}">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+            <button type="submit" class="search-submit-btn btn-gold" aria-label="Buscar">
+              <span>Buscar</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="search-stats">
+        {{#if query}}
+          <p>
+            {{#if totalResults}}
+              Se encontraron <strong>{{totalResults}}</strong> resultados para "<strong>{{query}}</strong>"
+            {{else}}
+              No se encontraron resultados para "<strong>{{query}}</strong>"
+            {{/if}}
+          </p>
+        {{else}}
+          <p>Ingresa un término de búsqueda para encontrar servicios, eventos y más.</p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  <div class="search-content">
+    <div class="container">
+      {{#if totalResults}}
+        {{#if results.servicios.length}}
+          <div class="results-section" data-aos="fade-up">
+            <h2 class="section-title">
+              <i class="bi bi-star"></i>
+              Servicios
+            </h2>
+            <div class="results-grid services-grid">
+              {{#each results.servicios}}
+                <div class="result-card">
+                  <a href="{{this.url}}" class="result-link">
+                    <div class="result-image">
+                      <img src="{{this.image}}" alt="{{this.title}}" loading="lazy">
+                    </div>
+                    <div class="result-content">
+                      <h3 class="result-title">{{this.title}}</h3>
+                      <p class="result-description">{{truncate this.description 100}}</p>
+                    </div>
+                  </a>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if results.tiposEventos.length}}
+          <div class="results-section" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="section-title">
+              <i class="bi bi-calendar-event"></i>
+              Tipos de Eventos
+            </h2>
+            <div class="results-grid events-grid">
+              {{#each results.tiposEventos}}
+                <div class="result-card">
+                  <a href="{{this.url}}" class="result-link">
+                    <div class="result-image">
+                      <img src="{{this.image}}" alt="{{this.title}}" loading="lazy">
+                    </div>
+                    <div class="result-content">
+                      <h3 class="result-title">{{this.title}}</h3>
+                      <p class="result-description">{{truncate this.description 100}}</p>
+                    </div>
+                  </a>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if results.galeria.length}}
+          <div class="results-section" data-aos="fade-up" data-aos-delay="200">
+            <h2 class="section-title">
+              <i class="bi bi-images"></i>
+              Galería
+            </h2>
+            <div class="results-grid gallery-grid">
+              {{#each results.galeria}}
+                <div class="result-card gallery-card">
+                  <a href="{{this.url}}" class="result-link">
+                    <div class="result-image">
+                      <img src="{{this.image}}" alt="{{this.title}}" loading="lazy">
+                    </div>
+                    <div class="result-content">
+                      <h3 class="result-title">{{this.title}}</h3>
+                      <p class="result-description">{{truncate this.description 100}}</p>
+                    </div>
+                  </a>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if results.resenas.length}}
+          <div class="results-section" data-aos="fade-up" data-aos-delay="300">
+            <h2 class="section-title">
+              <i class="bi bi-chat-square-text"></i>
+              Reseñas
+            </h2>
+            <div class="results-grid reviews-grid">
+              {{#each results.resenas}}
+                <div class="result-card review-card">
+                  <a href="{{this.url}}" class="result-link">
+                    <div class="result-content">
+                      <div class="review-rating">
+                        {{#times this.rating}}
+                          <i class="bi bi-star-fill"></i>
+                        {{/times}}
+                        {{#times (subtract 5 this.rating)}}
+                          <i class="bi bi-star"></i>
+                        {{/times}}
+                      </div>
+                      <h3 class="result-title">{{this.title}}</h3>
+                      <p class="result-description">{{truncate this.description 150}}</p>
+                    </div>
+                  </a>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if isAdmin}}
+          {{#if results.mensajes.length}}
+            <div class="results-section admin-section" data-aos="fade-up" data-aos-delay="400">
+              <h2 class="section-title">
+                <i class="bi bi-envelope"></i>
+                Mensajes de Contacto
+                <span class="admin-badge">Solo administradores</span>
+              </h2>
+              <div class="results-list messages-list">
+                {{#each results.mensajes}}
+                  <div class="result-card message-card">
+                    <a href="{{this.url}}" class="result-link">
+                      <div class="result-content">
+                        <div class="message-meta">
+                          <span class="message-date">{{formatDate this.date}}</span>
+                          <span class="message-email">{{this.email}}</span>
+                        </div>
+                        <h3 class="result-title">{{this.title}}</h3>
+                        <p class="result-description">{{truncate this.description 200}}</p>
+                      </div>
+                    </a>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/if}}
+        {{/if}}
+      {{else}}
+        {{#if query}}
+          <div class="no-results">
+            <div class="no-results-icon">
+              <i class="bi bi-search"></i>
+            </div>
+            <h2>No se encontraron resultados</h2>
+            <p>No pudimos encontrar resultados para "<strong>{{query}}</strong>"</p>
+            <div class="search-suggestions">
+              <h3>Sugerencias:</h3>
+              <ul>
+                <li>Verifica que todas las palabras estén escritas correctamente.</li>
+                <li>Intenta usar palabras más generales.</li>
+                <li>Prueba con términos relacionados.</li>
+              </ul>
+            </div>
+            <div class="popular-searches">
+              <h3>Búsquedas populares:</h3>
+              <div class="popular-searches-grid">
+                <a href="/buscar?q=meseros">Meseros</a>
+                <a href="/buscar?q=bodas">Bodas</a>
+                <a href="/buscar?q=bartenders">Bartenders</a>
+                <a href="/buscar?q=corporativos">Eventos Corporativos</a>
+              </div>
+            </div>
+          </div>
+        {{else}}
+          <div class="search-intro">
+            <div class="search-intro-icon">
+              <i class="bi bi-search"></i>
+            </div>
+            <h2>¿Qué estás buscando?</h2>
+            <p>Ingresa un término de búsqueda para encontrar servicios, eventos y más.</p>
+            <div class="popular-searches">
+              <h3>Búsquedas populares:</h3>
+              <div class="popular-searches-grid">
+                <a href="/buscar?q=meseros">Meseros</a>
+                <a href="/buscar?q=bodas">Bodas</a>
+                <a href="/buscar?q=bartenders">Bartenders</a>
+                <a href="/buscar?q=corporativos">Eventos Corporativos</a>
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Estilos para la página de resultados de búsqueda */
+  .search-results-page {
+    padding-top: 0;
+    min-height: calc(100vh - 135px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-hero {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)), url('/img/search-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 0 40px;
+    margin-bottom: 40px;
+    color: var(--white);
+    position: relative;
+  }
+
+  .search-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .search-title {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    margin-bottom: 20px;
+    color: var(--gold);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: fadeInDown 0.5s ease-out;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .search-form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .search-form {
+    display: flex;
+    gap: 16px;
+    max-width: 100%;
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: rgba(229, 199, 107, 0.5);
+    box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .search-input-wrapper i {
+    color: var(--white-dimmer);
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+  }
+
+  .search-input-wrapper:focus-within i {
+    color: var(--gold);
+  }
+
+  .search-input-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--white);
+    padding: 16px;
+    font-size: 1.1rem;
+    outline: none;
+    width: 100%;
+  }
+
+  .search-input-wrapper input::placeholder {
+    color: var(--white-dimmer);
+    transition: color 0.3s ease;
+  }
+
+  .search-input-wrapper input:focus::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .clear-search-btn {
+    background: transparent;
+    border: none;
+    color: var(--white-dimmer);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+
+  .clear-search-btn:hover {
+    color: var(--white);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .clear-search-btn:focus {
+    outline: 2px solid rgba(229, 199, 107, 0.5);
+    outline-offset: 2px;
+  }
+
+  .clear-search-btn.hidden {
+    display: none;
+  }
+
+  .search-submit-btn {
+
+  }
+
+  .search-submit-btn:hover {
+
+  }
+
+  .search-submit-btn:active {
+
+  }
+
+  .search-submit-btn:focus {
+  }
+
+  .search-submit-btn i {
+  }
+
+  .search-submit-btn:hover i {
+  }
+
+  .search-stats {
+    text-align: center;
+    color: var(--white-dim);
+    font-size: 1.1rem;
+    animation: fadeIn 0.5s ease-out 0.4s both;
+    margin-top: 20px;
+  }
+
+  .search-stats strong {
+    color: var(--gold);
+  }
+
+  .search-content {
+    padding: 40px 0 80px;
+    flex: 1;
+  }
+
+  .results-section {
+    margin-bottom: 60px;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--gold);
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(229, 199, 107, 0.2);
+  }
+
+  .section-title i {
+    color: var(--gold);
+  }
+
+  .admin-badge {
+    font-size: 0.7rem;
+    background-color: var(--gold);
+    color: var(--black);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .results-grid {
+    display: grid;
+    gap: 24px;
+  }
+
+  .services-grid, .events-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .reviews-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .result-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    display: flex;
+    position: relative;
+  }
+
+  .result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    border-color: rgba(229, 199, 107, 0.2);
+  }
+
+  .result-card:focus-within {
+    outline: 2px solid rgba(229, 199, 107, 0.5);
+    outline-offset: 3px;
+  }
+
+  .result-link {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-link:focus {
+    outline: none;
+  }
+
+  .result-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(229, 199, 107, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .result-link:hover::before,
+  .result-link:focus::before {
+    opacity: 1;
+  }
+
+  .result-image {
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .gallery-card .result-image {
+    height: 220px;
+  }
+
+  .result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .result-card:hover .result-image img {
+    transform: scale(1.05);
+  }
+
+  .result-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .result-card:hover .result-image::after {
+    opacity: 1;
+  }
+
+  .result-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: var(--gold);
+    transition: color 0.3s ease;
+    line-height: 1.3;
+  }
+
+  .result-card:hover .result-title {
+    color: var(--gold-light);
+  }
+
+  .result-description {
+    color: var(--white-dim);
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .review-rating {
+    margin-bottom: 10px;
+    color: var(--gold);
+    display: flex;
+    gap: 2px;
+  }
+
+  .review-card {
+    background: linear-gradient(145deg, rgba(229, 199, 107, 0.1), rgba(229, 199, 107, 0.05));
+  }
+
+  .message-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  }
+
+  .message-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: var(--white-dimmer);
+  }
+
+  .message-date {
+    font-style: italic;
+  }
+
+  .message-email {
+    color: var(--gold);
+  }
+
+  .no-results, .search-intro {
+    text-align: center;
+    padding: 60px 0;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out 0.2s both;
+  }
+
+  .no-results-icon, .search-intro-icon {
+    font-size: 4rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+    opacity: 0.7;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+  }
+
+  .search-suggestions, .popular-searches {
+    margin-top: 30px;
+  }
+
+  .search-suggestions h3, .popular-searches h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+  }
+
+  .search-suggestions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
+
+  .search-suggestions li {
+    margin-bottom: 10px;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .search-suggestions li::before {
+    content: '•';
+    position: absolute;
+    left: 8px;
+    color: var(--gold);
+  }
+
+  .popular-searches-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 15px;
+  }
+
+  .popular-searches-grid a {
+    background-color: rgba(229, 199, 107, 0.1);
+    color: var(--gold);
+    padding: 10px 18px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+  }
+
+  .popular-searches-grid a:hover {
+    background-color: rgba(229, 199, 107, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .popular-searches-grid a:focus {
+    outline: 2px solid rgba(229, 199, 107, 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Mejoras de accesibilidad */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Estilos responsivos mejorados */
+  @media (max-width: 1200px) {
+    .services-grid, .events-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+
+  @media (max-width: 991.98px) {
+    .search-hero {
+      padding: 80px 0 30px;
+    }
+    
+    .section-title {
+      font-size: 1.4rem;
+    }
+    
+    .services-grid, .events-grid, .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .reviews-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .result-image {
+      height: 160px;
+    }
+    
+    .gallery-card .result-image {
+      height: 200px;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .search-form {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-input-wrapper {
+      width: 100%;
+    }
+
+    .search-submit-btn {
+      height: 50px;
+      width: 100%;
+    }
+
+    .services-grid, .events-grid, .gallery-grid, .reviews-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    
+    .result-image {
+      height: 150px;
+    }
+    
+    .gallery-card .result-image {
+      height: 180px;
+    }
+    
+    .section-title {
+      font-size: 1.3rem;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .search-hero {
+      padding: 70px 0 25px;
+    }
+
+    .search-input-wrapper {
+      height: 50px;
+    }
+
+    .search-input-wrapper input {
+      font-size: 1rem;
+      padding: 12px;
+    }
+
+    .services-grid, .events-grid, .gallery-grid, .reviews-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .result-image {
+      height: 180px;
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+    }
+    
+    .result-title {
+      font-size: 1.1rem;
+    }
+    
+    .search-content {
+      padding: 30px 0 60px;
+    }
+    
+    .popular-searches-grid {
+      gap: 10px;
+    }
+    
+    .popular-searches-grid a {
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchQueryInput = document.getElementById('searchQueryInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    
+    // Mostrar/ocultar botón de limpiar
+    searchQueryInput.addEventListener('input', function() {
+      if (this.value.trim() !== '') {
+        clearSearchBtn.classList.remove('hidden');
+      } else {
+        clearSearchBtn.classList.add('hidden');
+      }
+    });
+    
+    // Limpiar campo de búsqueda
+    clearSearchBtn.addEventListener('click', function() {
+      searchQueryInput.value = '';
+      searchQueryInput.focus();
+      this.classList.add('hidden');
+    });
+    
+    // Mejorar accesibilidad para teclado
+    searchQueryInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        this.value = '';
+        clearSearchBtn.classList.add('hidden');
+      }
+    });
+    
+    // Animación al hacer scroll - alternativa a AOS
+    const animateElements = document.querySelectorAll('[data-aos]');
+    
+    // Función para verificar si un elemento está en el viewport
+    function isInViewport(element) {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.9 &&
+        rect.bottom >= 0
+      );
+    }
+    
+    // Función para animar elementos cuando entran en el viewport
+    function animateOnScroll() {
+      animateElements.forEach(element => {
+        if (isInViewport(element) && !element.classList.contains('aos-animated')) {
+          element.classList.add('aos-animated');
+          
+          // Aplicar estilo de animación basado en data-aos
+          const animationType = element.getAttribute('data-aos');
+          const delay = element.getAttribute('data-aos-delay') || 0;
+          
+          element.style.animation = `${animationType} 0.6s ease forwards`;
+          element.style.animationDelay = `${parseInt(delay)}ms`;
+        }
+      });
+    }
+    
+    // Iniciar animación al cargar la página
+    animateOnScroll();
+    
+    // Animar al hacer scroll
+    window.addEventListener('scroll', animateOnScroll);
+    
+    // Añadir comportamiento de enfoque mejorado para tarjetas de resultados
+    const resultCards = document.querySelectorAll('.result-card');
+    resultCards.forEach(card => {
+      const link = card.querySelector('.result-link');
+      
+      // Añadir efecto hover cuando se enfoca el enlace
+      if (link) {
+        link.addEventListener('focus', () => {
+          card.classList.add('focused');
+        });
+        
+        link.addEventListener('blur', () => {
+          card.classList.remove('focused');
+        });
+      }
+    });
+    
+    // Mejorar accesibilidad para dispositivos móviles
+    if (window.matchMedia('(max-width: 767.98px)').matches) {
+      // Aumentar área táctil para enlaces pequeños en móviles
+      const popularSearchLinks = document.querySelectorAll('.popular-searches-grid a');
+      popularSearchLinks.forEach(link => {
+        link.style.padding = '10px 16px';
+      });
+    }
+  });
+</script> 

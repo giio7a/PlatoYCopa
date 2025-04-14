@@ -1,0 +1,256 @@
+/**
+* Plato y Copa - Variables de Tema
+*
+* Este archivo define las variables CSS utilizadas en toda la aplicación
+* para mantener una apariencia consistente y permitir cambios de tema.
+*/
+
+:root {
+    /* Colores base */
+    --black: #000000;
+    --white: #ffffff;
+    --white-dim: rgba(255, 255, 255, 0.7);
+   
+    /* Colores de marca */
+    --gold: #e5c76b;
+    --gold-light: rgba(229, 199, 107, 0.15);
+    --gold-dark: #c9a94d;
+    --light-gold:#d5942b;
+    --gold-border: rgba(229, 199, 107, 0.5);
+   
+    /* Gradientes */
+    --gold-gradient: linear-gradient(135deg, var(--gold-light), var(--gold));
+    --dark-gradient: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+   
+    /* Efectos */
+    --gold-glow: 0 0 10px rgba(229, 199, 107, 0.5);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --neo-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5), -5px -5px 10px rgba(255, 255, 255, 0.05);
+    --neo-shadow-inset: inset 3px 3px 5px rgba(0, 0, 0, 0.5), inset -3px -3px 5px rgba(255, 255, 255, 0.05);
+   
+    /* Bordes */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --glass-border: rgba(255, 255, 255, 0.1);
+   
+    /* Transiciones */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+   
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+   
+    /* Fuentes */
+    --font-size-factor: 1;
+    --font-size-xs: calc(0.75rem * var(--font-size-factor));
+    --font-size-sm: calc(0.875rem * var(--font-size-factor));
+    --font-size-md: calc(1rem * var(--font-size-factor));
+    --font-size-lg: calc(1.125rem * var(--font-size-factor));
+    --font-size-xl: calc(1.25rem * var(--font-size-factor));
+    --font-size-2xl: calc(1.5rem * var(--font-size-factor));
+    --font-size-3xl: calc(1.875rem * var(--font-size-factor));
+    --font-size-4xl: calc(2.25rem * var(--font-size-factor));
+   
+    /* Z-index */
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+   
+    /* Tema oscuro (predeterminado) */
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2a2a2a;
+    --bg-card: rgba(30, 30, 30, 0.8);
+    --bg-input: rgba(0, 0, 0, 0.3);
+   
+    --text-primary: var(--white);
+    --text-secondary: var(--white-dim);
+    --text-muted: rgba(255, 255, 255, 0.5);
+    --text-accent: var(--gold);
+   
+    --border-color: var(--glass-border);
+    --divider-color: rgba(255, 255, 255, 0.1);
+   
+    /* Componentes específicos */
+    --sidebar-bg: rgba(18, 18, 18, 0.95);
+    --header-bg: rgba(18, 18, 18, 0.95);
+    --card-bg: var(--bg-card);
+    --input-bg: var(--bg-input);
+    --input-border: var(--gold-border);
+    --input-text: var(--text-primary);
+    --button-primary-bg: var(--gold-gradient);
+    --button-primary-text: var(--black);
+    --button-secondary-bg: rgba(0, 0, 0, 0.3);
+    --button-secondary-text: var(--white-dim);
+    --button-secondary-border: var(--gold-border);
+   
+    /* Espaciado para vista compacta */
+    --compact-factor: 1;
+    --card-padding: calc(var(--spacing-lg) * var(--compact-factor));
+    --section-margin: calc(var(--spacing-xl) * var(--compact-factor));
+    --item-margin: calc(var(--spacing-md) * var(--compact-factor));
+   }
+   
+   /*
+   * Tema claro
+   * Estas variables se aplicarán cuando el elemento html tenga la clase 'light-mode'
+   */
+   .light-mode {
+    /* Colores base */
+    --black: #000000;
+    --white: #ffffff;
+    --white-dim: rgba(0, 0, 0, 0.7);
+   
+    /* Colores de marca */
+    --gold: #c9a94d;
+    --gold-light: rgba(229, 199, 107, 0.15);
+    --gold-dark: #b39235;
+    --gold-border: rgba(201, 169, 77, 0.3);
+   
+    /* Gradientes */
+    --gold-gradient: linear-gradient(135deg, #e5c76b, #c9a94d);
+    --light-gradient: linear-gradient(135deg, #ffffff, #f5f5f5);
+   
+    /* Tema claro */
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f0f2f5;
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --bg-input: rgba(255, 255, 255, 0.9);
+   
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --text-muted: rgba(0, 0, 0, 0.5);
+    --text-accent: #c9a94d;
+   
+    --border-color: rgba(0, 0, 0, 0.1);
+    --divider-color: rgba(0, 0, 0, 0.1);
+   
+    /* Efectos */
+    --gold-glow: 0 0 15px rgba(201, 169, 77, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08) !important;
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    --neo-shadow: 5px 5px 15px rgba(0, 0, 0, 0.05), -5px -5px 15px rgba(255, 255, 255, 0.8) !important;
+    --neo-shadow-inset: inset 3px 3px 5px rgba(0, 0, 0, 0.05), inset -3px -3px 5px rgba(255, 255, 255, 0.8) !important;
+   
+    /* Componentes específicos */
+    --sidebar-bg: rgba(255, 255, 255, 0.95);
+    --header-bg: rgba(255, 255, 255, 0.95);
+    --card-bg: var(--bg-card);
+    --input-bg: var(--bg-input);
+    --input-border: rgba(201, 169, 77, 0.3);
+    --input-text: var(--text-primary);
+    --button-primary-bg: var(--gold-gradient);
+    --button-primary-text: var(--black);
+    --button-secondary-bg: rgba(255, 255, 255, 0.9);
+    --button-secondary-text: #495057;
+    --button-secondary-border: rgba(201, 169, 77, 0.3);
+   }
+   
+   /* 
+   * Tamaños de fuente
+   * Estas clases se aplicarán al elemento html según la configuración
+   */
+   .font-small {
+    --font-size-factor: 0.85;
+   }
+   
+   .font-medium {
+    --font-size-factor: 1;
+   }
+   
+   .font-large {
+    --font-size-factor: 1.2;
+   }
+   
+   /* 
+   * Vista compacta
+   * Esta clase se aplicará al elemento html cuando se active la vista compacta
+   */
+   .compact-view {
+    --compact-factor: 0.8;
+   }
+   
+   /* Aplicación de tamaños de fuente */
+   html {
+    font-size: 16px; /* Tamaño base */
+   }
+   
+   html.font-small {
+    font-size: 13.6px; /* 85% del tamaño base */
+   }
+   
+   html.font-medium {
+    font-size: 16px; /* Tamaño base */
+   }
+   
+   html.font-large {
+    font-size: 19.2px; /* 120% del tamaño base */
+   }
+   
+   /* Aplicación de espaciado para vista compacta */
+   html.compact-view .card {
+    margin-bottom: calc(1rem * var(--compact-factor));
+   }
+   
+   html.compact-view .card-body {
+    padding: calc(1rem * var(--compact-factor));
+   }
+   
+   html.compact-view .form-group {
+    margin-bottom: calc(1rem * var(--compact-factor));
+   }
+   
+   html.compact-view table td,
+   html.compact-view table th {
+    padding: calc(0.5rem * var(--compact-factor)) calc(0.75rem * var(--compact-factor));
+   }
+   
+   html.compact-view .nav-item {
+    padding: calc(0.5rem * var(--compact-factor)) 0;
+   }
+   
+   html.compact-view .sidebar-menu .nav-item a {
+    padding: calc(0.75rem * var(--compact-factor)) calc(1rem * var(--compact-factor));
+   }
+   
+   html.compact-view .main-header {
+    padding: calc(1rem * var(--compact-factor));
+   }
+   
+   html.compact-view .content-body {
+    padding: calc(1.5rem * var(--compact-factor));
+   }
+   
+   /* Transiciones suaves para cambios de tema */
+   body,
+   .sidebar,
+   .main-header,
+   .card,
+   .dropdown-menu,
+   input,
+   select,
+   textarea,
+   button,
+   .nav-item a,
+   table,
+   .alert,
+   .badge,
+   .modal-content {
+    transition: background-color var(--transition-normal), color var(--transition-normal), border-color
+      var(--transition-normal), box-shadow var(--transition-normal);
+   }
+   

@@ -1,12 +1,16 @@
-// Cambiar estilo del navbar al hacer scroll
-window.addEventListener("scroll", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("scroll", () => {
     const navbar = document.querySelector(".navbar")
-    if (window.scrollY > 50) {
-      navbar.classList.add("scrolled")
-    } else {
-      navbar.classList.remove("scrolled")
+    if (navbar) {  // Solo se ejecuta si navbar existe
+      if (window.scrollY > 50) {
+        navbar.classList.add("scrolled")
+      } else {
+        navbar.classList.remove("scrolled")
+      }
     }
   })
+});
+
   
   // Calculadora de cotización
   document.addEventListener("DOMContentLoaded", () => {

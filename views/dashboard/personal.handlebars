@@ -1,0 +1,2515 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Personal</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary add-member-btn" data-toggle="modal" data-target="addMemberModal">
+      <i class="bi bi-plus-lg"></i> <span>Añadir Miembro</span>
+    </button>
+  </div>
+</div>
+
+<div class="content-container">
+  <!-- Filtros y búsqueda -->
+  <div class="filters-container">
+    <div class="search-container">
+      <input type="text" id="searchMember" class="search-input" placeholder="Buscar miembro...">
+      <i class="bi bi-search"></i>
+    </div>
+    <div class="filter-actions">
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle">
+          <i class="bi bi-funnel"></i> <span>Filtrar por cargo</span>
+        </button>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item active" data-filter="all">Todos</a>
+          {{#each cargosUnicos}}
+            <a href="#" class="dropdown-item" data-filter="{{this}}">{{this}}</a>
+          {{/each}}
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle">
+          <i class="bi bi-sort-down"></i> <span>Ordenar</span>
+        </button>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item active" data-sort="orden">Por Orden</a>
+          <a href="#" class="dropdown-item" data-sort="nombre">Por Nombre</a>
+          <a href="#" class="dropdown-item" data-sort="cargo">Por Cargo</a>
+          <a href="#" class="dropdown-item" data-sort="reciente">Más Recientes</a>
+        </div>
+      </div>
+    </div>
+    <div class="view-toggle">
+      <button class="btn-icon active" data-view="grid" title="Vista de cuadrícula"><i class="bi bi-grid"></i></button>
+      <button class="btn-icon" data-view="list" title="Vista de lista"><i class="bi bi-list-ul"></i></button>
+    </div>
+  </div>
+
+  <!-- Contenedor de miembros del equipo -->
+  <div id="teamContainer" class="team-grid">
+    {{#if miembrosEquipo.length}}
+      {{#each miembrosEquipo}}
+        <div class="team-card" data-id="{{this.id}}" data-posicion="{{this.posicion}}" data-name="{{this.nombre}}" data-orden="{{this.orden}}">
+          <div class="order-badge">{{this.orden}}</div>
+          <div class="team-card-header">
+            <div class="team-member-actions">
+              <button class="btn-icon edit-member" data-id="{{this.id}}" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-icon delete-member" data-id="{{this.id}}" data-name="{{this.nombre}}" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="team-card-body">
+            <div class="team-member-photo">
+              {{#if this.imagen}}
+                <img src="{{this.imagen}}" alt="{{this.nombre}}">
+              {{else}}
+                <div class="photo-placeholder">
+                  <i class="bi bi-person"></i>
+                </div>
+              {{/if}}
+            </div>
+            <div class="team-member-info">
+              <h3 class="team-member-name">{{this.nombre}}</h3>
+              <p class="team-member-position">{{this.posicion}}</p>
+              <p class="team-member-description">{{this.bio}}</p>
+              <div class="team-member-social">
+                {{#if this.redes_sociales}}
+                  {{#with (parseJSON this.redes_sociales)}}
+                    {{#if this.facebook}}
+                      <a href="{{this.facebook}}" target="_blank" class="social-icon" title="Facebook">
+                        <i class="bi bi-facebook"></i>
+                      </a>
+                    {{/if}}
+                    {{#if this.instagram}}
+                      <a href="{{this.instagram}}" target="_blank" class="social-icon" title="Instagram">
+                        <i class="bi bi-instagram"></i>
+                      </a>
+                    {{/if}}
+                    {{#if this.twitter}}
+                      <a href="{{this.twitter}}" target="_blank" class="social-icon" title="Twitter">
+                        <i class="bi bi-twitter"></i>
+                      </a>
+                    {{/if}}
+                    {{#if this.linkedin}}
+                      <a href="{{this.linkedin}}" target="_blank" class="social-icon" title="LinkedIn">
+                        <i class="bi bi-linkedin"></i>
+                      </a>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </div>
+            </div>
+          </div>
+          <div class="team-card-footer">
+            <div class="order-controls">
+              <button class="btn-icon move-up" data-id="{{this.id}}" data-orden="{{this.orden}}" title="Subir orden (disminuir número)">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+              <button class="btn-icon move-down" data-id="{{this.id}}" data-orden="{{this.orden}}" title="Bajar orden (aumentar número)">
+                <i class="bi bi-arrow-down"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="bi bi-people"></i>
+        </div>
+        <h3>No hay miembros en el equipo</h3>
+        <p>Comienza añadiendo miembros a tu equipo</p>
+        <button class="btn btn-primary add-member-btn" data-toggle="modal" data-target="addMemberModal">
+          <i class="bi bi-plus-lg"></i> Añadir Miembro
+        </button>
+      </div>
+    {{/if}}
+  </div>
+
+  <!-- Paginación -->
+  {{#if miembrosEquipo.length}}
+    <div class="pagination-container">
+      <button class="btn-icon pagination-prev" disabled>
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <span class="pagination-info">Página 1 de 1</span>
+      <button class="btn-icon pagination-next" disabled>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  {{/if}}
+</div>
+
+<!-- Modal para añadir miembro -->
+<div class="modal" id="addMemberModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Añadir Miembro del Equipo</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addMemberForm" class="needs-validation" novalidate enctype="multipart/form-data">
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="nombre" class="form-label">Nombre Completo <span class="required">*</span></label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                <div class="invalid-feedback">Por favor ingresa el nombre completo.</div>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="cargo" class="form-label">Posición <span class="required">*</span></label>
+                <input type="text" class="form-control" id="cargo" name="cargo" required list="cargos-list">
+                <datalist id="cargos-list">
+                  {{#each cargosUnicos}}
+                    <option value="{{this}}">
+                  {{/each}}
+                </datalist>
+                <div class="invalid-feedback">Por favor ingresa el cargo.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion" class="form-label">Biografía</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="orden" name="orden" min="0" value="0">
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="foto" class="form-label">Foto</label>
+                <div class="custom-file-input">
+                  <input type="file" id="foto" name="foto" accept="image/*">
+                  <label for="foto">Seleccionar imagen</label>
+                </div>
+                <div class="form-text">Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Redes Sociales</label>
+            <div class="social-inputs">
+              <div class="social-input">
+                <i class="bi bi-facebook"></i>
+                <input type="url" class="form-control" name="facebook" placeholder="URL de Facebook">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-instagram"></i>
+                <input type="url" class="form-control" name="instagram" placeholder="URL de Instagram">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-twitter"></i>
+                <input type="url" class="form-control" name="twitter" placeholder="URL de Twitter">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-linkedin"></i>
+                <input type="url" class="form-control" name="linkedin" placeholder="URL de LinkedIn">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-preview">
+            <div class="preview-container">
+              <div class="photo-preview">
+                <div class="photo-placeholder" id="photoPlaceholder">
+                  <i class="bi bi-person"></i>
+                </div>
+                <img src="/placeholder.svg" alt="Vista previa" id="photoPreview" style="display: none;">
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar miembro -->
+<div class="modal" id="editMemberModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Miembro del Equipo</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editMemberForm" class="needs-validation" novalidate enctype="multipart/form-data">
+          <input type="hidden" id="edit_id" name="id">
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_nombre" class="form-label">Nombre Completo <span class="required">*</span></label>
+                <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                <div class="invalid-feedback">Por favor ingresa el nombre completo.</div>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_cargo" class="form-label">Posición <span class="required">*</span></label>
+                <input type="text" class="form-control" id="edit_cargo" name="cargo" required list="edit-cargos-list">
+                <datalist id="edit-cargos-list">
+                  {{#each cargosUnicos}}
+                    <option value="{{this}}">
+                  {{/each}}
+                </datalist>
+                <div class="invalid-feedback">Por favor ingresa el cargo.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit_descripcion" class="form-label">Biografía</label>
+            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_orden" class="form-label">Orden</label>
+                <input type="number" class="form-control" id="edit_orden" name="orden" min="0" value="0">
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="edit_foto" class="form-label">Foto</label>
+                <div class="custom-file-input">
+                  <input type="file" id="edit_foto" name="foto" accept="image/*">
+                  <label for="edit_foto">Seleccionar imagen</label>
+                </div>
+                <div class="form-text">Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Redes Sociales</label>
+            <div class="social-inputs">
+              <div class="social-input">
+                <i class="bi bi-facebook"></i>
+                <input type="url" class="form-control" id="edit_facebook" name="facebook" placeholder="URL de Facebook">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-instagram"></i>
+                <input type="url" class="form-control" id="edit_instagram" name="instagram" placeholder="URL de Instagram">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-twitter"></i>
+                <input type="url" class="form-control" id="edit_twitter" name="twitter" placeholder="URL de Twitter">
+              </div>
+              <div class="social-input">
+                <i class="bi bi-linkedin"></i>
+                <input type="url" class="form-control" id="edit_linkedin" name="linkedin" placeholder="URL de LinkedIn">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-preview">
+            <div class="preview-container">
+              <div class="photo-preview">
+                <div class="photo-placeholder" id="edit_photoPlaceholder">
+                  <i class="bi bi-person"></i>
+                </div>
+                <img src="/placeholder.svg" alt="Vista previa" id="edit_photoPreview" style="display: none;">
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal" id="confirmDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Eliminación</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+        </div>
+        <p>¿Estás seguro de que deseas eliminar a <span id="deleteMemberName"></span> del equipo?</p>
+        <input type="hidden" id="deleteMemberId">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div class="modal" id="successModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Operación Exitosa</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="success-icon">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <p id="successMessage">La operación se ha completado con éxito.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de error -->
+<div class="modal" id="errorModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Error</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="error-icon">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+        <p id="errorMessage">Ha ocurrido un error al procesar la solicitud.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container"></div>
+
+{{#section 'styles'}}
+<style>
+/* Variables */
+:root {
+  --transition-speed: 0.3s;
+  --border-radius: 8px;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --hover-transform: translateY(-5px);
+  
+  /* Colores mejorados para mejor contraste */
+  --gold: #e5c76b;
+  --gold-hover: #d4b75a;
+  --gold-light: rgba(229, 199, 107, 0.15);
+  --gold-border: rgba(229, 199, 107, 0.3);
+  --black: #121212;
+  --black-light: #1e1e1e;
+  --black-lighter: #2a2a2a;
+  --white: #ffffff;
+  --white-dim: rgba(255, 255, 255, 0.85);
+  --white-dimmer: rgba(255, 255, 255, 0.65);
+  
+  /* Nuevas variables para espaciado consistente */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+}
+
+/* Estilos para la página de gestión de personal */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.page-title {
+  color: var(--gold);
+  font-weight: 500;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.page-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.add-member-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 10px 16px;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-speed) ease;
+  min-width: auto; /* Evita que se expanda en mobile */
+  max-width: 100%; /* Limita el ancho en mobile */
+}
+
+/* Contenedor principal */
+.content-container {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Filtros y búsqueda */
+.filters-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--black-lighter);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gold-border);
+}
+
+.search-container {
+  position: relative;
+  width: 300px;
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 15px 12px 40px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gold-border);
+  background-color: var(--black-light);
+  color: var(--white);
+  transition: all var(--transition-speed) ease;
+}
+
+.search-input:focus {
+  border-color: var(--gold);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.25);
+}
+
+.search-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--white-dimmer);
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 10px 16px;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-speed) ease;
+  white-space: nowrap;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 180px;
+  background-color: var(--black-light);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  z-index: 1000;
+  display: none;
+  padding: 8px 0;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown.active .dropdown-menu {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: var(--white-dim);
+  text-decoration: none;
+  transition: all var(--transition-speed) ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+}
+
+.dropdown-item.active {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* Vista de tarjetas */
+.view-toggle {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.view-toggle .btn-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius);
+  background-color: var(--black-lighter);
+  color: var(--white-dimmer);
+  border: 1px solid var(--gold-border);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.view-toggle .btn-icon:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+}
+
+.view-toggle .btn-icon.active {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+/* Grid de miembros del equipo */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Lista de miembros del equipo */
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Estilos compartidos para tarjetas y elementos de lista */
+.team-card {
+  background-color: var(--black-light);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  box-shadow: var(--card-shadow);
+}
+
+.team-card:hover {
+  transform: var(--hover-transform);
+  border-color: var(--gold);
+}
+
+.team-card-header {
+  position: relative;
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10; /* Asegurar que los botones estén por encima */
+}
+
+.team-member-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  z-index: 15;
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.team-card:hover .team-member-actions {
+  opacity: 1;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--black-lighter);
+  color: var(--white-dimmer);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.btn-icon:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.btn-icon.edit-member:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+}
+
+.btn-icon.delete-member:hover {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.order-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--gold);
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 5;
+}
+
+.team-card-body {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.team-member-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto var(--spacing-lg);
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.team-member-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 3rem;
+}
+
+.team-member-info {
+  text-align: center;
+}
+
+.team-member-name {
+  color: var(--gold);
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.3rem;
+}
+
+.team-member-position {
+  color: var(--white-dim);
+  margin: 0 0 var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.team-member-description {
+  color: var(--white-dimmer);
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.team-member-social {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--black-lighter);
+  color: var(--white-dimmer);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed) ease;
+}
+
+.social-icon:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  transform: translateY(-3px);
+}
+
+.team-card-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--gold-border);
+  display: flex;
+  justify-content: center;
+}
+
+.order-controls {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* Estilos específicos para la vista de lista */
+.team-list .team-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0;
+  margin-bottom: var(--spacing-sm);
+  min-height: 100px; /* Altura mínima para evitar colapsos */
+}
+
+.team-list .team-card:hover {
+  transform: translateX(5px);
+  border-color: var(--gold);
+}
+
+.team-list .team-card .team-card-header {
+  position: absolute;
+  top: 10px;
+  right: 100px; /* Espacio para evitar superposición con botones de orden */
+  padding: 0;
+  z-index: 20; /* Mayor z-index para evitar superposiciones */
+}
+
+.team-list .team-card .order-badge {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.team-list .team-card .team-card-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 15px 150px 15px 50px; /* Aumentado el padding derecho para los botones */
+  text-align: left;
+  grid-column: 1 / 3;
+}
+
+.team-list .team-card .team-member-photo {
+  width: 64px;
+  height: 64px;
+  margin: 0 var(--spacing-lg) 0 0;
+  flex-shrink: 0;
+}
+
+.team-list .team-card .team-member-info {
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  padding-right: var(--spacing-lg); /* Espacio adicional para evitar superposición */
+}
+
+.team-list .team-card .team-member-position {
+  font-weight: 600;
+  color: var(--gold-light);
+  display: inline-block;
+  margin-bottom: var(--spacing-sm);
+  padding: 3px 8px;
+  background-color: rgba(229, 199, 107, 0.1);
+  border-radius: 4px;
+}
+
+.team-list .team-card .team-member-social {
+  justify-content: flex-start;
+  margin-top: var(--spacing-sm);
+}
+
+.team-list .team-card .team-card-footer {
+  border-top: none;
+  border-left: 1px solid var(--gold-border);
+  padding: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  grid-column: 3;
+  min-width: 70px; /* Ancho mínimo para los botones */
+}
+
+.team-list .team-card .order-controls {
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Estilos responsivos para la vista de lista */
+@media (max-width: 992px) {
+  .team-list .team-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    padding-top: 60px; /* Espacio para los botones de acción */
+  }
+  
+  .team-list .team-card .team-card-header {
+    top: 10px;
+    right: 10px;
+    padding: 0;
+  }
+  
+  .team-list .team-card .team-card-body {
+    padding: 60px 15px 15px 15px;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .team-list .team-card .order-badge {
+    top: 15px;
+    left: 15px;
+    transform: none;
+  }
+  
+  .team-list .team-card .team-card-footer {
+    border-left: none;
+    border-top: 1px solid var(--gold-border);
+    flex-direction: row;
+    justify-content: center;
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .team-list .team-card .order-controls {
+    flex-direction: row;
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .team-list .team-card .team-card-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .team-list .team-card .team-member-photo {
+    margin: 0 0 var(--spacing-md) 0;
+  }
+  
+  .team-list .team-card .team-member-info {
+    text-align: center;
+  }
+  
+  .team-list .team-card .team-member-social {
+    justify-content: center;
+  }
+}
+
+/* Paginación */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--spacing-xl);
+}
+
+.pagination-info {
+  margin: 0 var(--spacing-md);
+  color: var(--white-dim);
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px var(--spacing-lg);
+  text-align: center;
+  background-color: var(--black-light);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  grid-column: 1 / -1;
+  box-shadow: var(--card-shadow);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: var(--gold-light);
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h3 {
+  color: var(--gold);
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  color: var(--white-dim);
+  margin: 0 0 var(--spacing-lg);
+  font-size: 1rem;
+}
+
+/* Formularios */
+.form-row {
+  display: flex;
+  margin: 0 -10px;
+  flex-wrap: wrap;
+}
+
+.form-col {
+  padding: 0 10px;
+  width: 50%;
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  color: var(--white);
+  font-weight: 500;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: var(--black-lighter);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  color: var(--white);
+  transition: all var(--transition-speed) ease;
+}
+
+.form-control:focus {
+  border-color: var(--gold);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(229, 199, 107, 0.25);
+}
+
+.form-text {
+  color: var(--white-dimmer);
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+/* Input de archivo personalizado */
+.custom-file-input {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-file-input input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.custom-file-input label {
+  display: block;
+  padding: 12px 15px;
+  background-color: var(--black-lighter);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--border-radius);
+  color: var(--white);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-file-input:hover label {
+  border-color: var(--gold);
+  background-color: var(--black-light);
+}
+
+/* Inputs de redes sociales */
+.social-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.social-input {
+  position: relative;
+}
+
+.social-input i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--white-dimmer);
+}
+
+.social-input input {
+  padding-left: 40px;
+}
+
+/* Vista previa de foto */
+.form-preview {
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.preview-container {
+  display: flex;
+  justify-content: center;
+}
+
+.photo-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Modales */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  backdrop-filter: blur(5px);
+}
+
+.modal.show {
+  display: block;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  background-color: var(--black-light);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transform: translateY(-20px);
+  transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--gold-border);
+  background-color: var(--black-lighter);
+}
+
+.modal-title {
+  color: var(--gold);
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close:hover {
+  color: var(--gold);
+  background-color: rgba(229, 199, 107, 0.1);
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--gold-border);
+}
+
+/* Botones */
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-primary {
+  background-color: var(--gold);
+  color: var(--black);
+}
+
+.btn-primary:hover {
+  background-color: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--black-lighter);
+  color: var(--white);
+  border: 1px solid var(--gold-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--black-light);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: var(--white-dim);
+  border: 1px solid var(--gold-border);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+/* Alertas */
+.alert {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+}
+
+.alert i {
+  font-size: 1.5rem;
+}
+
+/* Iconos de éxito y error */
+.success-icon, .error-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: 4rem;
+}
+
+.success-icon i {
+  color: #28a745;
+}
+
+.error-icon i {
+  color: #dc3545;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1060;
+  max-width: 350px;
+}
+
+.toast {
+  background-color: var(--black-light);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: var(--spacing-md);
+  opacity: 0;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--gold-border);
+  background-color: var(--black-lighter);
+}
+
+.toast-icon {
+  margin-right: var(--spacing-sm);
+  font-size: 1.2rem;
+}
+
+.toast-title {
+  flex: 1;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.toast-body {
+  padding: var(--spacing-md);
+  color: var(--white-dim);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--white-dimmer);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  color: var(--gold);
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .search-container {
+    width: 100%;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .team-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .social-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-col {
+    width: 100%;
+  }
+  
+  .modal-dialog {
+    margin: 10px auto;
+  }
+  
+  .modal-body {
+    padding: var(--spacing-md);
+  }
+  
+  /* Mantener visibles los botones de acción en mobile */
+  .team-member-actions {
+    opacity: 1;
+  }
+  
+  /* Ajustar el botón de añadir para que no ocupe todo el ancho */
+  .add-member-btn {
+    width: auto;
+    min-width: 44px;
+    justify-content: center;
+  }
+  
+  .add-member-btn span {
+    display: none;
+  }
+  
+  /* Mostrar texto en botones de filtro solo en desktop */
+  .dropdown-toggle span {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .page-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-actions {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  .filter-actions .dropdown {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .filter-actions .dropdown-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-footer button {
+    width: 100%;
+  }
+  
+  .view-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .view-toggle .btn-icon {
+    flex: 1;
+  }
+}
+
+/* Ajustes para dispositivos táctiles */
+@media (hover: none) {
+  .team-member-actions {
+    opacity: 1;
+  }
+  
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .team-card:hover,
+  .team-list .team-card:hover {
+    transform: none;
+  }
+  
+  .btn:hover,
+  .btn-icon:hover,
+  .social-icon:hover {
+    transform: none;
+  }
+}
+
+/* Animaciones */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.btn-primary:active {
+  animation: pulse 0.3s ease;
+}
+
+/* Mejoras para datalist */
+datalist {
+  display: none;
+}
+
+/* Mejoras para tooltips en botones de orden */
+.move-up[title], .move-down[title] {
+  position: relative;
+}
+
+.move-up[title]:hover::after, .move-down[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--black-lighter);
+  color: var(--white);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  margin-bottom: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Restaurar preferencia de vista
+  const savedViewPreference = localStorage.getItem('teamViewPreference');
+  if (savedViewPreference) {
+    const viewButton = document.querySelector(`.view-toggle [data-view="${savedViewPreference}"]`);
+    if (viewButton) {
+      viewButton.click();
+    }
+  }
+  
+  // --- CONFIGURACIÓN DE TOAST ---
+  // Crear contenedor de toast si no existe
+  if (!document.querySelector('.toast-container')) {
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Función para mostrar notificaciones toast
+  window.showToast = function({ type, title, message, duration = 5000 }) {
+    // Crear elemento toast
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.style.transform = 'translateX(100%)';
+    
+    // Crear contenido del toast
+    let iconClass = '';
+    let iconColor = '';
+    let borderColor = '';
+    
+    if (type === 'success') {
+      iconClass = 'bi-check-circle-fill';
+      iconColor = '#28a745';
+      borderColor = '#28a745';
+    } else if (type === 'error') {
+      iconClass = 'bi-x-circle-fill';
+      iconColor = '#dc3545';
+      borderColor = '#dc3545';
+    } else if (type === 'warning') {
+      iconClass = 'bi-exclamation-triangle-fill';
+      iconColor = '#ffc107';
+      borderColor = '#ffc107';
+    } else if (type === 'info') {
+      iconClass = 'bi-info-circle-fill';
+      iconColor = '#17a2b8';
+      borderColor = '#17a2b8';
+    }
+    
+    toast.style.borderLeftColor = borderColor;
+    
+    toast.innerHTML = `
+      <div class="toast-header">
+        <i class="toast-icon bi ${iconClass}" style="color: ${iconColor}"></i>
+        <strong class="toast-title">${title}</strong>
+        <button type="button" class="btn-close">×</button>
+      </div>
+      <div class="toast-body">${message}</div>
+    `;
+    
+    // Agregar al contenedor
+    const toastContainer = document.querySelector('.toast-container');
+    toastContainer.appendChild(toast);
+    
+    // Animar entrada
+    setTimeout(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.classList.add('show');
+    }, 10);
+    
+    // Configurar cierre automático
+    const timeout = setTimeout(() => {
+      closeToast(toast);
+    }, duration);
+    
+    // Configurar botón de cierre
+    toast.querySelector('.btn-close').addEventListener('click', () => {
+      clearTimeout(timeout);
+      closeToast(toast);
+    });
+    
+    function closeToast(toastElement) {
+      toastElement.style.transform = 'translateX(100%)';
+      toastElement.style.opacity = '0';
+      setTimeout(() => {
+        toastElement.remove();
+      }, 300);
+    }
+  };
+  
+  // --- FUNCIONES DE MODAL ---
+  // Función para mostrar modales de éxito y error
+  function showSuccessModal(message) {
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+      successMessage.textContent = message;
+      openModal('successModal');
+    } else {
+      console.error('Elemento successMessage no encontrado');
+    }
+  }
+  
+  function showErrorModal(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+      errorMessage.textContent = message;
+      openModal('errorModal');
+    } else {
+      console.error('Elemento errorMessage no encontrado');
+    }
+  }
+  
+  // Función para abrir modales
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      console.error(`Modal no encontrado: ${modalId}`);
+    }
+  }
+  
+  // Función para cerrar modales
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    }
+  }
+  
+  // Abrir modal con delegación de eventos para mejor rendimiento
+  document.addEventListener('click', function(e) {
+    // Botones de apertura de modal
+    if (e.target.closest('[data-toggle="modal"]')) {
+      e.preventDefault();
+      const button = e.target.closest('[data-toggle="modal"]');
+      if (button) {
+        const targetModal = button.getAttribute('data-target');
+        openModal(targetModal);
+      }
+    }
+    
+    // Botones de cierre de modal
+    if (e.target.closest('[data-dismiss="modal"]')) {
+      e.preventDefault();
+      const button = e.target.closest('[data-dismiss="modal"]');
+      if (button) {
+        const modal = button.closest('.modal');
+        if (modal) {
+          modal.classList.remove('show');
+          document.body.classList.remove('modal-open');
+          document.body.style.overflow = '';
+        }
+      }
+    }
+    
+    // Cerrar modal al hacer clic fuera del contenido
+    if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+      e.target.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    }
+    
+    // --- MANEJO DE ELIMINAR MIEMBRO ---
+    // Botones de eliminar con delegación de eventos mejorada
+    if (e.target.closest('.delete-member')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const button = e.target.closest('.delete-member');
+      if (button) {
+        const memberId = button.getAttribute('data-id');
+        const memberName = button.getAttribute('data-name') || 'este miembro';
+        
+        // Llenar modal de confirmación
+        document.getElementById('deleteMemberId').value = memberId;
+        
+        // Verificar si el elemento existe antes de asignar textContent
+        const deleteNameElement = document.getElementById('deleteMemberName');
+        if (deleteNameElement) {
+          deleteNameElement.textContent = memberName;
+        }
+        
+        // Abrir modal
+        openModal('confirmDeleteModal');
+      }
+    }
+    
+    // --- TOGGLE VISTA GRID/LIST ---
+    if (e.target.closest('.view-toggle .btn-icon')) {
+      const button = e.target.closest('.view-toggle .btn-icon');
+      const viewButtons = document.querySelectorAll('.view-toggle .btn-icon');
+      const teamContainer = document.getElementById('teamContainer');
+      
+      if (button && teamContainer) {
+        // Desactivar todos los botones
+        viewButtons.forEach(btn => btn.classList.remove('active'));
+        // Activar el botón actual
+        button.classList.add('active');
+        
+        const viewType = button.getAttribute('data-view');
+        
+        // Cambiar la clase del contenedor
+        teamContainer.classList.remove('team-grid', 'team-list');
+        teamContainer.classList.add(viewType === 'grid' ? 'team-grid' : 'team-list');
+        
+        // Guardar preferencia de vista en localStorage
+        localStorage.setItem('teamViewPreference', viewType);
+        
+        // Asegurarse de que los botones permanezcan visibles
+        document.querySelectorAll('.team-member-actions').forEach(actions => {
+          actions.style.opacity = '1';
+        });
+      }
+    }
+    
+    // --- MANEJO DE DROPDOWNS ---
+    if (e.target.closest('.dropdown-toggle')) {
+      e.stopPropagation();
+      const toggle = e.target.closest('.dropdown-toggle');
+      const dropdown = toggle.closest('.dropdown');
+      
+      // Cerrar otros dropdowns
+      document.querySelectorAll('.dropdown.active').forEach(otherDropdown => {
+        if (otherDropdown !== dropdown) {
+          otherDropdown.classList.remove('active');
+        }
+      });
+      
+      // Toggle el dropdown actual
+      dropdown.classList.toggle('active');
+    }
+    
+    // --- FILTRAR MIEMBROS ---
+    if (e.target.closest('[data-filter]')) {
+      e.preventDefault();
+      const item = e.target.closest('[data-filter]');
+      
+      // Desactivar todos los filtros
+      document.querySelectorAll('[data-filter]').forEach(filter => {
+        filter.classList.remove('active');
+      });
+      
+      // Activar el filtro actual
+      item.classList.add('active');
+      
+      const filter = item.getAttribute('data-filter');
+      const members = document.querySelectorAll('.team-card');
+      
+      members.forEach(member => {
+        if (filter === 'all') {
+          member.style.display = '';
+        } else {
+          const posicion = member.getAttribute('data-posicion');
+          if (posicion === filter) {
+            member.style.display = '';
+          } else {
+            member.style.display = 'none';
+          }
+        }
+        
+        // Asegurarse de que los botones permanezcan visibles
+        const actions = member.querySelector('.team-member-actions');
+        if (actions) {
+          actions.style.opacity = '1';
+        }
+      });
+    }
+    
+    // --- ORDENAR MIEMBROS ---
+    if (e.target.closest('[data-sort]')) {
+      e.preventDefault();
+      const item = e.target.closest('[data-sort]');
+      
+      // Desactivar todos los ordenamientos
+      document.querySelectorAll('[data-sort]').forEach(sort => {
+        sort.classList.remove('active');
+      });
+      
+      // Activar el ordenamiento actual
+      item.classList.add('active');
+      
+      const sort = item.getAttribute('data-sort');
+      const container = document.getElementById('teamContainer');
+      
+      if (!container) return;
+      
+      // Nuevo enfoque: Usar clonación de nodos para preservar todos los estilos y event listeners
+      const members = Array.from(document.querySelectorAll('.team-card'));
+      
+      // Ordenar los miembros según el criterio seleccionado
+      members.sort((a, b) => {
+        if (sort === 'orden') {
+          const orderA = parseInt(a.getAttribute('data-orden') || '0', 10);
+          const orderB = parseInt(b.getAttribute('data-orden') || '0', 10);
+          return orderA - orderB;
+        } else if (sort === 'nombre') {
+          const nameA = a.getAttribute('data-name') || '';
+          const nameB = b.getAttribute('data-name') || '';
+          return nameA.localeCompare(nameB);
+        } else if (sort === 'cargo') {
+          const positionA = a.getAttribute('data-posicion') || '';
+          const positionB = b.getAttribute('data-posicion') || '';
+          return positionA.localeCompare(positionB);
+        } else if (sort === 'reciente') {
+          const idA = parseInt(a.getAttribute('data-id') || '0', 10);
+          const idB = parseInt(b.getAttribute('data-id') || '0', 10);
+          return idB - idA;
+        }
+        return 0;
+      });
+      
+      // Ocultar temporalmente el contenedor para evitar reflows múltiples
+      container.style.display = 'none';
+      
+      // Vaciar el contenedor
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      
+      // Agregar los elementos ordenados de vuelta al contenedor
+      members.forEach(member => {
+        container.appendChild(member);
+        
+        // Asegurarse de que los botones permanezcan visibles
+        const actions = member.querySelector('.team-member-actions');
+        if (actions) {
+          actions.style.opacity = '1';
+        }
+      });
+      
+      // Mostrar el contenedor nuevamente
+      container.style.display = '';
+    }
+    
+    // --- BOTONES DE CAMBIO DE ORDEN ---
+    // Manejar botón subir (disminuir orden)
+    if (e.target.closest('.move-up')) {
+      e.preventDefault();
+      const button = e.target.closest('.move-up');
+      if (button) {
+        const memberId = button.getAttribute('data-id');
+        const currentOrder = parseInt(button.getAttribute('data-orden') || '0', 10);
+        
+        // No permitir orden negativo
+        if (currentOrder <= 0) {
+          window.showToast({
+            type: 'warning',
+            title: 'Aviso',
+            message: 'El orden no puede ser menor que 0.'
+          });
+          return;
+        }
+        
+        const newOrder = currentOrder - 1;
+        updateMemberOrder(memberId, newOrder, button);
+      }
+    }
+    
+    // Manejar botón bajar (aumentar orden)
+    if (e.target.closest('.move-down')) {
+      e.preventDefault();
+      const button = e.target.closest('.move-down');
+      if (button) {
+        const memberId = button.getAttribute('data-id');
+        const currentOrder = parseInt(button.getAttribute('data-orden') || '0', 10);
+        const newOrder = currentOrder + 1;
+        
+        updateMemberOrder(memberId, newOrder, button);
+      }
+    }
+    
+    // --- BOTONES DE EDITAR ---
+    if (e.target.closest('.edit-member')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const button = e.target.closest('.edit-member');
+      if (button) {
+        const memberId = button.getAttribute('data-id');
+        
+        // Mostrar indicador de carga
+        button.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+        button.disabled = true;
+        
+        // Obtener datos del miembro
+        fetch(`/dashboard/personal/api/miembros/${memberId}`)
+          .then(response => response.json())
+          .then(data => {
+            // Restaurar botón
+            button.innerHTML = '<i class="bi bi-pencil"></i>';
+            button.disabled = false;
+            
+            if (data.success) {
+              const miembro = data.miembro;
+              
+              // Verificar que los elementos existen antes de asignar valores
+              const idInput = document.getElementById('edit_id');
+              const nombreInput = document.getElementById('edit_nombre');
+              const cargoInput = document.getElementById('edit_cargo');
+              const descripcionInput = document.getElementById('edit_descripcion');
+              const ordenInput = document.getElementById('edit_orden');
+              const photoPreview = document.getElementById('edit_photoPreview');
+              const photoPlaceholder = document.getElementById('edit_photoPlaceholder');
+              
+              if (idInput) idInput.value = miembro.id;
+              if (nombreInput) nombreInput.value = miembro.nombre || '';
+              if (cargoInput) cargoInput.value = miembro.posicion || miembro.cargo || '';
+              if (descripcionInput) descripcionInput.value = miembro.bio || miembro.descripcion || '';
+              if (ordenInput) ordenInput.value = miembro.orden || 0;
+              
+              // Actualizar la imagen de perfil si existe
+              if (miembro.imagen && photoPreview && photoPlaceholder) {
+                photoPreview.src = miembro.imagen;
+                photoPreview.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+              } else if (photoPreview && photoPlaceholder) {
+                photoPreview.style.display = 'none';
+                photoPlaceholder.style.display = 'flex';
+              }
+              
+              // Llenar redes sociales
+              try {
+                const redesSociales = typeof miembro.redes_sociales === 'string' 
+                  ? JSON.parse(miembro.redes_sociales || '{}')
+                  : miembro.redes_sociales || {};
+                  
+                const facebookInput = document.getElementById('edit_facebook');
+                const instagramInput = document.getElementById('edit_instagram');
+                const twitterInput = document.getElementById('edit_twitter');
+                const linkedinInput = document.getElementById('edit_linkedin');
+                
+                if (facebookInput) facebookInput.value = redesSociales.facebook || '';
+                if (instagramInput) instagramInput.value = redesSociales.instagram || '';
+                if (twitterInput) twitterInput.value = redesSociales.twitter || '';
+                if (linkedinInput) linkedinInput.value = redesSociales.linkedin || '';
+              } catch (error) {
+                console.error('Error al parsear redes sociales:', error);
+              }
+              
+              // Abrir modal
+              openModal('editMemberModal');
+            } else {
+              showErrorModal(data.message || 'No se pudo obtener la información del miembro.');
+            }
+          })
+          .catch(error => {
+            // Restaurar botón
+            button.innerHTML = '<i class="bi bi-pencil"></i>';
+            button.disabled = false;
+            
+            console.error('Error:', error);
+            showErrorModal('Ocurrió un error al obtener la información del miembro.');
+          });
+      }
+    }
+  });
+  
+  // Cerrar dropdowns al hacer clic fuera
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown.active').forEach(dropdown => {
+        dropdown.classList.remove('active');
+      });
+    }
+  });
+  
+  // --- BÚSQUEDA EN TIEMPO REAL ---
+  const searchInput = document.getElementById('searchMember');
+  if (searchInput) {
+    // Debounce para mejorar rendimiento
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      
+      searchTimeout = setTimeout(() => {
+        const searchTerm = this.value.toLowerCase();
+        const members = document.querySelectorAll('.team-card');
+        
+        members.forEach(member => {
+          // Buscar en nombre, posición y descripción
+          const name = member.getAttribute('data-name') || '';
+          const position = member.getAttribute('data-posicion') || '';
+          const descriptionElement = member.querySelector('.team-member-description');
+          const description = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
+          
+          if (name.toLowerCase().includes(searchTerm) || 
+              position.toLowerCase().includes(searchTerm) || 
+              description.includes(searchTerm)) {
+            member.style.display = '';
+          } else {
+            member.style.display = 'none';
+          }
+          
+          // Asegurarse de que los botones permanezcan visibles
+          const actions = member.querySelector('.team-member-actions');
+          if (actions) {
+            actions.style.opacity = '1';
+          }
+        });
+      }, 300);
+    });
+  }
+  
+  // Función para actualizar el orden de un miembro
+  function updateMemberOrder(memberId, newOrder, buttonElement) {
+    if (!memberId || !buttonElement) return;
+    
+    // Mostrar indicador de carga
+    const originalHTML = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+    buttonElement.disabled = true;
+    
+    fetch(`/dashboard/personal/api/miembros/${memberId}/orden`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orden: newOrder })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Restaurar botón
+      buttonElement.innerHTML = originalHTML;
+      buttonElement.disabled = false;
+      
+      if (data.success) {
+        // Mostrar mensaje de éxito
+        window.showToast({
+          type: 'success',
+          title: 'Éxito',
+          message: 'Orden actualizado correctamente.'
+        });
+        
+        // Actualizar el número de orden en la interfaz
+        const memberCard = buttonElement.closest('.team-card');
+        const orderBadge = memberCard?.querySelector('.order-badge');
+        
+        if (orderBadge) {
+          orderBadge.textContent = newOrder;
+          
+          // Aplicar animación de actualización
+          orderBadge.style.transform = 'scale(1.2)';
+          setTimeout(() => {
+            orderBadge.style.transform = 'scale(1)';
+          }, 300);
+        }
+        
+        // Actualizar el atributo data-orden en los botones y en la tarjeta
+        const moveUpBtn = memberCard?.querySelector('.move-up');
+        const moveDownBtn = memberCard?.querySelector('.move-down');
+        
+        if (moveUpBtn) moveUpBtn.setAttribute('data-orden', newOrder.toString());
+        if (moveDownBtn) moveDownBtn.setAttribute('data-orden', newOrder.toString());
+        if (memberCard) memberCard.setAttribute('data-orden', newOrder.toString());
+        
+      } else {
+        // Mostrar mensaje de error
+        window.showToast({
+          type: 'error',
+          title: 'Error',
+          message: data.message || 'No se pudo actualizar el orden.'
+        });
+      }
+    })
+    .catch(error => {
+      // Restaurar botón
+      buttonElement.innerHTML = originalHTML;
+      buttonElement.disabled = false;
+      
+      console.error('Error:', error);
+      window.showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Ocurrió un error al procesar la solicitud.'
+      });
+    });
+  }
+  
+  // --- PREVISUALIZACIÓN DE IMÁGENES ---
+  // Previsualizar imagen en formulario de añadir
+  const fotoInput = document.getElementById('foto');
+  const photoPreview = document.getElementById('photoPreview');
+  const photoPlaceholder = document.getElementById('photoPlaceholder');
+  
+  if (fotoInput && photoPreview && photoPlaceholder) {
+    fotoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          photoPreview.src = e.target.result;
+          photoPreview.style.display = 'block';
+          photoPlaceholder.style.display = 'none';
+        };
+        
+        reader.readAsDataURL(file);
+        
+        // Actualizar el texto del label
+        const label = this.nextElementSibling;
+        if (label) {
+          label.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        }
+      }
+    });
+  }
+  
+  // Previsualizar imagen en formulario de editar
+  const editFotoInput = document.getElementById('edit_foto');
+  const editPhotoPreview = document.getElementById('edit_photoPreview');
+  const editPhotoPlaceholder = document.getElementById('edit_photoPlaceholder');
+  
+  if (editFotoInput && editPhotoPreview && editPhotoPlaceholder) {
+    editFotoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          editPhotoPreview.src = e.target.result;
+          editPhotoPreview.style.display = 'block';
+          editPhotoPlaceholder.style.display = 'none';
+        };
+        
+        reader.readAsDataURL(file);
+        
+        // Actualizar el texto del label
+        const label = this.nextElementSibling;
+        if (label) {
+          label.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        }
+      }
+    });
+  }
+  
+  // --- AÑADIR MIEMBRO ---
+  const addMemberForm = document.getElementById('addMemberForm');
+  
+  if (addMemberForm) {
+    addMemberForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      // Crear FormData para enviar los datos incluyendo la imagen
+      const formData = new FormData(this);
+      
+      // Validar que el orden no sea negativo
+      const orden = parseInt(formData.get('orden'), 10);
+      if (orden < 0) {
+        formData.set('orden', '0');
+      }
+      
+      // Recopilar datos de redes sociales
+      const socialData = {
+        facebook: formData.get('facebook') || '',
+        instagram: formData.get('instagram') || '',
+        twitter: formData.get('twitter') || '',
+        linkedin: formData.get('linkedin') || ''
+      };
+      
+      // Añadir redes sociales como JSON
+      formData.delete('facebook');
+      formData.delete('instagram');
+      formData.delete('twitter');
+      formData.delete('linkedin');
+      formData.append('redes_sociales', JSON.stringify(socialData));
+      
+      // Mostrar indicador de carga
+      const submitBtn = this.querySelector('button[type="submit"]');
+      if (!submitBtn) return;
+      
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Guardando...';
+      submitBtn.disabled = true;
+      
+      // Enviar solicitud para crear miembro
+      fetch('/dashboard/personal/api/miembros', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        if (data.success) {
+          // Cerrar modal
+          closeModal('addMemberModal');
+          
+          // Mostrar mensaje de éxito
+          showSuccessModal('Miembro del equipo añadido correctamente.');
+          
+          // Recargar la página para mostrar el nuevo miembro
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Mostrar mensaje de error
+          showErrorModal(data.message || 'No se pudo añadir el miembro del equipo.');
+        }
+      })
+      .catch(error => {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        console.error('Error:', error);
+        showErrorModal('Ocurrió un error al procesar la solicitud.');
+      });
+    });
+  }
+  
+  // --- EDITAR MIEMBRO ---
+  const editMemberForm = document.getElementById('editMemberForm');
+  
+  if (editMemberForm) {
+    editMemberForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+      
+      const memberId = document.getElementById('edit_id')?.value;
+      if (!memberId) return;
+      
+      // Crear FormData para enviar los datos incluyendo la imagen
+      const formData = new FormData(this);
+      
+      // Validar que el orden no sea negativo
+      const orden = parseInt(formData.get('orden'), 10);
+      if (orden < 0) {
+        formData.set('orden', '0');
+      }
+      
+      // Recopilar datos de redes sociales
+      const socialData = {
+        facebook: formData.get('facebook') || '',
+        instagram: formData.get('instagram') || '',
+        twitter: formData.get('twitter') || '',
+        linkedin: formData.get('linkedin') || ''
+      };
+      
+      // Añadir redes sociales como JSON
+      formData.delete('facebook');
+      formData.delete('instagram');
+      formData.delete('twitter');
+      formData.delete('linkedin');
+      formData.append('redes_sociales', JSON.stringify(socialData));
+      
+      // Mostrar indicador de carga
+      const submitBtn = this.querySelector('button[type="submit"]');
+      if (!submitBtn) return;
+      
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Guardando...';
+      submitBtn.disabled = true;
+      
+      // Enviar solicitud para actualizar miembro
+      fetch(`/dashboard/personal/api/miembros/${memberId}`, {
+        method: 'PUT',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        if (data.success) {
+          // Cerrar modal
+          closeModal('editMemberModal');
+          
+          // Mostrar mensaje de éxito
+          showSuccessModal('Miembro del equipo actualizado correctamente.');
+          
+          // Recargar la página para mostrar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Mostrar mensaje de error
+          showErrorModal(data.message || 'No se pudo actualizar el miembro del equipo.');
+        }
+      })
+      .catch(error => {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        console.error('Error:', error);
+        showErrorModal('Ocurrió un error al procesar la solicitud.');
+      });
+    });
+  }
+  
+  // --- CONFIRMACIÓN DE ELIMINACIÓN ---
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', function() {
+      const memberId = document.getElementById('deleteMemberId')?.value;
+      if (!memberId) return;
+      
+      // Mostrar indicador de carga
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="bi bi-arrow-repeat"></i> Eliminando...';
+      this.disabled = true;
+      
+      // Enviar solicitud para eliminar miembro
+      fetch(`/dashboard/personal/api/miembros/${memberId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Restaurar botón
+        this.innerHTML = originalText;
+        this.disabled = false;
+        
+        if (data.success) {
+          // Cerrar modal
+          closeModal('confirmDeleteModal');
+          
+          // Mostrar mensaje de éxito
+          showSuccessModal('Miembro del equipo eliminado correctamente.');
+          
+          // Recargar la página para actualizar la lista
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Cerrar modal de confirmación
+          closeModal('confirmDeleteModal');
+          
+          // Mostrar mensaje de error
+          showErrorModal(data.message || 'No se pudo eliminar el miembro del equipo.');
+        }
+      })
+      .catch(error => {
+        // Restaurar botón
+        this.innerHTML = originalText;
+        this.disabled = false;
+        
+        console.error('Error:', error);
+        
+        // Cerrar modal de confirmación
+        closeModal('confirmDeleteModal');
+        
+        showErrorModal('Ocurrió un error al procesar la solicitud.');
+      });
+    });
+  }
+  
+  // --- AJUSTES RESPONSIVOS ---
+  // Función para ajustar elementos según el tamaño de pantalla
+  function adjustResponsiveElements() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const isLandscape = width > height;
+    
+    // Ajustar altura de modales en landscape
+    if (isLandscape && width <= 992) {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = (height - 180) + 'px';
+      });
+    } else {
+      const modalBodies = document.querySelectorAll('.modal-body');
+      modalBodies.forEach(body => {
+        body.style.maxHeight = '';
+      });
+    }
+    
+    // Ajustar tamaño de botones en móvil
+    if (width <= 576) {
+      document.querySelectorAll('.btn-icon').forEach(btn => {
+        btn.style.width = '44px';
+        btn.style.height = '44px';
+      });
+    } else {
+      document.querySelectorAll('.btn-icon').forEach(btn => {
+        btn.style.width = '';
+        btn.style.height = '';
+      });
+    }
+    
+    // Asegurarse de que los botones permanezcan visibles
+    document.querySelectorAll('.team-member-actions').forEach(actions => {
+      actions.style.opacity = '1';
+    });
+  }
+  
+  // Ejecutar al cargar
+  adjustResponsiveElements();
+  
+  // Ejecutar al cambiar tamaño o orientación
+  window.addEventListener('resize', adjustResponsiveElements);
+  window.addEventListener('orientationchange', adjustResponsiveElements);
+});
+</script>
+{{/section}}

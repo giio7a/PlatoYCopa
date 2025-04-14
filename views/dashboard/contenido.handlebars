@@ -1,0 +1,1011 @@
+<div class="page-header">
+  <h2 class="page-title">Gestión de Contenido</h2>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#addContentModal">
+      <i class="bi bi-plus-lg"></i> Nuevo Contenido
+    </button>
+  </div>
+</div>
+
+<div class="content-tabs">
+  <button class="content-tab active" data-section="home">Inicio</button>
+  <button class="content-tab" data-section="about">Nosotros</button>
+  <button class="content-tab" data-section="services">Servicios</button>
+  <button class="content-tab" data-section="contact">Contacto</button>
+  <button class="content-tab" data-section="footer">Pie de Página</button>
+  <button class="content-tab" data-section="seo">SEO</button>
+</div>
+
+<div class="content-sections">
+  <!-- Sección Inicio -->
+  <div class="content-section active" id="home-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Contenido de la Página de Inicio</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editHomeModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>Banner Principal</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.home.banner.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Subtítulo:</div>
+              <div class="preview-value">{{contenido.home.banner.subtitulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Texto del Botón:</div>
+              <div class="preview-value">{{contenido.home.banner.boton_texto}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen de Fondo:</div>
+              <div class="preview-value">
+                <img src="{{contenido.home.banner.imagen}}" alt="Banner" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Sección de Introducción</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.home.introduccion.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.home.introduccion.descripcion}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen:</div>
+              <div class="preview-value">
+                <img src="{{contenido.home.introduccion.imagen}}" alt="Introducción" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Sección de Características</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.home.caracteristicas.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.home.caracteristicas.descripcion}}</div>
+            </div>
+            <div class="preview-grid">
+              {{#each contenido.home.caracteristicas.items}}
+              <div class="preview-grid-item">
+                <div class="preview-icon"><i class="bi bi-{{this.icono}}"></i></div>
+                <h5>{{this.titulo}}</h5>
+                <p>{{this.descripcion}}</p>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sección Nosotros -->
+  <div class="content-section" id="about-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Contenido de la Página Nosotros</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editAboutModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>Banner</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.about.banner.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen de Fondo:</div>
+              <div class="preview-value">
+                <img src="{{contenido.about.banner.imagen}}" alt="Banner" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Historia</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.about.historia.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.about.historia.descripcion}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen:</div>
+              <div class="preview-value">
+                <img src="{{contenido.about.historia.imagen}}" alt="Historia" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Equipo</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.about.equipo.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.about.equipo.descripcion}}</div>
+            </div>
+            <div class="preview-grid">
+              {{#each contenido.about.equipo.miembros}}
+              <div class="preview-grid-item">
+                <div class="preview-image-circle">
+                  <img src="{{this.foto}}" alt="{{this.nombre}}">
+                </div>
+                <h5>{{this.nombre}}</h5>
+                <p>{{this.cargo}}</p>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sección Servicios -->
+  <div class="content-section" id="services-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Contenido de la Página Servicios</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editServicesModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>Banner</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.services.banner.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen de Fondo:</div>
+              <div class="preview-value">
+                <img src="{{contenido.services.banner.imagen}}" alt="Banner" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Introducción</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.services.introduccion.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.services.introduccion.descripcion}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sección Contacto -->
+  <div class="content-section" id="contact-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Contenido de la Página Contacto</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editContactModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>Banner</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.contact.banner.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Imagen de Fondo:</div>
+              <div class="preview-value">
+                <img src="{{contenido.contact.banner.imagen}}" alt="Banner" class="preview-image">
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Información de Contacto</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.contact.info.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.contact.info.descripcion}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Dirección:</div>
+              <div class="preview-value">{{contenido.contact.info.direccion}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Teléfono:</div>
+              <div class="preview-value">{{contenido.contact.info.telefono}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Email:</div>
+              <div class="preview-value">{{contenido.contact.info.email}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Horario:</div>
+              <div class="preview-value">{{contenido.contact.info.horario}}</div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Formulario de Contacto</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título:</div>
+              <div class="preview-value">{{contenido.contact.form.titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.contact.form.descripcion}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sección Pie de Página -->
+  <div class="content-section" id="footer-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Contenido del Pie de Página</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editFooterModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>Información</h4>
+            <div class="preview-item">
+              <div class="preview-label">Descripción:</div>
+              <div class="preview-value">{{contenido.footer.descripcion}}</div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Redes Sociales</h4>
+            <div class="preview-grid">
+              {{#each contenido.footer.redes_sociales}}
+              <div class="preview-grid-item">
+                <div class="preview-icon"><i class="bi bi-{{this.icono}}"></i></div>
+                <h5>{{this.nombre}}</h5>
+                <p>{{this.url}}</p>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Enlaces Rápidos</h4>
+            <div class="preview-list">
+              {{#each contenido.footer.enlaces}}
+              <div class="preview-list-item">
+                <span>{{this.nombre}}</span>
+                <span>{{this.url}}</span>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sección SEO -->
+  <div class="content-section" id="seo-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Configuración SEO</h3>
+        <div class="card-tools">
+          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editSeoModal">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="content-preview">
+          <div class="content-section-preview">
+            <h4>General</h4>
+            <div class="preview-item">
+              <div class="preview-label">Título del Sitio:</div>
+              <div class="preview-value">{{contenido.seo.titulo_sitio}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción del Sitio:</div>
+              <div class="preview-value">{{contenido.seo.descripcion_sitio}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Palabras Clave:</div>
+              <div class="preview-value">{{contenido.seo.keywords}}</div>
+            </div>
+          </div>
+          
+          <div class="content-section-preview">
+            <h4>Redes Sociales</h4>
+            <div class="preview-item">
+              <div class="preview-label">Imagen OG:</div>
+              <div class="preview-value">
+                <img src="{{contenido.seo.og_imagen}}" alt="OG Image" class="preview-image">
+              </div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Título OG:</div>
+              <div class="preview-value">{{contenido.seo.og_titulo}}</div>
+            </div>
+            <div class="preview-item">
+              <div class="preview-label">Descripción OG:</div>
+              <div class="preview-value">{{contenido.seo.og_descripcion}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Contenido de Inicio -->
+<div class="modal" id="editHomeModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Contenido de Inicio</h3>
+        <button type="button" class="modal-close" data-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editHomeForm" class="crud-form needs-validation" data-type="contenido" data-section="home" novalidate>
+          <div class="form-tabs">
+            <button type="button" class="form-tab active" data-tab="banner">Banner</button>
+            <button type="button" class="form-tab" data-tab="introduccion">Introducción</button>
+            <button type="button" class="form-tab" data-tab="caracteristicas">Características</button>
+          </div>
+          
+          <div class="form-tab-content active" id="banner-tab">
+            <h4>Banner Principal</h4>
+            
+            <div class="form-group">
+              <label for="home_banner_titulo" class="form-label">Título</label>
+              <input type="text" class="form-control" id="home_banner_titulo" name="home[banner][titulo]" value="{{contenido.home.banner.titulo}}" required>
+              <div class="invalid-feedback">Por favor ingresa un título.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_banner_subtitulo" class="form-label">Subtítulo</label>
+              <input type="text" class="form-control" id="home_banner_subtitulo" name="home[banner][subtitulo]" value="{{contenido.home.banner.subtitulo}}" required>
+              <div class="invalid-feedback">Por favor ingresa un subtítulo.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_banner_boton_texto" class="form-label">Texto del Botón</label>
+              <input type="text" class="form-control" id="home_banner_boton_texto" name="home[banner][boton_texto]" value="{{contenido.home.banner.boton_texto}}" required>
+              <div class="invalid-feedback">Por favor ingresa el texto del botón.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_banner_imagen" class="form-label">Imagen de Fondo</label>
+              <div class="current-image-container">
+                <img src="{{contenido.home.banner.imagen}}" alt="Banner" class="current-image">
+              </div>
+              <input type="file" class="form-control" id="home_banner_imagen" name="home_banner_imagen" accept="image/*">
+              <div class="form-text">Deja en blanco para mantener la imagen actual.</div>
+            </div>
+          </div>
+          
+          <div class="form-tab-content" id="introduccion-tab">
+            <h4>Sección de Introducción</h4>
+            
+            <div class="form-group">
+              <label for="home_introduccion_titulo" class="form-label">Título</label>
+              <input type="text" class="form-control" id="home_introduccion_titulo" name="home[introduccion][titulo]" value="{{contenido.home.introduccion.titulo}}" required>
+              <div class="invalid-feedback">Por favor ingresa un título.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_introduccion_descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="home_introduccion_descripcion" name="home[introduccion][descripcion]" rows="4" required>{{contenido.home.introduccion.descripcion}}</textarea>
+              <div class="invalid-feedback">Por favor ingresa una descripción.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_introduccion_imagen" class="form-label">Imagen</label>
+              <div class="current-image-container">
+                <img src="{{contenido.home.introduccion.imagen}}" alt="Introducción" class="current-image">
+              </div>
+              <input type="file" class="form-control" id="home_introduccion_imagen" name="home_introduccion_imagen" accept="image/*">
+              <div class="form-text">Deja en blanco para mantener la imagen actual.</div>
+            </div>
+          </div>
+          
+          <div class="form-tab-content" id="caracteristicas-tab">
+            <h4>Sección de Características</h4>
+            
+            <div class="form-group">
+              <label for="home_caracteristicas_titulo" class="form-label">Título</label>
+              <input type="text" class="form-control" id="home_caracteristicas_titulo" name="home[caracteristicas][titulo]" value="{{contenido.home.caracteristicas.titulo}}" required>
+              <div class="invalid-feedback">Por favor ingresa un título.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="home_caracteristicas_descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="home_caracteristicas_descripcion" name="home[caracteristicas][descripcion]" rows="3" required>{{contenido.home.caracteristicas.descripcion}}</textarea>
+              <div class="invalid-feedback">Por favor ingresa una descripción.</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Características</label>
+              <div class="repeater-items" id="caracteristicas-items">
+                {{#each contenido.home.caracteristicas.items}}
+                <div class="repeater-item">
+                  <div class="repeater-item-header">
+                    <span class="repeater-item-title">Característica {{@index}}</span>
+                    <div class="repeater-item-actions">
+                      <button type="button" class="btn-repeater-action move-up" title="Mover arriba">
+                        <i class="bi bi-arrow-up"></i>
+                      </button>
+                      <button type="button" class="btn-repeater-action move-down" title="Mover abajo">
+                        <i class="bi bi-arrow-down"></i>
+                      </button>
+                      <button type="button" class="btn-repeater-action delete" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="repeater-item-content">
+                    <div class="form-row">
+                      <div class="form-col">
+                        <div class="form-group">
+                          <label class="form-label">Título</label>
+                          <input type="text" class="form-control" name="home[caracteristicas][items][{{@index}}][titulo]" value="{{this.titulo}}" required>
+                        </div>
+                      </div>
+                      <div class="form-col">
+                        <div class="form-group">
+                          <label class="form-label">Icono</label>
+                          <input type="text" class="form-control" name="home[caracteristicas][items][{{@index}}][icono]" value="{{this.icono}}" required>
+                          <div class="form-text">Nombre del icono de Bootstrap Icons (sin el prefijo bi-).</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Descripción</label>
+                      <textarea class="form-control" name="home[caracteristicas][items][{{@index}}][descripcion]" rows="2" required>{{this.descripcion}}</textarea>
+                    </div>
+                  </div>
+                </div>
+                {{/each}}
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm mt-2" id="add-caracteristica">
+                <i class="bi bi-plus-lg"></i> Agregar Característica
+              </button>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modales para editar otras secciones (About, Services, Contact, Footer, SEO) -->
+<!-- Estos modales seguirían una estructura similar al modal de Inicio -->
+
+{{#section 'styles'}}
+<style>
+  .content-tabs {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gold-border);
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dark) var(--black-light);
+  }
+  
+  .content-tabs::-webkit-scrollbar {
+    height: 5px;
+  }
+  
+  .content-tabs::-webkit-scrollbar-track {
+    background: var(--black-light);
+  }
+  
+  .content-tabs::-webkit-scrollbar-thumb {
+    background-color: var(--gold-dark);
+    border-radius: 10px;
+  }
+  
+  .content-tab {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    color: var(--white-dim);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    white-space: nowrap;
+  }
+  
+  .content-tab:hover {
+    color: var(--gold);
+  }
+  
+  .content-tab.active {
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+  }
+  
+  .content-section {
+    display: none;
+  }
+  
+  .content-section.active {
+    display: block;
+  }
+  
+  .content-section-preview {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .content-section-preview:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .content-section-preview h4 {
+    color: var(--gold);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+  
+  .preview-item {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .preview-label {
+    width: 150px;
+    color: var(--white-dimmer);
+    font-weight: 500;
+  }
+  
+  .preview-value {
+    flex: 1;
+    color: var(--white);
+  }
+  
+  .preview-image {
+    max-width: 300px;
+    max-height: 150px;
+    border-radius: 5px;
+    border: 1px solid var(--gold-border);
+  }
+  
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .preview-grid-item {
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .preview-icon {
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  
+  .preview-image-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    border: 2px solid var(--gold);
+  }
+  
+  .preview-image-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .preview-grid-item h5 {
+    color: var(--gold);
+    margin: 0 0 5px;
+    font-size: 1rem;
+  }
+  
+  .preview-grid-item p {
+    color: var(--white-dim);
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  
+  .preview-list {
+    margin-top: 15px;
+  }
+  
+  .preview-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .preview-list-item:last-child {
+    border-bottom: none;
+  }
+  
+  .form-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gold-border);
+  }
+  
+  .form-tab {
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .form-tab:hover {
+    color: var(--gold);
+  }
+  
+  .form-tab.active {
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+  }
+  
+  .form-tab-content {
+    display: none;
+  }
+  
+  .form-tab-content.active {
+    display: block;
+  }
+  
+  .repeater-items {
+    margin-top: 15px;
+  }
+  
+  .repeater-item {
+    background-color: var(--black-lighter);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .repeater-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--gold-border);
+    cursor: pointer;
+  }
+  
+  .repeater-item-title {
+    font-weight: 500;
+    color: var(--gold);
+  }
+  
+  .repeater-item-actions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .btn-repeater-action {
+    background: none;
+    border: none;
+    color: var(--white-dim);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-repeater-action:hover {
+    background-color: var(--gold-light);
+    color: var(--gold);
+  }
+  
+  .btn-repeater-action.delete:hover {
+    color: var(--danger);
+  }
+  
+  .repeater-item-content {
+    padding: 15px;
+  }
+  
+  .mt-2 {
+    margin-top: 10px;
+  }
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Cambiar entre secciones de contenido
+    const contentTabs = document.querySelectorAll('.content-tab');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    contentTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const section = this.getAttribute('data-section');
+        
+        // Actualizar tabs
+        contentTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Actualizar secciones
+        contentSections.forEach(s => s.classList.remove('active'));
+        document.getElementById(`${section}-section`).classList.add('active');
+      });
+    });
+    
+    // Cambiar entre tabs de formulario
+    const formTabs = document.querySelectorAll('.form-tab');
+    const formTabContents = document.querySelectorAll('.form-tab-content');
+    
+    formTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        
+        // Actualizar tabs
+        formTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Actualizar contenidos
+        formTabContents.forEach(c => c.classList.remove('active'));
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+    
+    // Funcionalidad para repeater (agregar/eliminar características)
+    const addCaracteristicaBtn = document.getElementById('add-caracteristica');
+    const caracteristicasContainer = document.getElementById('caracteristicas-items');
+    
+    if (addCaracteristicaBtn) {
+      addCaracteristicaBtn.addEventListener('click', function() {
+        const items = caracteristicasContainer.querySelectorAll('.repeater-item');
+        const index = items.length;
+        
+        const newItem = document.createElement('div');
+        newItem.className = 'repeater-item';
+        newItem.innerHTML = `
+          <div class="repeater-item-header">
+            <span class="repeater-item-title">Característica ${index}</span>
+            <div class="repeater-item-actions">
+              <button type="button" class="btn-repeater-action move-up" title="Mover arriba">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+              <button type="button" class="btn-repeater-action move-down" title="Mover abajo">
+                <i class="bi bi-arrow-down"></i>
+              </button>
+              <button type="button" class="btn-repeater-action delete" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="repeater-item-content">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">Título</label>
+                  <input type="text" class="form-control" name="home[caracteristicas][items][${index}][titulo]" required>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">Icono</label>
+                  <input type="text" class="form-control" name="home[caracteristicas][items][${index}][icono]" required>
+                  <div class="form-text">Nombre del icono de Bootstrap Icons (sin el prefijo bi-).</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" name="home[caracteristicas][items][${index}][descripcion]" rows="2" required></textarea>
+            </div>
+          </div>
+        `;
+        
+        caracteristicasContainer.appendChild(newItem);
+        initRepeaterItemEvents(newItem);
+      });
+    }
+    
+    // Inicializar eventos para items existentes
+    function initRepeaterItemEvents(item) {
+      const deleteBtn = item.querySelector('.btn-repeater-action.delete');
+      const moveUpBtn = item.querySelector('.btn-repeater-action.move-up');
+      const moveDownBtn = item.querySelector('.btn-repeater-action.move-down');
+      const header = item.querySelector('.repeater-item-header');
+      
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (confirm('¿Estás seguro de que deseas eliminar este elemento?')) {
+            item.remove();
+            updateRepeaterIndexes();
+          }
+        });
+      }
+      
+      if (moveUpBtn) {
+        moveUpBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const prev = item.previousElementSibling;
+          if (prev) {
+            caracteristicasContainer.insertBefore(item, prev);
+            updateRepeaterIndexes();
+          }
+        });
+      }
+      
+      if (moveDownBtn) {
+        moveDownBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const next = item.nextElementSibling;
+          if (next) {
+            caracteristicasContainer.insertBefore(next, item);
+            updateRepeaterIndexes();
+          }
+        });
+      }
+      
+      if (header) {
+        header.addEventListener('click', function() {
+          const content = item.querySelector('.repeater-item-content');
+          if (content.style.display === 'none') {
+            content.style.display = 'block';
+          } else {
+            content.style.display = 'none';
+          }
+        });
+      }
+    }
+    
+    // Actualizar índices después de reordenar
+    function updateRepeaterIndexes() {
+      const items = caracteristicasContainer.querySelectorAll('.repeater-item');
+      
+      items.forEach((item, index) => {
+        const title = item.querySelector('.repeater-item-title');
+        const inputs = item.querySelectorAll('input, textarea');
+        
+        if (title) {
+          title.textContent = `Característica ${index}`;
+        }
+        
+        inputs.forEach(input => {
+          const name = input.getAttribute('name');
+          if (name) {
+            const newName = name.replace(/\[\d+\]/, `[${index}]`);
+            input.setAttribute('name', newName);
+          }
+        });
+      });
+    }
+    
+    // Inicializar eventos para items existentes
+    document.querySelectorAll('.repeater-item').forEach(item => {
+      initRepeaterItemEvents(item);
+    });
+    
+    // Envío de formulario para editar contenido
+    document.querySelectorAll('.crud-form[data-type="contenido"]').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const section = this.getAttribute('data-section');
+        
+        fetch(`/api/contenido/${section}`, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Cerrar modal
+            const modal = this.closest('.modal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            
+            // Mostrar mensaje de éxito
+            window.showToast({
+              type: 'success',
+              title: 'Éxito',
+              message: 'Contenido actualizado correctamente.'
+            });
+            
+            // Recargar página para ver cambios
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            window.showToast({
+              type: 'error',
+              title: 'Error',
+              message: data.message || 'No se pudo actualizar el contenido.'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          window.showToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Ocurrió un error al procesar la solicitud.'
+          });
+        });
+      });
+    });
+  });
+</script>
+{{/section}}

@@ -1,0 +1,734 @@
+<div class="dashboard-overview">
+  <!-- Stats Cards - Ahora todos son clickeables -->
+  <div class="stats-cards">
+    <a href="/dashboard/cotizaciones" class="stat-card-link">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="bi bi-calendar-event"></i>
+        </div>
+        <div class="stat-content">
+          <h2 class="stat-value">{{stats.totalCotizaciones}}</h2>
+          <p class="stat-label">Cotizaciones</p>
+        </div>
+      </div>
+    </a>
+    
+    <a href="/dashboard/mensajes" class="stat-card-link">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="bi bi-envelope"></i>
+        </div>
+        <div class="stat-content">
+          <h2 class="stat-value">{{mensajesNoLeidosCount}}</h2>
+          <p class="stat-label">Mensajes sin leer</p>
+        </div>
+      </div>
+    </a>
+    
+    <a href="/dashboard/resenas" class="stat-card-link">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="bi bi-star"></i>
+        </div>
+        <div class="stat-content">
+          <h2 class="stat-value">{{stats.totalResenas}}</h2>
+          <p class="stat-label">Reseñas</p>
+        </div>
+      </div>
+    </a>
+    
+    <a href="/dashboard/galeria" class="stat-card-link">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="bi bi-images"></i>
+        </div>
+        <div class="stat-content">
+          <h2 class="stat-value">{{imagenesCount}}</h2>
+          <p class="stat-label">Imágenes en galería</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  
+  <!-- Recent Activity - Diseño mejorado para responsive -->
+  <div class="dashboard-grid">
+    <div class="dashboard-grid-item">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Cotizaciones Recientes</h3>
+          <div class="card-tools">
+            <a href="/dashboard/cotizaciones" class="btn btn-sm btn-primary">Ver todas</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="data-table responsive-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Tipo de Evento</th>
+                  <th>Fecha</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each cotizacionesRecientes}}
+                <tr class="{{#if @first}}highlight{{/if}}">
+                  <td data-label="Cliente">{{this.nombre_cliente}}</td>
+                  <td data-label="Tipo de Evento">{{this.tipo_evento}}</td>
+                  <td data-label="Fecha">{{formatDate this.fecha_evento}}</td>
+                  <td data-label="Total">{{formatPrice this.costo_total}}</td>
+                  <td data-label="Estado">
+                    <span class="badge-status {{this.estado}}">{{this.estado}}</span>
+                  </td>
+                  <td data-label="Acciones">
+                    <div class="actions">
+                      <a href="/dashboard/cotizaciones/{{this.id}}" class="btn-table-action view" title="Ver detalles">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                      <button class="btn-table-action edit" title="Editar" data-toggle="modal" data-target="#editCotizacionModal" data-id="{{this.id}}">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn-table-action delete btn-delete" title="Eliminar" data-id="{{this.id}}" data-type="cotizaciones" data-name="{{this.nombre_cliente}}">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {{else}}
+                <tr>
+                  <td colspan="6" class="text-center">No hay cotizaciones recientes</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="dashboard-grid-item">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Mensajes Recientes</h3>
+          <div class="card-tools">
+            <a href="/dashboard/mensajes" class="btn btn-sm btn-primary">Ver todos</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="messages-list">
+            {{#each mensajesRecientes}}
+            <a href="/dashboard/mensajes/{{this.id}}" class="message-item-link">
+              <div class="message-item {{#if this.leido}}read{{else}}unread{{/if}}">
+                <div class="message-avatar">
+                  <i class="bi bi-person"></i>
+                </div>
+                <div class="message-content">
+                  <div class="message-header">
+                    <h4 class="message-name">{{this.nombre}}</h4>
+                    <span class="message-date">{{formatDate this.fecha_envio}}</span>
+                  </div>
+                  <p class="message-text">{{truncate this.mensaje 100}}</p>
+                </div>
+              </div>
+            </a>
+            {{else}}
+            <div class="empty-state">
+              <i class="bi bi-envelope-open"></i>
+              <p>No hay mensajes recientes</p>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#section 'styles'}}
+<style>
+  /* Responsive grid layout */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-grid-item {
+    width: 100%;
+  }
+  
+  /* Tarjetas de estadísticas clickeables */
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease-in-out;
+    display: block;
+  }
+  
+  .stat-card-link:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-card-link:hover .stat-card {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px hsla(0, 0, 0, 0.2);
+    border-color: var(--gold);
+  }
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .stat-icon i {
+    font-size: 1.2rem;
+  }
+  .card{
+     transition: transform 0.2s ease-in-out;
+     height: 100%;
+  }
+  .card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px hsla(0, 0, 0, 0.2);
+    border-color: var(--gold);
+  }
+  /* Mensajes clickeables */
+  .message-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .message-item-link:hover {
+    transform: translateY(-3px);
+  }
+  
+  .message-item-link:hover .message-item {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+  }
+  
+  /* Media queries para diferentes tamaños de pantalla */
+  @media (min-width: 768px) {
+    .stats-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Ajustes para pantallas medianas */
+  @media (max-width: 991px) {
+    .stats-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+      padding: 15px;
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .stat-icon i {
+      font-size: 1.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Ajustes para pantallas pequeñas */
+  @media (max-width: 576px) {
+    .stats-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Ajustes para orientación landscape en móvil */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .stats-cards {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    
+    .dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    
+    .stat-card {
+      padding: 10px;
+    }
+    
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    
+    .stat-icon i {
+      font-size: 1.2rem;
+    }
+    
+    .stat-value {
+      font-size: 1.4rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+    }
+    
+    .card-body {
+      padding: 15px;
+    }
+    
+    .message-item {
+      padding: 10px;
+    }
+  }
+  
+  /* Para pantallas muy pequeñas en landscape */
+  @media (max-height: 450px) and (orientation: landscape) {
+    .stats-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  /* Responsive table styles */
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .responsive-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  
+  .responsive-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .responsive-table tr:hover {
+    background-color: var(--hover-bg);
+  }
+  
+  @media screen and (max-width: 768px) {
+    .responsive-table thead {
+      display: none;
+    }
+    
+    .responsive-table, 
+    .responsive-table tbody, 
+    .responsive-table tr, 
+    .responsive-table td {
+      display: block;
+      width: 100%;
+    }
+    
+    .responsive-table tr {
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .responsive-table td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      text-align: right;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .responsive-table td:last-child {
+      border-bottom: none;
+    }
+    
+    .responsive-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: var(--primary);
+      text-align: left;
+      padding-right: 10px;
+    }
+    
+    .responsive-table td .actions {
+      justify-content: flex-end;
+    }
+  }
+  
+  /* Ajustes para landscape en tablas */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .responsive-table td {
+      padding: 8px 10px;
+    }
+    
+    .btn-table-action {
+      width: 25px;
+      height: 25px;
+    }
+  }
+  
+  .badge-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .badge-status.pendiente {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: var(--warning);
+  }
+  
+  .badge-status.confirmada {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--success);
+  }
+  
+  .badge-status.cancelada {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: var(--danger);
+  }
+  
+  .messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .message-item {
+    display: flex;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Estilo para mensajes no leídos */
+  .message-item.unread {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-left: 3px solid var(--warning);
+  }
+  
+  .message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .message-avatar i {
+    color: var(--primary);
+    font-size: 1.2rem;
+  }
+  
+  .message-content {
+    flex: 1;
+    min-width: 0; /* Prevents content from overflowing */
+  }
+  
+  .message-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .message-name {
+    color: var(--primary);
+    font-weight: 500;
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .message-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  
+  .message-text {
+    color: var(--text-color);
+    margin: 0;
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Ajustes para mensajes en landscape */
+  @media (max-width: 992px) and (orientation: landscape) {
+    .message-item {
+      padding: 10px;
+    }
+    
+    .message-avatar {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .message-text {
+      margin-bottom: 5px;
+    }
+  }
+  
+  /* Highlight para la primera fila de cotizaciones */
+  .responsive-table tr.highlight {
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+</style>
+{{/section}}
+
+{{#section 'scripts'}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Dashboard charts and analytics could be initialized here
+    console.log('Dashboard initialized');
+    
+    // Helper function to adjust responsive elements
+    function adjustResponsiveElements() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const isLandscape = width > height;
+      
+      // Ajustar el layout de las tarjetas de estadísticas
+      const statsCards = document.querySelector('.stats-cards');
+      if (statsCards) {
+        if (width <= 576) {
+          // En móvil vertical, una columna
+          statsCards.style.gridTemplateColumns = '1fr';
+        } else if (width <= 991) {
+          // En tablets, dos columnas
+          statsCards.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else if (isLandscape && height <= 450) {
+          // En móvil landscape, cuatro columnas
+          statsCards.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        } else {
+          // En desktop, cuatro columnas
+          statsCards.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        }
+      }
+      
+      // Ajustar el layout del grid principal
+      const dashboardGrid = document.querySelector('.dashboard-grid');
+      if (dashboardGrid) {
+        if (width <= 991 && !isLandscape) {
+          // En móvil y tablet vertical, una columna
+          dashboardGrid.style.gridTemplateColumns = '1fr';
+        } else if (isLandscape && width <= 991) {
+          // En landscape, dos columnas
+          dashboardGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else {
+          // En desktop, dos columnas
+          dashboardGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        }
+      }
+    }
+    
+    // Run on load
+    adjustResponsiveElements();
+    
+    // Run on resize and orientation change
+    window.addEventListener('resize', adjustResponsiveElements);
+    window.addEventListener('orientationchange', adjustResponsiveElements);
+    
+    // Añadir funcionalidad para las acciones de la tabla
+    const editButtons = document.querySelectorAll('.btn-table-action.edit');
+    editButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const cotizacionId = this.getAttribute('data-id');
+        // Aquí puedes cargar los datos de la cotización para editar
+        fetch(`/api/cotizaciones/${cotizacionId}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('Datos de cotización cargados:', data);
+            // Mostrar el modal de edición
+            const modal = document.querySelector(this.getAttribute('data-target'));
+            if (modal) {
+              // Llenar los campos del modal con los datos
+              // ...
+              
+              // Mostrar el modal
+              modal.classList.add('show');
+            }
+          })
+          .catch(error => {
+            console.error('Error al cargar datos de cotización:', error);
+            // Mostrar mensaje de error
+            showToast('Error al cargar datos', 'error');
+          });
+      });
+    });
+    
+    // Funcionalidad para botones de eliminar
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const type = this.getAttribute('data-type');
+        const name = this.getAttribute('data-name');
+        
+        // Configurar el modal de confirmación
+        const modal = document.getElementById('baseModal');
+        const modalTitle = modal.querySelector('.modal-title');
+        const modalBody = modal.querySelector('.modal-body');
+        const confirmButton = document.getElementById('modalConfirm');
+        
+        modalTitle.textContent = 'Confirmar eliminación';
+        modalBody.innerHTML = `<p>¿Estás seguro de que deseas eliminar la ${type === 'cotizaciones' ? 'cotización' : 'entrada'} de <strong>${name}</strong>?</p>
+                              <p>Esta acción no se puede deshacer.</p>`;
+        
+        // Mostrar el modal
+        modal.classList.add('show');
+        
+        // Configurar el botón de confirmación
+        confirmButton.onclick = function() {
+          // Realizar la eliminación
+          fetch(`/api/${type}/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              // Eliminar la fila de la tabla o actualizar la vista
+              const row = button.closest('tr');
+              if (row) {
+                row.remove();
+              }
+              
+              // Cerrar el modal
+              modal.classList.remove('show');
+              
+              // Mostrar mensaje de éxito
+              showToast('Elemento eliminado correctamente', 'success');
+            } else {
+              throw new Error('Error al eliminar');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            // Mostrar mensaje de error
+            showToast('Error al eliminar el elemento', 'error');
+            // Cerrar el modal
+            modal.classList.remove('show');
+          });
+        };
+      });
+    });
+    
+    // Función para mostrar notificaciones toast
+    function showToast(message, type = 'info') {
+      const toastContainer = document.querySelector('.toast-container');
+      if (!toastContainer) {
+        // Crear el contenedor de toasts si no existe
+        const newToastContainer = document.createElement('div');
+        newToastContainer.className = 'toast-container';
+        document.body.appendChild(newToastContainer);
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : 'bi-info-circle'}"></i>
+          <span>${message}</span>
+        </div>
+        <button class="toast-close"><i class="bi bi-x"></i></button>
+      `;
+      
+      const container = document.querySelector('.toast-container');
+      container.appendChild(toast);
+      
+      // Mostrar el toast
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 100);
+      
+      // Configurar el botón de cierre
+      const closeButton = toast.querySelector('.toast-close');
+      closeButton.addEventListener('click', () => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      });
+      
+      // Auto-cerrar después de 5 segundos
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 5000);
+    }
+    
+    // Cerrar modales
+    const modalCloseButtons = document.querySelectorAll('[data-dismiss="modal"]');
+    modalCloseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const modal = this.closest('.modal');
+        if (modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  });
+</script>
+{{/section}}
