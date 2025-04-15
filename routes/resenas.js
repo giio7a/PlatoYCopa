@@ -75,6 +75,34 @@ export default function configureResenasRoutes(app, db) {
     }
   })
 
+  // Ruta para reseñas individuales
+app.get("/resenas/:id", async (req, res) => {
+  try {
+    const reviewId = req.params.id
+
+    // Redirigir a la página de reseñas con el ID como parámetro de consulta
+    res.redirect(`/resenas?id=${reviewId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a la reseña con ID ${req.params.id}:`, error)
+    res.redirect("/resenas")
+  }
+})
+
+    // Ruta para reseñas filtradas por tipo de evento
+app.get("/resenas/tipo/:id", async (req, res) => {
+  try {
+    const eventTypeId = req.params.id
+
+    // Redirigir a la página de reseñas con el tipo como parámetro de consulta
+    res.redirect(`/resenas?tipo=${eventTypeId}`)
+  } catch (error) {
+    console.error(`Error al redirigir a reseñas para el tipo de evento ${req.params.id}:`, error)
+    res.redirect("/resenas")
+  }
+})  
+
+    
+
   // Submit a new review
   app.post("/submit-review", async (req, res) => {
     try {

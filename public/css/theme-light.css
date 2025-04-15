@@ -63,11 +63,11 @@
 }
 
 .light-mode .sidebar-user .user-info h4 {
-  color: var(--text-primary) !important;
+  color: rgba(0,0,0,0.65) !important;
 }
 
 .light-mode .sidebar-user .user-info span {
-  color: var(--text-secondary) !important;
+  color: var(--gold) !important;
 }
 
 .light-mode .sidebar-user .nav-item {

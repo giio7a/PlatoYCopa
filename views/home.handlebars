@@ -586,7 +586,7 @@ Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
    z-index: 3;
 }
 
-.highlighted-service {
+.highlighted-service, .highlighted-review {
    transform: scale(1.05);
    box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
    border: 2px solid var(--gold);
@@ -595,32 +595,8 @@ Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente.
    z-index: 2;
 }
 
-.highlighted-service::before {
+.highlighted-service::before, .highlighted-review::before {
    content: "Servicio seleccionado";
-   position: absolute;
-   top: -10px;
-   left: 50%;
-   transform: translateX(-50%);
-   background: var(--gold);
-   color: var(--black);
-   padding: 3px 10px;
-   border-radius: 20px;
-   font-size: 0.8rem;
-   font-weight: 600;
-   z-index: 3;
-}
-
-.highlighted-review {
-   transform: scale(1.05);
-   box-shadow: 0 0 20px rgba(229, 199, 107, 0.6);
-   border: 2px solid var(--gold);
-   border-radius: var(--border-radius);
-   position: relative;
-   z-index: 2;
-}
-
-.highlighted-review::before {
-   content: "Reseña seleccionada";
    position: absolute;
    top: -10px;
    left: 50%;

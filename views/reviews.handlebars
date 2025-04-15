@@ -1969,25 +1969,6 @@
     transform: scale(1);
   }
 }
-
-.highlighted-review {
-  box-shadow: 0 0 20px var(--gold);
-  border-color: var(--gold);
-  animation: highlight-pulse 2s infinite;
-}
-
-@keyframes highlight-pulse {
-  0% {
-    box-shadow: 0 0 15px var(--gold);
-  }
-  50% {
-    box-shadow: 0 0 25px var(--gold);
-  }
-  100% {
-    box-shadow: 0 0 15px var(--gold);
-  }
-}
-
 @media (max-width: 767.98px) {
   .no-images-content {
       padding: 20px;
@@ -2685,9 +2666,15 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('contractNumber').value = '';
       
       // Cerrar el modal de detalle si está abierto
-      if (currentReviewId === reviewId) {
-          bootstrap.Modal.getInstance(document.getElementById('reviewDetailModal')).hide();
-      }
+      // Cerrar el modal de detalle si está abierto
+  const detailModal = document.getElementById('reviewDetailModal');
+  const modalInstance = bootstrap.Modal.getInstance(detailModal);
+  if (detailModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+  }
+  if (modalInstance) {
+      modalInstance.hide();
+  }
       
       // Pequeño retraso para asegurar una transición suave
       setTimeout(() => {
