@@ -443,20 +443,6 @@
   border-top: 1px solid var(--border-color) !important;
   background-color: rgba(255, 255, 255, 0.8) !important;
 }
-
-.light-mode .modal-close {
-  background: transparent !important;
-  border: none !important;
-  color: var(--text-secondary) !important;
-  font-size: 1.5rem !important;
-  cursor: pointer !important;
-  transition: color var(--transition-fast) !important;
-}
-
-.light-mode .modal-close:hover {
-  color: var(--text-accent) !important;
-}
-
 /* Paginación */
 
 .light-mode .pagination .page-item .page-link {
@@ -1902,7 +1888,7 @@
   background: linear-gradient(to left, rgba(229, 199,107, 0.8), rgba(255, 255, 255, 0.6));
 }
 .light-mode .modal-title, .light-mode .modal-close{
-  color:var(--white) !important;
+  color:rgba(0, 0, 0, 0.65)!important;
 }
 
 .light-mode .modal-body{
