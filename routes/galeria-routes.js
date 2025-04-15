@@ -1,45 +1,12 @@
-import multer from "multer"
 import path from "path"
-import fs from "fs"
 import { fileURLToPath } from "url"
+import { createUploader } from "../utils/cloudinary.js"
 
-// Configuración de multer para subida de imágenes
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "../public/img/gallery")
-
-    // Crear directorio si no existe
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-
-    cb(null, uploadDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    const ext = path.extname(file.originalname)
-    cb(null, "gallery-" + uniqueSuffix + ext)
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif|webp/
-    const mimetype = filetypes.test(file.mimetype)
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
-
-    if (mimetype && extname) {
-      return cb(null, true)
-    }
-
-    cb(new Error("Solo se permiten archivos de imagen (jpg, jpeg, png, gif, webp)"))
-  },
-})
+// Configuración de Cloudinary para subida de imágenes
+const upload = createUploader("gallery")
 
 export default function configureGaleriaRoutes(app, db) {
   // Middleware para verificar autenticación
@@ -138,8 +105,8 @@ export default function configureGaleriaRoutes(app, db) {
         })
       }
 
-      // Procesar la imagen
-      const url_imagen = `/img/gallery/${req.file.filename}`
+      // Procesar la imagen - Ahora obtenemos la URL de Cloudinary
+      const url_imagen = req.file.path
 
       // Crear la imagen - Pasamos la función getDb de db
       const result = await db.galeriaRepo.crear(
@@ -185,19 +152,10 @@ export default function configureGaleriaRoutes(app, db) {
         return res.status(404).json({ success: false, message: "Imagen no encontrada" })
       }
 
-      // Procesar la imagen
+      // Procesar la imagen - Si hay una nueva imagen, usamos la URL de Cloudinary
       let url_imagen = imagen.url_imagen
       if (req.file) {
-        url_imagen = `/img/gallery/${req.file.filename}`
-
-        // Eliminar la imagen anterior si existe y no es la predeterminada
-        if (
-          imagen.url_imagen &&
-          !imagen.url_imagen.includes("placeholder") &&
-          fs.existsSync(path.join(__dirname, "../public", imagen.url_imagen))
-        ) {
-          fs.unlinkSync(path.join(__dirname, "../public", imagen.url_imagen))
-        }
+        url_imagen = req.file.path
       }
 
       // Actualizar la imagen - Pasamos la función getDb de db
@@ -239,15 +197,6 @@ export default function configureGaleriaRoutes(app, db) {
       const result = await db.galeriaRepo.eliminar(req.params.id, db.getDb)
 
       if (result.success) {
-        // Eliminar el archivo si existe y no es la predeterminada
-        if (
-          imagen.url_imagen &&
-          !imagen.url_imagen.includes("placeholder") &&
-          fs.existsSync(path.join(__dirname, "../public", imagen.url_imagen))
-        ) {
-          fs.unlinkSync(path.join(__dirname, "../public", imagen.url_imagen))
-        }
-
         res.json({ success: true, message: "Imagen eliminada correctamente" })
       } else {
         res.status(500).json({ success: false, message: result.message })

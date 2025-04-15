@@ -3,46 +3,16 @@
  */
 
 import express from "express"
-import multer from "multer"
 import path from "path"
 import { fileURLToPath } from "url"
 import { sanitizeInput } from "../utils/validation.js"
-import fs from "fs"
+import { createUploader } from "../utils/cloudinary.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Determinar la carpeta de destino para imágenes del equipo
-    const uploadPath = path.join(__dirname, "../public/uploads/team")
-
-    // Asegurarse de que la carpeta existe
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true })
-    }
-
-    cb(null, uploadPath)
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname))
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB límite
-  fileFilter: (req, file, cb) => {
-    // Validar tipos de archivo
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true)
-    } else {
-      cb(new Error("Solo se permiten imágenes"))
-    }
-  },
-})
+// Configuración de Cloudinary para subida de archivos
+const upload = createUploader("team")
 
 export default function configurePersonalRoutes(app, db) {
   const isAuthenticated =
@@ -175,9 +145,9 @@ export default function configurePersonalRoutes(app, db) {
         redes_sociales: redes_sociales || "{}",
       }
 
-      // If an image was uploaded, add it to the data
+      // If an image was uploaded, add it to the data - Ahora usamos la URL de Cloudinary
       if (req.file) {
-        miembroData.foto_url = `/uploads/team/${req.file.filename}`
+        miembroData.foto_url = req.file.path
       }
 
       console.log("Datos para crear miembro:", miembroData)
@@ -231,9 +201,9 @@ export default function configurePersonalRoutes(app, db) {
         redes_sociales: redes_sociales || "{}",
       }
 
-      // If an image was uploaded, add it to the data
+      // If an image was uploaded, add it to the data - Ahora usamos la URL de Cloudinary
       if (req.file) {
-        miembroData.foto_url = `/uploads/team/${req.file.filename}` // Use foto_url for database field
+        miembroData.foto_url = req.file.path
       }
 
       console.log("Datos procesados para actualizar:", miembroData)
@@ -337,4 +307,3 @@ export default function configurePersonalRoutes(app, db) {
   // Registrar explícitamente las rutas API
   app.use("/dashboard/personal/api", router)
 }
-

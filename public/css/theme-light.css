@@ -1799,6 +1799,11 @@
 .light-mode .quick-action-btn{
   background-color: rgba(229,  199, 107, 0.4);
   color: rgba(0,0,0, 0.65);
+  width: 100%;
+}
+
+.light-mode .toggle-password {
+  color: var(--gold) !important;
 }
 .light-mode .quick-action-btn:hover,
 .light-mode .quick-action-btn:hover i,
@@ -2128,4 +2133,20 @@
 
 .light-mode .redirect-message{
   color: rgba(0,0,0,0.5);
+}
+.light-mode .empty-state{
+  background: var(--white);
+}
+
+.light-mode .empty-icon{
+  color: var(--gold);
+}
+
+.light-mode .dashboard-footer{
+  background: var(--white);
+  border-top: rgba(0,0,0,0.1) 1px solid;
+}
+
+.light-mode .dashboard-footer p{
+  color: rgba(0,0,0,0.65);
 }

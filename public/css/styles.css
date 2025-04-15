@@ -100,7 +100,7 @@
   }
   
   /* Hero Section */
-  .hero {
+  .hero, .header {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -112,7 +112,7 @@
     background-color: var(--black);
   }
   
-  .hero::before {
+  .hero::before, .header::before {
     content: "";
     position: absolute;
     top: 0;
@@ -125,7 +125,7 @@
     z-index: 0;
   }
   
-  .hero-content {
+  .hero-content, .header-content {
     position: relative;
     z-index: 1;
   }
@@ -758,15 +758,15 @@
   
   /* Header for inner pages */
   .header {
-    height: 50vh;
-    min-height: 400px;
+    min-height: 100vh;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     text-align: center;
+    padding: 8rem 1rem 6rem;
     position: relative;
     background-color: var(--black);
-    padding-top: 80px;
   }
   
   .header::before {

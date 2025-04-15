@@ -1,46 +1,14 @@
 import express from "express"
-import multer from "multer"
 import path from "path"
 import fs from "fs"
 import { fileURLToPath } from "url"
+import { createUploader } from "../utils/cloudinary.js"
 
-// Configuración de multer para subida de imágenes
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "../public/img/services")
-
-    // Crear directorio si no existe
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-
-    cb(null, uploadDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    const ext = path.extname(file.originalname)
-    cb(null, "service-" + uniqueSuffix + ext)
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif|webp/
-    const mimetype = filetypes.test(file.mimetype)
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
-
-    if (mimetype && extname) {
-      return cb(null, true)
-    }
-
-    cb(new Error("Solo se permiten archivos de imagen (jpg, jpeg, png, gif, webp)"))
-  },
-})
+// Configuración de Cloudinary para subida de imágenes
+const upload = createUploader("services")
 
 export default function configureServiciosRoutes(app, db) {
 
@@ -114,7 +82,7 @@ export default function configureServiciosRoutes(app, db) {
       // Procesar la imagen
       let imagen_url = null
       if (req.file) {
-        imagen_url = `/img/services/${req.file.filename}`
+        imagen_url = req.file.path
       }
 
       // Preparar características como JSON si se proporcionan
@@ -175,16 +143,7 @@ export default function configureServiciosRoutes(app, db) {
       // Procesar la imagen
       let imagen_url = servicio.imagen_url
       if (req.file) {
-        imagen_url = `/img/services/${req.file.filename}`
-
-        // Eliminar la imagen anterior si existe y no es la predeterminada
-        if (
-          servicio.imagen_url &&
-          !servicio.imagen_url.includes("placeholder") &&
-          fs.existsSync(path.join(__dirname, "../public", servicio.imagen_url))
-        ) {
-          fs.unlinkSync(path.join(__dirname, "../public", servicio.imagen_url))
-        }
+        imagen_url = req.file.path
       }
 
       // Preparar características como JSON si se proporcionan
@@ -236,15 +195,6 @@ export default function configureServiciosRoutes(app, db) {
       const result = await db.serviciosRepo.eliminar(req.params.id, db.getDb)
 
       if (result.success) {
-        // Eliminar la imagen si existe y no es la predeterminada
-        if (
-          servicio.imagen_url &&
-          !servicio.imagen_url.includes("placeholder") &&
-          fs.existsSync(path.join(__dirname, "../public", servicio.imagen_url))
-        ) {
-          fs.unlinkSync(path.join(__dirname, "../public", servicio.imagen_url))
-        }
-
         res.json({ success: true, message: "Servicio eliminado correctamente" })
       } else {
         res.status(500).json({ success: false, message: result.message })

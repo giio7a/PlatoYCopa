@@ -1,60 +1,66 @@
-import sqlite3 from "sqlite3"
-import { open } from "sqlite"
+import pg from "pg"
 import fs from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 import bcrypt from "bcrypt"
-import { getLocalDateTime } from '../app.js'
+import { getLocalDateTime } from "../app.js"
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Variable para almacenar la conexión a la base de datos
-let dbConnection = null
+let dbPool = null
 
 // Función para inicializar la base de datos
 export async function initializeDatabase() {
-  if (dbConnection) return dbConnection
 
-  console.log("Inicializando la base de datos...")
+  console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
-  // Asegurarse de que el directorio database existe
-  const dbDir = path.join(__dirname, "..")
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true })
-  }
+  if (dbPool) return dbPool
+
+  console.log("Inicializando la base de datos PostgreSQL...")
 
   try {
-    // Abrir la conexión a la base de datos
-    dbConnection = await open({
-      filename: path.join(dbDir, "platoycopa.db"),
-      driver: sqlite3.Database,
-    })
+    // Crear el pool de conexiones a PostgreSQL
+     dbPool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+    
+
+    // Verificar la conexión
+    const client = await dbPool.connect()
+    console.log("Conexión a PostgreSQL establecida correctamente")
 
     // Verificar si la base de datos ya tiene tablas
-    const tableCheck = await dbConnection.get("SELECT name FROM sqlite_master WHERE type='table' AND name='servicios'")
+    const tableCheck = await client.query(
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'servicios'",
+    )
 
-    if (!tableCheck) {
+    if (tableCheck.rows.length === 0) {
       console.log("Creando esquema de la base de datos...")
       // Ejecutar el esquema SQL para crear las tablas
       const schemaPath = path.join(__dirname, "schema.sql")
       const schema = fs.readFileSync(schemaPath, "utf8")
-      await dbConnection.exec(schema)
+      await client.query(schema)
       console.log("Esquema de la base de datos creado correctamente")
     } else {
       console.log("La base de datos ya está inicializada")
     }
 
     // Verificar si existe la tabla de usuarios
-    const usuariosTable = await dbConnection.get(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='usuarios'",
+    const usuariosTable = await client.query(
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'usuarios'",
     )
 
-    if (!usuariosTable) {
+    if (usuariosTable.rows.length === 0) {
       console.log("Creando tabla de usuarios...")
-      await dbConnection.exec(`
+      await client.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          id SERIAL PRIMARY KEY,
           email TEXT NOT NULL UNIQUE,
           password TEXT NOT NULL,
           nombre TEXT,
@@ -68,53 +74,81 @@ export async function initializeDatabase() {
       `)
     } else {
       // Verificar si existen las columnas telefono e imagen_url
-      const tableInfo = await dbConnection.all("PRAGMA table_info(usuarios)")
+      const telefonoColumnCheck = await client.query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'usuarios' 
+        AND column_name = 'telefono'
+      `)
 
-      // Verificar si existe la columna telefono
-      const telefonoColumnExists = tableInfo.some((column) => column.name === "telefono")
-      if (!telefonoColumnExists) {
+      if (telefonoColumnCheck.rows.length === 0) {
         console.log("Añadiendo columna 'telefono' a la tabla usuarios")
-        await dbConnection.run("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
+        await client.query("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
       }
 
-      // Verificar si existe la columna imagen_url
-      const imagenColumnExists = tableInfo.some((column) => column.name === "imagen_url")
-      if (!imagenColumnExists) {
+      const imagenColumnCheck = await client.query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'usuarios' 
+        AND column_name = 'imagen_url'
+      `)
+
+      if (imagenColumnCheck.rows.length === 0) {
         console.log("Añadiendo columna 'imagen_url' a la tabla usuarios")
-        await dbConnection.run("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
+        await client.query("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
       }
 
-      // Verificar si existe la columna activo
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo")
-      if (!activoColumnExists) {
+      const activoColumnCheck = await client.query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'usuarios' 
+        AND column_name = 'activo'
+      `)
+
+      if (activoColumnCheck.rows.length === 0) {
         console.log("Añadiendo columna 'activo' a la tabla usuarios")
-        await dbConnection.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+        await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
       }
     }
 
-
-    console.log("Base de datos inicializada correctamente")
-    return dbConnection
+    client.release()
+    console.log("Base de datos PostgreSQL inicializada correctamente")
+    return dbPool
   } catch (error) {
-    console.error("Error al inicializar la base de datos:", error)
+    console.error("Error al inicializar la base de datos PostgreSQL:", error)
     throw error
   }
 }
 
 // Función para obtener la conexión a la base de datos
 export async function getDb() {
-  if (!dbConnection) {
+  if (!dbPool) {
     await initializeDatabase()
   }
-  return dbConnection
+  return dbPool
+}
+
+// Función para ejecutar consultas
+async function query(text, params) {
+  const pool = await getDb()
+  const client = await pool.connect()
+  try {
+    const result = await client.query(text, params)
+    return result
+  } finally {
+    client.release()
+  }
 }
 
 // Repositorio de usuarios
 export const usuariosRepo = {
   async verificarCredenciales(email, password) {
-    const db = await getDb()
     try {
-      const usuario = await db.get("SELECT * FROM usuarios WHERE email = ?", email)
+      const result = await query("SELECT * FROM usuarios WHERE email = $1", [email])
+      const usuario = result.rows[0]
 
       if (!usuario) {
         return { success: false, message: "Usuario no encontrado" }
@@ -132,7 +166,7 @@ export const usuariosRepo = {
       }
 
       // Actualizar último acceso
-      await db.run("UPDATE usuarios SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id = ?", usuario.id)
+      await query("UPDATE usuarios SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id = $1", [usuario.id])
 
       return {
         success: true,
@@ -153,12 +187,12 @@ export const usuariosRepo = {
   },
 
   async getByEmail(email) {
-    const db = await getDb()
     try {
-      return await db.get(
-        "SELECT id, email, nombre, password, rol, fecha_creacion, ultimo_acceso, telefono, imagen_url, activo FROM usuarios WHERE email = ?",
-        email,
+      const result = await query(
+        "SELECT id, email, nombre, password, rol, fecha_creacion, ultimo_acceso, telefono, imagen_url, activo FROM usuarios WHERE email = $1",
+        [email],
       )
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener usuario con email ${email}:`, error)
       return null
@@ -166,72 +200,97 @@ export const usuariosRepo = {
   },
 
   async crearUsuario(userData) {
-    const db = await getDb();
     try {
-      let { email, password, nombre, rol = "admin", telefono, imagen_url, activo } = userData;
-  
+      let { email, password, nombre, rol = "admin", telefono, imagen_url, activo } = userData
+
       console.log(
         `Intentando crear usuario con email: ${email}, nombre: ${nombre}, rol: ${rol}, telefono: ${telefono}, imagen: ${imagen_url ? "Sí" : "No"}, activo: ${activo}`,
-      );
-  
+      )
+
       // 👉 Forzar rol admin si es el correo oficial
       if (email.trim().toLowerCase() === "platoycopa.oficial@gmail.com") {
-        rol = "admin";
-        console.log("Correo oficial detectado, rol forzado a administrador.");
+        rol = "admin"
+        console.log("Correo oficial detectado, rol forzado a administrador.")
       }
-  
+
       // Verificar si el usuario ya existe
-      const existingUser = await this.getByEmail(email);
+      const existingUser = await this.getByEmail(email)
       if (existingUser) {
-        console.log(`Error: El email ${email} ya está registrado`);
-        return { success: false, message: "El correo electrónico ya está registrado" };
+        console.log(`Error: El email ${email} ya está registrado`)
+        return { success: false, message: "El correo electrónico ya está registrado" }
       }
-  
-      // Verificar si la columna activo existe
-      const tableInfo = await db.all("PRAGMA table_info(usuarios)");
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo");
-  
-      if (!activoColumnExists) {
-        console.log("Creando columna 'activo' en la tabla usuarios");
-        await db.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1");
+
+      // Verificar si existen las columnas necesarias
+      const pool = await getDb()
+      const client = await pool.connect()
+
+      try {
+        // Verificar columna activo
+        const activoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'activo'
+        `)
+
+        if (activoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'activo' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+        }
+
+        // Verificar columna telefono
+        const telefonoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'telefono'
+        `)
+
+        if (telefonoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'telefono' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
+        }
+
+        // Verificar columna imagen_url
+        const imagenColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'imagen_url'
+        `)
+
+        if (imagenColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'imagen_url' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
+        }
+
+        // Insertar el nuevo usuario
+        console.log("Insertando nuevo usuario en la base de datos")
+        const result = await client.query(
+          "INSERT INTO usuarios (email, password, nombre, rol, activo, telefono, imagen_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+          [email, password, nombre, rol, activo !== undefined ? activo : 1, telefono || null, imagen_url || null],
+        )
+
+        console.log(`Usuario creado con ID: ${result.rows[0].id}`)
+        return { success: true, id: result.rows[0].id }
+      } finally {
+        client.release()
       }
-  
-      const telefonoColumnExists = tableInfo.some((column) => column.name === "telefono");
-      if (!telefonoColumnExists) {
-        console.log("Creando columna 'telefono' en la tabla usuarios");
-        await db.run("ALTER TABLE usuarios ADD COLUMN telefono TEXT");
-      }
-  
-      const imagenColumnExists = tableInfo.some((column) => column.name === "imagen_url");
-      if (!imagenColumnExists) {
-        console.log("Creando columna 'imagen_url' en la tabla usuarios");
-        await db.run("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT");
-      }
-  
-      // Insertar el nuevo usuario
-      console.log("Insertando nuevo usuario en la base de datos");
-      const result = await db.run(
-        "INSERT INTO usuarios (email, password, nombre, rol, activo, telefono, imagen_url) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [email, password, nombre, rol, activo !== undefined ? activo : 1, telefono || null, imagen_url || null],
-      );
-  
-      console.log(`Usuario creado con ID: ${result.lastID}`);
-      return { success: true, id: result.lastID };
     } catch (error) {
-      console.error("Error al crear usuario:", error);
-      return { success: false, message: `Error al crear usuario: ${error.message}` };
+      console.error("Error al crear usuario:", error)
+      return { success: false, message: `Error al crear usuario: ${error.message}` }
     }
-  }
-  ,
+  },
 
   async cambiarPassword(email, newPassword) {
-    const db = await getDb()
     try {
-
       // Actualizar la contraseña
-      const result = await db.run("UPDATE usuarios SET password = ? WHERE email = ?", [newPassword, email])
+      const result = await query("UPDATE usuarios SET password = $1 WHERE email = $2", [newPassword, email])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Usuario no encontrado" }
       }
 
@@ -244,49 +303,70 @@ export const usuariosRepo = {
 
   // Asegurarse de que la función getAll devuelva el campo activo
   async getAll() {
-    const db = await getDb()
     try {
-      // Verificar si la columna activo existe
-      const tableInfo = await db.all("PRAGMA table_info(usuarios)")
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo")
+      const pool = await getDb()
+      const client = await pool.connect()
 
-      // Si la columna no existe, crearla
-      if (!activoColumnExists) {
-        console.log("Creando columna 'activo' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+      try {
+        // Verificar columna activo
+        const activoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'activo'
+        `)
+
+        if (activoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'activo' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+        }
+
+        // Verificar columna telefono
+        const telefonoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'telefono'
+        `)
+
+        if (telefonoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'telefono' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
+        }
+
+        // Verificar columna imagen_url
+        const imagenColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'imagen_url'
+        `)
+
+        if (imagenColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'imagen_url' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
+        }
+
+        // Obtener todos los usuarios con el campo activo
+        const result = await client.query(
+          "SELECT id, email, nombre, rol, fecha_creacion, ultimo_acceso, activo, telefono, imagen_url FROM usuarios",
+        )
+
+        console.log(`Obtenidos ${result.rows.length} usuarios`)
+
+        // Asegurarse de que todos los usuarios tengan el campo activo
+        return result.rows.map((usuario) => ({
+          ...usuario,
+          activo: usuario.activo !== undefined ? usuario.activo : 1,
+          telefono: usuario.telefono || "",
+          imagen_url: usuario.imagen_url || null,
+        }))
+      } finally {
+        client.release()
       }
-
-      // Verificar si la columna telefono existe
-      const telefonoColumnExists = tableInfo.some((column) => column.name === "telefono")
-
-      // Si la columna no existe, crearla
-      if (!telefonoColumnExists) {
-        console.log("Creando columna 'telefono' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
-      }
-
-      // Verificar si la columna imagen_url existe
-      const imagenColumnExists = tableInfo.some((column) => column.name === "imagen_url")
-
-      // Si la columna no existe, crearla
-      if (!imagenColumnExists) {
-        console.log("Creando columna 'imagen_url' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
-      }
-
-      // Obtener todos los usuarios con el campo activo
-      const usuarios = await db.all(
-        "SELECT id, email, nombre, rol, fecha_creacion, ultimo_acceso, activo, telefono, imagen_url FROM usuarios",
-      )
-      console.log(`Obtenidos ${usuarios.length} usuarios`)
-
-      // Asegurarse de que todos los usuarios tengan el campo activo
-      return usuarios.map((usuario) => ({
-        ...usuario,
-        activo: usuario.activo !== undefined ? usuario.activo : 1,
-        telefono: usuario.telefono || "",
-        imagen_url: usuario.imagen_url || null,
-      }))
     } catch (error) {
       console.error("Error al obtener usuarios:", error)
       return []
@@ -295,69 +375,92 @@ export const usuariosRepo = {
 
   // Asegurarse de que la función getById devuelva el campo activo
   async getById(id) {
-    const db = await getDb()
     try {
-      // Verificar si la columna activo existe
-      const tableInfo = await db.all("PRAGMA table_info(usuarios)")
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo")
+      const pool = await getDb()
+      const client = await pool.connect()
 
-      // Si la columna no existe, crearla
-      if (!activoColumnExists) {
-        console.log("Creando columna 'activo' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
-      }
+      try {
+        // Verificar columna activo
+        const activoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'activo'
+        `)
 
-      // Verificar si la columna telefono existe
-      const telefonoColumnExists = tableInfo.some((column) => column.name === "telefono")
-
-      // Si la columna no existe, crearla
-      if (!telefonoColumnExists) {
-        console.log("Creando columna 'telefono' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
-      }
-
-      // Verificar si la columna imagen_url existe
-      const imagenColumnExists = tableInfo.some((column) => column.name === "imagen_url")
-
-      // Si la columna no existe, crearla
-      if (!imagenColumnExists) {
-        console.log("Creando columna 'imagen_url' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
-      }
-
-      // Obtener el usuario con el campo activo
-      const usuario = await db.get(
-        "SELECT id, email, nombre, rol, fecha_creacion, ultimo_acceso, activo, telefono, imagen_url, password FROM usuarios WHERE id = ?",
-        id,
-      )
-
-      if (usuario) {
-        // Asegurarse de que el usuario tenga el campo activo
-        return {
-          ...usuario,
-          activo: usuario.activo !== undefined ? usuario.activo : 1,
-          telefono: usuario.telefono || "",
-          imagen_url: usuario.imagen_url || null,
+        if (activoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'activo' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
         }
-      }
 
-      return null
+        // Verificar columna telefono
+        const telefonoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'telefono'
+        `)
+
+        if (telefonoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'telefono' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN telefono TEXT")
+        }
+
+        // Verificar columna imagen_url
+        const imagenColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'imagen_url'
+        `)
+
+        if (imagenColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'imagen_url' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN imagen_url TEXT")
+        }
+
+        // Obtener el usuario con el campo activo
+        const result = await client.query(
+          "SELECT id, email, nombre, rol, fecha_creacion, ultimo_acceso, activo, telefono, imagen_url, password FROM usuarios WHERE id = $1",
+          [id],
+        )
+
+        const usuario = result.rows[0]
+
+        if (usuario) {
+          // Asegurarse de que el usuario tenga el campo activo
+          return {
+            ...usuario,
+            activo: usuario.activo !== undefined ? usuario.activo : 1,
+            telefono: usuario.telefono || "",
+            imagen_url: usuario.imagen_url || null,
+          }
+        }
+
+        return null
+      } finally {
+        client.release()
+      }
     } catch (error) {
       console.error(`Error al obtener usuario con id ${id}:`, error)
       return null
     }
   },
+
   async getAllRoles() {
-    const db = await getDb()
     try {
-      return await db.all("SELECT rol, COUNT(*) as count FROM usuarios GROUP BY rol")
+      const result = await query("SELECT rol, COUNT(*) as count FROM usuarios GROUP BY rol")
+      return result.rows
     } catch (error) {
       console.error("Error al obtener roles:", error)
       return []
     }
   },
+
   async actualizarUsuario(id, userData) {
-    const db = await getDb()
     try {
       const { email, nombre, rol, activo, telefono, imagen_url } = userData
 
@@ -374,44 +477,45 @@ export const usuariosRepo = {
       let sql = "UPDATE usuarios SET "
       const params = []
       const fields = []
+      let paramIndex = 1
 
       if (email) {
-        fields.push("email = ?")
+        fields.push(`email = $${paramIndex++}`)
         params.push(email)
       }
 
       if (nombre) {
-        fields.push("nombre = ?")
+        fields.push(`nombre = $${paramIndex++}`)
         params.push(nombre)
       }
 
       if (rol) {
-        fields.push("rol = ?")
+        fields.push(`rol = $${paramIndex++}`)
         params.push(rol)
       }
 
       if (activo !== undefined) {
-        fields.push("activo = ?")
+        fields.push(`activo = $${paramIndex++}`)
         params.push(activo)
       }
 
       if (telefono !== undefined) {
-        fields.push("telefono = ?")
+        fields.push(`telefono = $${paramIndex++}`)
         params.push(telefono)
       }
 
       if (imagen_url !== undefined) {
-        fields.push("imagen_url = ?")
+        fields.push(`imagen_url = $${paramIndex++}`)
         params.push(imagen_url)
       }
 
-      sql += fields.join(", ") + " WHERE id = ?"
+      sql += fields.join(", ") + ` WHERE id = $${paramIndex}`
       params.push(id)
 
       // Actualizar los datos del usuario
-      const result = await db.run(sql, params)
+      const result = await query(sql, params)
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Usuario no encontrado o no se realizaron cambios" }
       }
 
@@ -423,16 +527,15 @@ export const usuariosRepo = {
   },
 
   async actualizarPassword(id, newPassword) {
-    const db = await getDb()
     try {
       // Encriptar la nueva contraseña
       const saltRounds = 10
       const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
 
       // Actualizar la contraseña
-      const result = await db.run("UPDATE usuarios SET password = ? WHERE id = ?", [hashedPassword, id])
+      const result = await query("UPDATE usuarios SET password = $1 WHERE id = $2", [hashedPassword, id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Usuario no encontrado" }
       }
 
@@ -445,28 +548,38 @@ export const usuariosRepo = {
 
   // Modificar la función activarUsuario para asegurar que la columna activo existe y se actualiza correctamente
   async activarUsuario(id) {
-    const db = await getDb()
     try {
-      // Verificar si la columna activo existe
-      const tableInfo = await db.all("PRAGMA table_info(usuarios)")
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo")
+      const pool = await getDb()
+      const client = await pool.connect()
 
-      // Si la columna no existe, crearla
-      if (!activoColumnExists) {
-        console.log("Creando columna 'activo' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+      try {
+        // Verificar columna activo
+        const activoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'activo'
+        `)
+
+        if (activoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'activo' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+        }
+
+        // Actualizar el estado a activo (1)
+        console.log(`Activando usuario con ID ${id}`)
+        const result = await client.query("UPDATE usuarios SET activo = 1 WHERE id = $1", [id])
+        console.log(`Resultado de activación: ${result.rowCount} filas afectadas`)
+
+        if (result.rowCount === 0) {
+          return { success: false, message: "Usuario no encontrado o ya está activo" }
+        }
+
+        return { success: true }
+      } finally {
+        client.release()
       }
-
-      // Actualizar el estado a activo (1)
-      console.log(`Activando usuario con ID ${id}`)
-      const result = await db.run("UPDATE usuarios SET activo = 1 WHERE id = ?", [id])
-      console.log(`Resultado de activación: ${result.changes} filas afectadas`)
-
-      if (result.changes === 0) {
-        return { success: false, message: "Usuario no encontrado o ya está activo" }
-      }
-
-      return { success: true }
     } catch (error) {
       console.error(`Error al activar usuario con id ${id}:`, error)
       return { success: false, message: `Error al activar usuario: ${error.message}` }
@@ -475,28 +588,38 @@ export const usuariosRepo = {
 
   // Modificar la función desactivarUsuario para asegurar que la columna activo existe y se actualiza correctamente
   async desactivarUsuario(id) {
-    const db = await getDb()
     try {
-      // Verificar si la columna activo existe
-      const tableInfo = await db.all("PRAGMA table_info(usuarios)")
-      const activoColumnExists = tableInfo.some((column) => column.name === "activo")
+      const pool = await getDb()
+      const client = await pool.connect()
 
-      // Si la columna no existe, crearla
-      if (!activoColumnExists) {
-        console.log("Creando columna 'activo' en la tabla usuarios")
-        await db.run("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+      try {
+        // Verificar columna activo
+        const activoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'usuarios' 
+          AND column_name = 'activo'
+        `)
+
+        if (activoColumnCheck.rows.length === 0) {
+          console.log("Creando columna 'activo' en la tabla usuarios")
+          await client.query("ALTER TABLE usuarios ADD COLUMN activo INTEGER DEFAULT 1")
+        }
+
+        // Actualizar el estado a inactivo (0)
+        console.log(`Desactivando usuario con ID ${id}`)
+        const result = await client.query("UPDATE usuarios SET activo = 0 WHERE id = $1", [id])
+        console.log(`Resultado de desactivación: ${result.rowCount} filas afectadas`)
+
+        if (result.rowCount === 0) {
+          return { success: false, message: "Usuario no encontrado o ya está inactivo" }
+        }
+
+        return { success: true }
+      } finally {
+        client.release()
       }
-
-      // Actualizar el estado a inactivo (0)
-      console.log(`Desactivando usuario con ID ${id}`)
-      const result = await db.run("UPDATE usuarios SET activo = 0 WHERE id = ?", [id])
-      console.log(`Resultado de desactivación: ${result.changes} filas afectadas`)
-
-      if (result.changes === 0) {
-        return { success: false, message: "Usuario no encontrado o ya está inactivo" }
-      }
-
-      return { success: true }
     } catch (error) {
       console.error(`Error al desactivar usuario con id ${id}:`, error)
       return { success: false, message: `Error al desactivar usuario: ${error.message}` }
@@ -504,17 +627,16 @@ export const usuariosRepo = {
   },
 
   async actualizarUltimoAcceso(id) {
-    const db = await getDb()
     try {
       // Obtener fecha y hora local
       const fechaAcceso = await getLocalDateTime()
-      
-      const result = await db.run(
-        "UPDATE usuarios SET ultimo_acceso = ? WHERE id = ?", 
-        [fechaAcceso.toISOString(), id]
-      )
 
-      if (result.changes === 0) {
+      const result = await query("UPDATE usuarios SET ultimo_acceso = $1 WHERE id = $2", [
+        fechaAcceso.toISOString(),
+        id,
+      ])
+
+      if (result.rowCount === 0) {
         return { success: false, message: "Usuario no encontrado" }
       }
 
@@ -526,7 +648,6 @@ export const usuariosRepo = {
   },
 
   async eliminarUsuario(id) {
-    const db = await getDb()
     try {
       // Verificar si el usuario existe
       const usuario = await this.getById(id)
@@ -535,7 +656,7 @@ export const usuariosRepo = {
       }
 
       // Eliminar el usuario
-      const result = await db.run("DELETE FROM usuarios WHERE id = ?", [id])
+      await query("DELETE FROM usuarios WHERE id = $1", [id])
 
       return {
         success: true,
@@ -551,53 +672,14 @@ export const usuariosRepo = {
 
 // Repositorio de servicios
 export const serviciosRepo = {
-  async crear(servicio, getDb) {
+  async crear(servicio) {
     try {
-      const db = await getDb();
-      const result = await db.run(
+      const result = await query(
         `INSERT INTO servicios (
           titulo, descripcion_corta, descripcion_completa, 
           precio, precio_desde, imagen_url, icono, 
           caracteristicas, destacado, orden
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          servicio.titulo,
-          servicio.descripcion_corta,
-          servicio.descripcion_completa,
-          servicio.precio,
-          servicio.precio_desde,
-          servicio.imagen_url,
-          servicio.icono,
-          servicio.caracteristicas,
-          servicio.destacado,
-          servicio.orden
-        ]
-      );
-
-      return { success: true, id: result.lastID };
-    } catch (error) {
-      console.error("Error al crear servicio:", error);
-      return { success: false, message: "Error al crear el servicio" };
-    }
-  },
-
-  async actualizar(servicio) {
-    try {
-      const db = await getDb();
-      await db.run(
-        `UPDATE servicios SET 
-          titulo = ?, 
-          descripcion_corta = ?, 
-          descripcion_completa = ?, 
-          precio = ?, 
-          precio_desde = ?, 
-          imagen_url = ?, 
-          icono = ?, 
-          caracteristicas = ?, 
-          destacado = ?, 
-          orden = ?,
-          fecha_actualizacion = CURRENT_TIMESTAMP
-        WHERE id = ?`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
         [
           servicio.titulo,
           servicio.descripcion_corta,
@@ -609,23 +691,59 @@ export const serviciosRepo = {
           servicio.caracteristicas,
           servicio.destacado,
           servicio.orden,
-          servicio.id
-        ]
-      );
+        ],
+      )
 
-      return { success: true };
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
-      console.error("Error al actualizar servicio:", error);
-      return { success: false, message: "Error al actualizar el servicio" };
+      console.error("Error al crear servicio:", error)
+      return { success: false, message: "Error al crear el servicio" }
     }
   },
 
-  async eliminar(id, getDb) {
-    const db = await getDb()
+  async actualizar(servicio) {
     try {
-      const result = await db.run("DELETE FROM servicios WHERE id = ?", id)
+      await query(
+        `UPDATE servicios SET 
+          titulo = $1, 
+          descripcion_corta = $2, 
+          descripcion_completa = $3, 
+          precio = $4, 
+          precio_desde = $5, 
+          imagen_url = $6, 
+          icono = $7, 
+          caracteristicas = $8, 
+          destacado = $9, 
+          orden = $10,
+          fecha_actualizacion = CURRENT_TIMESTAMP
+        WHERE id = $11`,
+        [
+          servicio.titulo,
+          servicio.descripcion_corta,
+          servicio.descripcion_completa,
+          servicio.precio,
+          servicio.precio_desde,
+          servicio.imagen_url,
+          servicio.icono,
+          servicio.caracteristicas,
+          servicio.destacado,
+          servicio.orden,
+          servicio.id,
+        ],
+      )
 
-      if (result.changes === 0) {
+      return { success: true }
+    } catch (error) {
+      console.error("Error al actualizar servicio:", error)
+      return { success: false, message: "Error al actualizar el servicio" }
+    }
+  },
+
+  async eliminar(id) {
+    try {
+      const result = await query("DELETE FROM servicios WHERE id = $1", [id])
+
+      if (result.rowCount === 0) {
         return { success: false, message: "Servicio no encontrado" }
       }
 
@@ -635,12 +753,12 @@ export const serviciosRepo = {
       return { success: false, message: `Error al eliminar servicio: ${error.message}` }
     }
   },
+
   async getAll() {
-    const db = await getDb()
     try {
-      const services = await db.all("SELECT * FROM servicios ORDER BY orden")
-      console.log(`Obtenidos ${services.length} servicios`)
-      return services
+      const result = await query("SELECT * FROM servicios ORDER BY orden")
+      console.log(`Obtenidos ${result.rows.length} servicios`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener servicios:", error)
       return []
@@ -648,11 +766,10 @@ export const serviciosRepo = {
   },
 
   async getDestacados() {
-    const db = await getDb()
     try {
-      const services = await db.all("SELECT * FROM servicios WHERE destacado = 1 ORDER BY orden")
-      console.log(`Obtenidos ${services.length} servicios destacados`)
-      return services
+      const result = await query("SELECT * FROM servicios WHERE destacado = 1 ORDER BY orden")
+      console.log(`Obtenidos ${result.rows.length} servicios destacados`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener servicios destacados:", error)
       return []
@@ -660,9 +777,9 @@ export const serviciosRepo = {
   },
 
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get("SELECT * FROM servicios WHERE id = ?", id)
+      const result = await query("SELECT * FROM servicios WHERE id = $1", [id])
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener servicio con id ${id}:`, error)
       return null
@@ -670,10 +787,9 @@ export const serviciosRepo = {
   },
 
   async getCount() {
-    const db = await getDb()
     try {
-      const result = await db.get("SELECT COUNT(*) as count FROM servicios")
-      return result.count
+      const result = await query("SELECT COUNT(*) as count FROM servicios")
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de servicios:", error)
       return 0
@@ -685,17 +801,16 @@ export const serviciosRepo = {
 export const tiposEventosRepo = {
   async crear(tipoEvento) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `INSERT INTO tipos_eventos (
           nombre, 
           descripcion, 
           icono
-        ) VALUES (?, ?, ?)`,
+        ) VALUES ($1, $2, $3) RETURNING id`,
         [tipoEvento.nombre, tipoEvento.descripcion, tipoEvento.icono],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al crear tipo de evento:", error)
       return { success: false, message: `Error al crear tipo de evento: ${error.message}` }
@@ -705,17 +820,16 @@ export const tiposEventosRepo = {
   // Método para actualizar un tipo de evento
   async actualizar(id, tipoEvento) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `UPDATE tipos_eventos SET 
-          nombre = ?, 
-          descripcion = ?, 
-          icono = ?
-        WHERE id = ?`,
+          nombre = $1, 
+          descripcion = $2, 
+          icono = $3
+        WHERE id = $4`,
         [tipoEvento.nombre, tipoEvento.descripcion, tipoEvento.icono, id],
       )
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Tipo de evento no encontrado" }
       }
 
@@ -729,10 +843,9 @@ export const tiposEventosRepo = {
   // Método para eliminar un tipo de evento
   async eliminar(id) {
     try {
-      const db = await getDb()
-      const result = await db.run("DELETE FROM tipos_eventos WHERE id = ?", id)
+      const result = await query("DELETE FROM tipos_eventos WHERE id = $1", [id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Tipo de evento no encontrado" }
       }
 
@@ -746,32 +859,33 @@ export const tiposEventosRepo = {
   // Método para verificar si un tipo de evento está siendo utilizado
   async isInUse(id) {
     try {
-      const db = await getDb()
-
       // Verificar en eventos
-      const eventosCount = await db.get("SELECT COUNT(*) as count FROM contratos WHERE tipo_evento_id = ?", [id])
+      const eventosResult = await query("SELECT COUNT(*) as count FROM contratos WHERE tipo_evento_id = $1", [id])
+      const eventosCount = Number.parseInt(eventosResult.rows[0].count)
 
       // Verificar en reseñas
-      const resenasCount = await db.get("SELECT COUNT(*) as count FROM resenas WHERE tipo_evento_id = ?", [id])
+      const resenasResult = await query("SELECT COUNT(*) as count FROM resenas WHERE tipo_evento_id = $1", [id])
+      const resenasCount = Number.parseInt(resenasResult.rows[0].count)
 
       // Verificar en cotizaciones
-      const cotizacionesCount = await db.get("SELECT COUNT(*) as count FROM cotizaciones WHERE tipo_evento_id = ?", [
+      const cotizacionesResult = await query("SELECT COUNT(*) as count FROM cotizaciones WHERE tipo_evento_id = $1", [
         id,
       ])
+      const cotizacionesCount = Number.parseInt(cotizacionesResult.rows[0].count)
 
-      return eventosCount.count > 0 || resenasCount.count > 0 || cotizacionesCount.count > 0
+      return eventosCount > 0 || resenasCount > 0 || cotizacionesCount > 0
     } catch (error) {
       console.error("Error al verificar uso de tipo de evento:", error)
       // En caso de error, asumimos que está en uso para prevenir eliminaciones incorrectas
       return true
     }
   },
+
   async getAll() {
-    const db = await getDb()
     try {
-      const tipos = await db.all("SELECT * FROM tipos_eventos")
-      console.log(`Obtenidos ${tipos.length} tipos de eventos`)
-      return tipos
+      const result = await query("SELECT * FROM tipos_eventos")
+      console.log(`Obtenidos ${result.rows.length} tipos de eventos`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener tipos de eventos:", error)
       return []
@@ -779,9 +893,9 @@ export const tiposEventosRepo = {
   },
 
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get("SELECT * FROM tipos_eventos WHERE id = ?", id)
+      const result = await query("SELECT * FROM tipos_eventos WHERE id = $1", [id])
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener tipo de evento con id ${id}:`, error)
       return null
@@ -790,18 +904,16 @@ export const tiposEventosRepo = {
 
   // Método agregado para obtener tipos de eventos con un conteo (por ejemplo, de servicios asociados)
   async getAllWithCountImages() {
-    const db = await getDb()
     try {
-      const tipos = await db.all(
+      const result = await query(
         `SELECT t.*, 
               (SELECT COUNT(*) FROM imagenes_galeria WHERE tipo_evento_id = t.id) as count
         FROM tipos_eventos t
         WHERE (SELECT COUNT(*) FROM imagenes_galeria WHERE tipo_evento_id = t.id) > 0
         ORDER BY count DESC
-        LIMIT 6;
-        `,
+        LIMIT 6`,
       )
-      return tipos
+      return result.rows
     } catch (error) {
       console.error("Error al obtener tipos de eventos con count:", error)
       return []
@@ -809,18 +921,16 @@ export const tiposEventosRepo = {
   },
 
   async getAllWithCountResenas() {
-    const db = await getDb()
     try {
-      const tipos = await db.all(
+      const result = await query(
         `SELECT t.*, 
               (SELECT COUNT(*) FROM resenas WHERE tipo_evento_id = t.id) as count
         FROM tipos_eventos t
         WHERE (SELECT COUNT(*) FROM resenas WHERE tipo_evento_id = t.id) > 0
         ORDER BY count DESC
-        LIMIT 6;
-        `,
+        LIMIT 6`,
       )
-      return tipos
+      return result.rows
     } catch (error) {
       console.error("Error al obtener tipos de eventos con count:", error)
       return []
@@ -833,8 +943,7 @@ export const galeriaRepo = {
   // Método para crear una imagen
   async crear(imagen) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `INSERT INTO imagenes_galeria (
         titulo, 
         descripcion, 
@@ -842,11 +951,11 @@ export const galeriaRepo = {
         url_imagen, 
         orden, 
         destacada
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
+      ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
         [imagen.titulo, imagen.descripcion, imagen.tipo_evento_id, imagen.url_imagen, imagen.orden, imagen.destacada],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al crear imagen:", error)
       return { success: false, message: `Error al crear imagen: ${error.message}` }
@@ -856,16 +965,15 @@ export const galeriaRepo = {
   // Método para actualizar una imagen
   async actualizar(imagen) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `UPDATE imagenes_galeria SET
-        titulo = ?, 
-        descripcion = ?, 
-        tipo_evento_id = ?, 
-        url_imagen = COALESCE(?, url_imagen), 
-        orden = ?, 
-        destacada = ?
-      WHERE id = ?`,
+        titulo = $1, 
+        descripcion = $2, 
+        tipo_evento_id = $3, 
+        url_imagen = COALESCE($4, url_imagen), 
+        orden = $5, 
+        destacada = $6
+      WHERE id = $7`,
         [
           imagen.titulo,
           imagen.descripcion,
@@ -877,7 +985,7 @@ export const galeriaRepo = {
         ],
       )
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Imagen no encontrada" }
       }
 
@@ -891,10 +999,9 @@ export const galeriaRepo = {
   // Método para eliminar una imagen
   async eliminar(id) {
     try {
-      const db = await getDb()
-      const result = await db.run("DELETE FROM imagenes_galeria WHERE id = ?", id)
+      const result = await query("DELETE FROM imagenes_galeria WHERE id = $1", [id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Imagen no encontrada" }
       }
 
@@ -906,31 +1013,30 @@ export const galeriaRepo = {
   },
 
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get(
-        "SELECT id, titulo, descripcion, url_imagen, url_imagen_completa, tipo_evento_id, destacada, orden FROM imagenes_galeria WHERE id = ?",
-        id,
+      const result = await query(
+        "SELECT id, titulo, descripcion, url_imagen, url_imagen_completa, tipo_evento_id, destacada, orden FROM imagenes_galeria WHERE id = $1",
+        [id],
       )
+      return result.rows[0]
     } catch (error) {
-      console.error(`Error al obtener usuario con id ${id}:`, error)
+      console.error(`Error al obtener imagen con id ${id}:`, error)
       return null
     }
   },
 
   // Método para obtener imágenes destacadas
-  async getDestacadas(limit = 6, getDb) {
+  async getDestacadas(limit = 6) {
     try {
-      const db = await getDb()
-      const imagenes = await db.all(
-        `SELECT * FROM galeria 
+      const result = await query(
+        `SELECT * FROM imagenes_galeria 
        WHERE destacada = 1 
-       ORDER BY orden ASC, fecha_creacion DESC 
-       LIMIT ?`,
+       ORDER BY orden ASC
+       LIMIT $1`,
         [limit],
       )
 
-      return imagenes
+      return result.rows
     } catch (error) {
       console.error("Error al obtener imágenes destacadas:", error)
       return []
@@ -938,18 +1044,17 @@ export const galeriaRepo = {
   },
 
   // Método para obtener imágenes por tipo de evento
-  async getByTipoEvento(tipoEventoId, limit = 12, offset = 0, getDb) {
+  async getByTipoEvento(tipoEventoId, limit = 12, offset = 0) {
     try {
-      const db = await getDb()
-      const imagenes = await db.all(
-        `SELECT * FROM galeria 
-       WHERE tipo_evento_id = ? 
-       ORDER BY orden ASC, fecha_creacion DESC 
-       LIMIT ? OFFSET ?`,
+      const result = await query(
+        `SELECT * FROM imagenes_galeria 
+       WHERE tipo_evento_id = $1 
+       ORDER BY orden ASC
+       LIMIT $2 OFFSET $3`,
         [tipoEventoId, limit, offset],
       )
 
-      return imagenes
+      return result.rows
     } catch (error) {
       console.error(`Error al obtener imágenes por tipo de evento ${tipoEventoId}:`, error)
       return []
@@ -959,32 +1064,31 @@ export const galeriaRepo = {
   // Método para contar imágenes por tipo de evento
   async getCountByTipoEvento(tipoEventoId) {
     try {
-      const db = await getDb()
-      const result = await db.get("SELECT COUNT(*) as count FROM imagenes_galeria WHERE tipo_evento_id = ?", [
+      const result = await query("SELECT COUNT(*) as count FROM imagenes_galeria WHERE tipo_evento_id = $1", [
         tipoEventoId,
       ])
 
-      return result.count
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error(`Error al contar imágenes por tipo de evento ${tipoEventoId}:`, error)
       return 0
     }
   },
+
   async getAll(limit = 100) {
-    const db = await getDb()
     try {
-      const imagenes = await db.all(
+      const result = await query(
         `
         SELECT g.*, t.nombre as tipo_evento 
         FROM imagenes_galeria g
         LEFT JOIN tipos_eventos t ON g.tipo_evento_id = t.id
         ORDER BY g.orden
-        LIMIT ?
+        LIMIT $1
       `,
-        limit,
+        [limit],
       )
-      console.log(`Obtenidas ${imagenes.length} imágenes de galería`)
-      return imagenes
+      console.log(`Obtenidas ${result.rows.length} imágenes de galería`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener imágenes de galería:", error)
       return []
@@ -992,9 +1096,8 @@ export const galeriaRepo = {
   },
 
   async getDestacadas() {
-    const db = await getDb()
     try {
-      const imagenes = await db.all(
+      const result = await query(
         `
         SELECT g.*, t.nombre as tipo_evento 
         FROM imagenes_galeria g
@@ -1003,8 +1106,8 @@ export const galeriaRepo = {
         ORDER BY g.orden
       `,
       )
-      console.log(`Obtenidas ${imagenes.length} imágenes destacadas`)
-      return imagenes
+      console.log(`Obtenidas ${result.rows.length} imágenes destacadas`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener imágenes destacadas:", error)
       return []
@@ -1012,18 +1115,18 @@ export const galeriaRepo = {
   },
 
   async getByTipoEvento(tipoEventoId) {
-    const db = await getDb()
     try {
-      return await db.all(
+      const result = await query(
         `
         SELECT g.*, t.nombre as tipo_evento 
         FROM imagenes_galeria g
         LEFT JOIN tipos_eventos t ON g.tipo_evento_id = t.id
-        WHERE g.tipo_evento_id = ?
+        WHERE g.tipo_evento_id = $1
         ORDER BY g.orden
       `,
-        tipoEventoId,
+        [tipoEventoId],
       )
+      return result.rows
     } catch (error) {
       console.error(`Error al obtener imágenes por tipo de evento ${tipoEventoId}:`, error)
       return []
@@ -1031,10 +1134,9 @@ export const galeriaRepo = {
   },
 
   async getCount() {
-    const db = await getDb()
     try {
-      const result = await db.get("SELECT COUNT(*) as count FROM imagenes_galeria")
-      return result.count
+      const result = await query("SELECT COUNT(*) as count FROM imagenes_galeria")
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de la galería:", error)
       return 0
@@ -1045,32 +1147,30 @@ export const galeriaRepo = {
 // Repositorio de reseñas
 export const resenasRepo = {
   async getByContrato(numero_contrato) {
-    const db = await getDb()
     try {
-      const query = `SELECT * FROM resenas WHERE numero_contrato = ?`
-      const row = await db.get(query, [numero_contrato])
-      return row
+      const result = await query("SELECT * FROM resenas WHERE numero_contrato = $1", [numero_contrato])
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener reseña con número de contrato ${numero_contrato}:`, error)
       throw error
     }
   },
+
   async getAll(limit = 10) {
-    const db = await getDb()
     try {
-      const resenas = await db.all(
+      const result = await query(
         `
         SELECT r.*, t.nombre as tipo_evento, t.icono as eventIcon 
         FROM resenas r
         LEFT JOIN tipos_eventos t ON r.tipo_evento_id = t.id
         WHERE r.verificado = 1
         ORDER BY r.id DESC
-        LIMIT ?
+        LIMIT $1
       `,
-        limit,
+        [limit],
       )
-      console.log(`Obtenidas ${resenas.length} reseñas`)
-      return resenas
+      console.log(`Obtenidas ${result.rows.length} reseñas`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener reseñas:", error)
       return []
@@ -1078,7 +1178,6 @@ export const resenasRepo = {
   },
 
   async agregarResena(resena) {
-    const db = await getDb()
     try {
       const { numero_contrato, nombre_cliente, tipo_evento_id, calificacion, comentario, imagenes } = resena
 
@@ -1114,16 +1213,16 @@ export const resenasRepo = {
       const imagenesJSON = JSON.stringify(imagenes || [])
 
       try {
-        const result = await db.run(
+        const result = await query(
           `
           INSERT INTO resenas (numero_contrato, nombre_cliente, fecha, tipo_evento_id, calificacion, comentario, imagenes, verificado)
-          VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 1) RETURNING id
         `,
           [numero_contrato, nombre_cliente, fecha, tipoEventoId, calificacion, comentario, imagenesJSON],
         )
 
-        console.log("Reseña insertada correctamente con ID:", result.lastID)
-        return { success: true, id: result.lastID }
+        console.log("Reseña insertada correctamente con ID:", result.rows[0].id)
+        return { success: true, id: result.rows[0].id }
       } catch (insertError) {
         console.error("Error específico al insertar reseña:", insertError)
         return { success: false, message: `Error al insertar: ${insertError.message}` }
@@ -1135,43 +1234,41 @@ export const resenasRepo = {
   },
 
   async getCount() {
-    const db = await getDb()
     try {
-      const result = await db.get("SELECT COUNT(*) as count FROM resenas")
-      return result.count
+      const result = await query("SELECT COUNT(*) as count FROM resenas")
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de reseñas:", error)
       return 0
     }
   },
-  // Nuevo método para obtener estadísticas de calificaciones
+
   // Nuevo método para obtener estadísticas de calificaciones, agrupadas por calificación
   async getRatingStats() {
-    const db = await getDb()
     try {
-      const stats = await db.all(
+      const result = await query(
         `SELECT calificacion, COUNT(*) as count 
        FROM resenas 
        WHERE verificado = 1 
        GROUP BY calificacion`,
       )
-      return stats
+      return result.rows
     } catch (error) {
       console.error("Error al obtener estadísticas de reseñas:", error)
       return []
     }
   },
+
   async getAllWithDetails() {
-    const db = await getDb()
     try {
-      const rows = await db.all(`
+      const result = await query(`
       SELECT r.*, te.nombre as tipo_evento, 
              CASE WHEN r.verificado = 1 THEN 1 ELSE 0 END as aprobada
       FROM resenas r
       LEFT JOIN tipos_eventos te ON r.tipo_evento_id = te.id
       ORDER BY r.id DESC
     `)
-      return rows
+      return result.rows
     } catch (error) {
       console.error("Error al obtener reseñas:", error)
       return []
@@ -1180,16 +1277,17 @@ export const resenasRepo = {
 
   // Obtener una reseña por ID
   async getById(id) {
-    const db = await getDb()
     try {
-      const query = `
+      const result = await query(
+        `
       SELECT r.*, 
              CASE WHEN r.verificado = 1 THEN 1 ELSE 0 END as aprobada
       FROM resenas r
-      WHERE r.id = ?
-    `
-      const row = await db.get(query, [id])
-      return row
+      WHERE r.id = $1
+    `,
+        [id],
+      )
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener reseña con ID ${id}:`, error)
       throw error
@@ -1198,7 +1296,6 @@ export const resenasRepo = {
 
   // Crear una nueva reseña
   async create(resenaDatos) {
-    const db = await getDb()
     try {
       // Convertir aprobada a verificado
       const verificado = resenaDatos.aprobada ? 1 : 0
@@ -1213,7 +1310,8 @@ export const resenasRepo = {
         imagenes = "[]",
       } = resenaDatos
 
-      const query = `
+      const result = await query(
+        `
       INSERT INTO resenas (
         nombre_cliente, 
         fecha, 
@@ -1223,19 +1321,12 @@ export const resenasRepo = {
         numero_contrato,
         imagenes,
         verificado
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `
-      const result = await db.run(query, [
-        nombre_cliente,
-        fecha,
-        tipo_evento_id,
-        calificacion,
-        comentario,
-        numero_contrato,
-        imagenes,
-        verificado,
-      ])
-      return { id: result.lastID, ...resenaDatos }
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id
+    `,
+        [nombre_cliente, fecha, tipo_evento_id, calificacion, comentario, numero_contrato, imagenes, verificado],
+      )
+      return { id: result.rows[0].id, ...resenaDatos }
     } catch (error) {
       console.error("Error al crear reseña:", error)
       throw error
@@ -1244,36 +1335,37 @@ export const resenasRepo = {
 
   // Actualizar una reseña existente
   async update(id, resenaDatos) {
-    const db = await getDb()
     try {
       // Convertir aprobada a verificado
       const verificado = resenaDatos.aprobada ? 1 : 0
       // Preparar datos para actualización
       const { nombre_cliente, fecha, tipo_evento_id, calificacion, comentario, numero_contrato, imagenes } = resenaDatos
 
-      const query = `
+      await query(
+        `
       UPDATE resenas 
-      SET nombre_cliente = ?,
-          fecha = ?,
-          tipo_evento_id = ?,
-          calificacion = ?,
-          comentario = ?,
-          numero_contrato = ?,
-          imagenes = ?,
-          verificado = ?
-      WHERE id = ?
-    `
-      await db.run(query, [
-        nombre_cliente,
-        fecha,
-        tipo_evento_id,
-        calificacion,
-        comentario,
-        numero_contrato || null,
-        imagenes || "[]",
-        verificado,
-        id,
-      ])
+      SET nombre_cliente = $1,
+          fecha = $2,
+          tipo_evento_id = $3,
+          calificacion = $4,
+          comentario = $5,
+          numero_contrato = $6,
+          imagenes = $7,
+          verificado = $8
+      WHERE id = $9
+    `,
+        [
+          nombre_cliente,
+          fecha,
+          tipo_evento_id,
+          calificacion,
+          comentario,
+          numero_contrato || null,
+          imagenes || "[]",
+          verificado,
+          id,
+        ],
+      )
       return { id, ...resenaDatos }
     } catch (error) {
       console.error(`Error al actualizar reseña con ID ${id}:`, error)
@@ -1283,10 +1375,8 @@ export const resenasRepo = {
 
   // Eliminar una reseña
   async delete(id) {
-    const db = await getDb()
     try {
-      const query = "DELETE FROM resenas WHERE id = ?"
-      await db.run(query, [id])
+      await query("DELETE FROM resenas WHERE id = $1", [id])
       return { id, deleted: true }
     } catch (error) {
       console.error(`Error al eliminar reseña con ID ${id}:`, error)
@@ -1296,10 +1386,8 @@ export const resenasRepo = {
 
   // Aprobar una reseña
   async approve(id) {
-    const db = await getDb()
     try {
-      const query = "UPDATE resenas SET verificado = 1 WHERE id = ?"
-      await db.run(query, [id])
+      await query("UPDATE resenas SET verificado = 1 WHERE id = $1", [id])
       return { id, approved: true }
     } catch (error) {
       console.error(`Error al aprobar reseña con ID ${id}:`, error)
@@ -1309,10 +1397,8 @@ export const resenasRepo = {
 
   // Desaprobar una reseña
   async disapprove(id) {
-    const db = await getDb()
     try {
-      const query = "UPDATE resenas SET verificado = 0 WHERE id = ?"
-      await db.run(query, [id])
+      await query("UPDATE resenas SET verificado = 0 WHERE id = $1", [id])
       return { id, disapproved: true }
     } catch (error) {
       console.error(`Error al desaprobar reseña con ID ${id}:`, error)
@@ -1322,50 +1408,49 @@ export const resenasRepo = {
 
   // Obtener reseñas aprobadas para mostrar en el sitio público
   async getApprovedReviews(limit = 6) {
-    const db = await getDb()
     try {
-      const query = `
+      const result = await query(
+        `
       SELECT r.*, te.nombre as tipo_evento
       FROM resenas r
       LEFT JOIN tipos_eventos te ON r.tipo_evento_id = te.id
       WHERE r.verificado = 1
       ORDER BY r.id DESC
-      LIMIT ?
-    `
-      const rows = await db.all(query, [limit])
-      return rows
+      LIMIT $1
+    `,
+        [limit],
+      )
+      return result.rows
     } catch (error) {
       console.error("Error al obtener reseñas aprobadas:", error)
       throw error
     }
   },
-  // Add this method to the resenasRepo in your postgress-db.js file
 
   // Inside resenasRepo object, add this method:
   async getByTipoEvento(tipoEventoId, limit = 10) {
-    const db = await getDb()
     try {
-      const resenas = await db.all(
+      const result = await query(
         `
       SELECT r.*, t.nombre as tipo_evento, t.icono as eventIcon 
       FROM resenas r
       LEFT JOIN tipos_eventos t ON r.tipo_evento_id = t.id
-      WHERE r.verificado = 1 AND r.tipo_evento_id = ?
+      WHERE r.verificado = 1 AND r.tipo_evento_id = $1
       ORDER BY r.id DESC
-      LIMIT ?
+      LIMIT $2
       `,
         [tipoEventoId, limit],
       )
-      console.log(`Obtenidas ${resenas.length} reseñas para el tipo de evento ${tipoEventoId}`)
-      return resenas
+      console.log(`Obtenidas ${result.rows.length} reseñas para el tipo de evento ${tipoEventoId}`)
+      return result.rows
     } catch (error) {
       console.error(`Error al obtener reseñas para el tipo de evento ${tipoEventoId}:`, error)
       return []
     }
   },
+
   // Método para incrementar los likes de una reseña
   async incrementLikes(reviewId) {
-    const db = await getDb()
     try {
       // Verificar si la reseña existe
       const review = await this.getById(reviewId)
@@ -1377,9 +1462,9 @@ export const resenasRepo = {
       const currentLikes = review.likes || 0
       const newLikes = currentLikes + 1
 
-      const result = await db.run("UPDATE resenas SET likes = ? WHERE id = ?", [newLikes, reviewId])
+      const result = await query("UPDATE resenas SET likes = $1 WHERE id = $2", [newLikes, reviewId])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "No se pudo actualizar los likes" }
       }
 
@@ -1392,20 +1477,19 @@ export const resenasRepo = {
 
   // Método para obtener las reseñas con más likes
   async getMostLiked(limit = 5) {
-    const db = await getDb()
     try {
-      const resenas = await db.all(
+      const result = await query(
         `
         SELECT r.*, t.nombre as tipo_evento, t.icono as eventIcon 
         FROM resenas r
         LEFT JOIN tipos_eventos t ON r.tipo_evento_id = t.id
         WHERE r.verificado = 1
         ORDER BY r.likes DESC, r.id DESC
-        LIMIT ?
+        LIMIT $1
         `,
         [limit],
       )
-      return resenas
+      return result.rows
     } catch (error) {
       console.error("Error al obtener reseñas más gustadas:", error)
       return []
@@ -1416,11 +1500,10 @@ export const resenasRepo = {
 // Repositorio de estadísticas
 export const estadisticasRepo = {
   async getAll() {
-    const db = await getDb()
     try {
-      const stats = await db.all("SELECT * FROM estadisticas")
-      console.log(`Obtenidas ${stats.length} estadísticas`)
-      return stats
+      const result = await query("SELECT * FROM estadisticas")
+      console.log(`Obtenidas ${result.rows.length} estadísticas`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener estadísticas:", error)
       return []
@@ -1431,16 +1514,20 @@ export const estadisticasRepo = {
 // Repositorio de equipo
 export const equipoRepo = {
   async getAll() {
-    const db = await getDb()
     try {
       // Verificar si la tabla existe
-      const tableExists = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='equipo'")
+      const tableCheck = await query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'equipo'
+      `)
 
-      if (!tableExists) {
+      if (tableCheck.rows.length === 0) {
         // Crear la tabla si no existe
-        await db.exec(`
+        await query(`
           CREATE TABLE IF NOT EXISTS equipo (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT NOT NULL,
             posicion TEXT NOT NULL,
             bio TEXT,
@@ -1453,9 +1540,9 @@ export const equipoRepo = {
         return []
       }
 
-      const team = await db.all("SELECT * FROM equipo ORDER BY orden ASC")
-      console.log(`Obtenidos ${team.length} miembros del equipo`)
-      return team
+      const result = await query("SELECT * FROM equipo ORDER BY orden ASC")
+      console.log(`Obtenidos ${result.rows.length} miembros del equipo`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener equipo:", error)
       return []
@@ -1463,9 +1550,9 @@ export const equipoRepo = {
   },
 
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get("SELECT * FROM equipo WHERE id = ?", id)
+      const result = await query("SELECT * FROM equipo WHERE id = $1", [id])
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener miembro del equipo con id ${id}:`, error)
       return null
@@ -1473,18 +1560,22 @@ export const equipoRepo = {
   },
 
   async crear(miembroData) {
-    const db = await getDb()
     try {
       const { nombre, cargo, descripcion, foto_url, orden, redes_sociales } = miembroData
 
       // Verify if the table exists
-      const tableExists = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='equipo'")
+      const tableCheck = await query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'equipo'
+      `)
 
-      if (!tableExists) {
+      if (tableCheck.rows.length === 0) {
         // Create the table if it doesn't exist with the redes_sociales column
-        await db.exec(`
+        await query(`
           CREATE TABLE IF NOT EXISTS equipo (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT NOT NULL,
             posicion TEXT NOT NULL,
             bio TEXT,
@@ -1496,23 +1587,28 @@ export const equipoRepo = {
         `)
       } else {
         // Check if redes_sociales column exists
-        const tableInfo = await db.all("PRAGMA table_info(equipo)")
-        const redesColumnExists = tableInfo.some((column) => column.name === "redes_sociales")
+        const redesColumnCheck = await query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'equipo' 
+          AND column_name = 'redes_sociales'
+        `)
 
         // Add redes_sociales column if it doesn't exist
-        if (!redesColumnExists) {
-          await db.run("ALTER TABLE equipo ADD COLUMN redes_sociales TEXT DEFAULT '{}'")
+        if (redesColumnCheck.rows.length === 0) {
+          await query("ALTER TABLE equipo ADD COLUMN redes_sociales TEXT DEFAULT '{}'")
         }
       }
 
       // Insert the new member
-      const result = await db.run(
+      const result = await query(
         `INSERT INTO equipo (nombre, posicion, bio, imagen, orden, redes_sociales)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
         [nombre, cargo, descripcion, foto_url, orden, redes_sociales],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al crear miembro del equipo:", error)
       return { success: false, message: `Error al crear miembro del equipo: ${error.message}` }
@@ -1520,64 +1616,69 @@ export const equipoRepo = {
   },
 
   async actualizar(id, miembroData) {
-    const db = await getDb()
     try {
       const { nombre, cargo, descripcion, foto_url, orden, redes_sociales } = miembroData
 
       // Check if redes_sociales column exists
-      const tableInfo = await db.all("PRAGMA table_info(equipo)")
-      const redesColumnExists = tableInfo.some((column) => column.name === "redes_sociales")
+      const redesColumnCheck = await query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'equipo' 
+        AND column_name = 'redes_sociales'
+      `)
 
       // Add redes_sociales column if it doesn't exist
-      if (!redesColumnExists) {
-        await db.run("ALTER TABLE equipo ADD COLUMN redes_sociales TEXT DEFAULT '{}'")
+      if (redesColumnCheck.rows.length === 0) {
+        await query("ALTER TABLE equipo ADD COLUMN redes_sociales TEXT DEFAULT '{}'")
       }
 
       // Build the SQL query dynamically
       let sql = "UPDATE equipo SET "
       const params = []
       const fields = []
+      let paramIndex = 1
 
       if (nombre !== undefined) {
-        fields.push("nombre = ?")
+        fields.push(`nombre = $${paramIndex++}`)
         params.push(nombre)
       }
 
       if (cargo !== undefined) {
-        fields.push("posicion = ?")
+        fields.push(`posicion = $${paramIndex++}`)
         params.push(cargo)
       }
 
       if (descripcion !== undefined) {
-        fields.push("bio = ?")
+        fields.push(`bio = $${paramIndex++}`)
         params.push(descripcion)
       }
 
       if (foto_url !== undefined) {
-        fields.push("imagen = ?")
+        fields.push(`imagen = $${paramIndex++}`)
         params.push(foto_url)
       }
 
       if (orden !== undefined) {
-        fields.push("orden = ?")
+        fields.push(`orden = $${paramIndex++}`)
         params.push(orden)
       }
 
       if (redes_sociales !== undefined) {
-        fields.push("redes_sociales = ?")
+        fields.push(`redes_sociales = $${paramIndex++}`)
         params.push(redes_sociales)
       }
 
-      sql += fields.join(", ") + " WHERE id = ?"
+      sql += fields.join(", ") + ` WHERE id = $${paramIndex}`
       params.push(id)
 
       console.log("SQL Query:", sql)
       console.log("Params:", params)
 
       // Update the member data
-      const result = await db.run(sql, params)
+      const result = await query(sql, params)
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Miembro no encontrado o no se realizaron cambios" }
       }
 
@@ -1589,11 +1690,10 @@ export const equipoRepo = {
   },
 
   async actualizarOrden(id, orden) {
-    const db = await getDb()
     try {
-      const result = await db.run("UPDATE equipo SET orden = ? WHERE id = ?", [orden, id])
+      const result = await query("UPDATE equipo SET orden = $1 WHERE id = $2", [orden, id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Miembro no encontrado o no se realizaron cambios" }
       }
 
@@ -1605,15 +1705,14 @@ export const equipoRepo = {
   },
 
   async eliminar(id) {
-    const db = await getDb()
     try {
       // Obtener información del miembro para eliminar la imagen si existe
       const miembro = await this.getById(id)
 
       // Eliminar el miembro
-      const result = await db.run("DELETE FROM equipo WHERE id = ?", id)
+      const result = await query("DELETE FROM equipo WHERE id = $1", [id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Miembro no encontrado" }
       }
 
@@ -1639,10 +1738,9 @@ export const equipoRepo = {
 
   // Añadir método para obtener cargos únicos en el repositorio de equipo
   async getCargosUnicos() {
-    const db = await getDb()
     try {
-      const result = await db.all("SELECT DISTINCT posicion FROM equipo WHERE posicion IS NOT NULL")
-      return result.map((item) => item.posicion)
+      const result = await query("SELECT DISTINCT posicion FROM equipo WHERE posicion IS NOT NULL")
+      return result.rows.map((item) => item.posicion)
     } catch (error) {
       console.error("Error al obtener cargos únicos:", error)
       return []
@@ -1653,9 +1751,9 @@ export const equipoRepo = {
 // Repositorio de contenido de página
 export const contenidoRepo = {
   async getBySeccion(seccion) {
-    const db = await getDb()
     try {
-      return await db.get("SELECT * FROM contenido_pagina WHERE seccion = ?", seccion)
+      const result = await query("SELECT * FROM contenido_pagina WHERE seccion = $1", [seccion])
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener contenido de sección ${seccion}:`, error)
       return null
@@ -1663,9 +1761,9 @@ export const contenidoRepo = {
   },
 
   async getAll() {
-    const db = await getDb()
     try {
-      return await db.all("SELECT * FROM contenido_pagina ORDER BY orden")
+      const result = await query("SELECT * FROM contenido_pagina ORDER BY orden")
+      return result.rows
     } catch (error) {
       console.error("Error al obtener contenido de página:", error)
       return []
@@ -1676,19 +1774,18 @@ export const contenidoRepo = {
 // Repositorio de mensajes de contacto
 export const contactoRepo = {
   async guardarMensaje(mensaje) {
-    const db = await getDb()
     try {
       const { nombre, email, telefono, tipo_evento, mensaje: contenido } = mensaje
 
-      const result = await db.run(
+      const result = await query(
         `
         INSERT INTO contacto_mensajes (nombre, email, telefono, tipo_evento, mensaje)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5) RETURNING id
       `,
         [nombre, email, telefono, tipo_evento, contenido],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al guardar mensaje de contacto:", error)
       return { success: false, message: "Error al guardar el mensaje." }
@@ -1696,296 +1793,346 @@ export const contactoRepo = {
   },
 
   async getMensajesNoLeidos() {
-    const db = await getDb()
     try {
-      return await db.all("SELECT * FROM contacto_mensajes WHERE leido = 0 ORDER BY fecha_envio DESC")
+      const result = await query("SELECT * FROM contacto_mensajes WHERE leido = 0 ORDER BY fecha_envio DESC")
+      return result.rows
     } catch (error) {
       console.error("Error al obtener mensajes no leídos:", error)
       return []
     }
   },
+
   async getCount() {
-    const db = await getDb()
     try {
-      const result = await db.get("SELECT COUNT(*) as count FROM contacto_mensajes")
-      return result.count
+      const result = await query("SELECT COUNT(*) as count FROM contacto_mensajes")
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de contacto mensajes:", error)
       return 0
     }
   },
+
   // Nuevo método para obtener los mensajes más recientes
   async getRecent(limit = 5) {
-    const db = await getDb()
     try {
-      return await db.all(
+      const result = await query(
         `
         SELECT * FROM contacto_mensajes 
         ORDER BY fecha_envio DESC 
-        LIMIT ?
+        LIMIT $1
       `,
         [limit],
       )
+      return result.rows
     } catch (error) {
       console.error("Error al obtener mensajes recientes:", error)
       return []
     }
   },
+
   async getAll() {
-    const db = await getDb()
     try {
-      return await db.all("SELECT * FROM contacto_mensajes ORDER BY fecha_envio DESC")
+      const result = await query("SELECT * FROM contacto_mensajes ORDER BY fecha_envio DESC")
+      return result.rows
     } catch (error) {
       console.error("Error al obtener mensajes:", error)
       return []
     }
   },
+
   // Guardar mensaje con fecha local
-async guardarMensaje(mensaje) {
-  const db = await getDb()
-  try {
-    const { nombre, email, telefono, tipo_evento, mensaje: contenido } = mensaje
-    
-    // Obtener fecha y hora local
-    const fechaEnvio = await getLocalDateTime()
-    
-    const result = await db.run(
-      `
-      INSERT INTO contacto_mensajes (nombre, email, telefono, tipo_evento, mensaje, fecha_envio)
-      VALUES (?, ?, ?, ?, ?, ?)
-      `,
-      [nombre, email, telefono, tipo_evento, contenido, fechaEnvio.toISOString()]
-    )
+  async guardarMensaje(mensaje) {
+    try {
+      const { nombre, email, telefono, tipo_evento, mensaje: contenido } = mensaje
 
-    return { success: true, id: result.lastID }
-  } catch (error) {
-    console.error("Error al guardar mensaje de contacto:", error)
-    return { success: false, message: "Error al guardar el mensaje." }
-  }
-},
-// Obtener un mensaje por ID con nombre del evento
-async obtenerMensajePorId(id) {
-  const db = await getDb()
-  try {
-    // Obtener el mensaje
-    const mensaje = await db.get("SELECT * FROM contacto_mensajes WHERE id = ?", id)
-    
-    if (!mensaje) {
-      return { success: false, message: "Mensaje no encontrado" }
+      // Obtener fecha y hora local
+      const fechaEnvio = await getLocalDateTime()
+
+      const result = await query(
+        `
+        INSERT INTO contacto_mensajes (nombre, email, telefono, tipo_evento, mensaje, fecha_envio)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
+        `,
+        [nombre, email, telefono, tipo_evento, contenido, fechaEnvio.toISOString()],
+      )
+
+      return { success: true, id: result.rows[0].id }
+    } catch (error) {
+      console.error("Error al guardar mensaje de contacto:", error)
+      return { success: false, message: "Error al guardar el mensaje." }
     }
-    
-    console.log(mensaje.tipo_evento)
-    
-    // Si hay un tipo de evento, obtener su nombre
-    if (mensaje.tipo_evento) {
-      try {
-        const tipoEvento = await tiposEventosRepo.getById(mensaje.tipo_evento)
-        if (tipoEvento) {
-          mensaje.tipo_evento_nombre = tipoEvento.nombre
-        }
-      } catch (err) {
-        console.error("Error al obtener nombre del tipo de evento:", err)
+  },
+
+  // Obtener un mensaje por ID con nombre del evento
+  async obtenerMensajePorId(id) {
+    try {
+      // Obtener el mensaje
+      const result = await query("SELECT * FROM contacto_mensajes WHERE id = $1", [id])
+      const mensaje = result.rows[0]
+
+      if (!mensaje) {
+        return { success: false, message: "Mensaje no encontrado" }
       }
-    }
-    
-    return { success: true, mensaje }
-  } catch (error) {
-    console.error("Error al obtener mensaje por id:", error)
-    return { success: false, message: error.message }
-  }
-},
-// Marcar mensaje como leído
-async marcarLeido(id) {
-  const db = await getDb()
-  try {
-    // Verificar si existe la columna leido
-    const tableInfo = await db.all("PRAGMA table_info(contacto_mensajes)")
-    const leidoColumnExists = tableInfo.some(column => column.name === "leido")
-    
-    // Si no existe, crearla
-    if (!leidoColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN leido INTEGER DEFAULT 0")
-    }
-    
-    const result = await db.run("UPDATE contacto_mensajes SET leido = 1 WHERE id = ?", id)
-    
-    if (result.changes === 0) {
-      return { success: false, message: "Mensaje no encontrado" }
-    }
-    
-    return { success: true }
-  } catch (error) {
-    console.error("Error al marcar mensaje como leído:", error)
-    return { success: false, message: error.message }
-  }
-},
-// Marcar mensaje como respondido con fecha local
-async marcarRespondido(id, respondidoPor, respuesta) {
-  const db = await getDb()
-  try {
-    // Verificar si existen las columnas necesarias
-    const tableInfo = await db.all("PRAGMA table_info(contacto_mensajes)")
-    
-    // Verificar columna respondido
-    const respondidoColumnExists = tableInfo.some(column => column.name === "respondido")
-    if (!respondidoColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN respondido INTEGER DEFAULT 0")
-    }
-    
-    // Verificar columna respondido_por
-    const respondidoPorColumnExists = tableInfo.some(column => column.name === "respondido_por")
-    if (!respondidoPorColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN respondido_por TEXT")
-    }
-    
-    // Verificar columna fecha_respuesta
-    const fechaRespuestaColumnExists = tableInfo.some(column => column.name === "fecha_respuesta")
-    if (!fechaRespuestaColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN fecha_respuesta TIMESTAMP")
-    }
-    
-    // Verificar columna respuesta
-    const respuestaColumnExists = tableInfo.some(column => column.name === "respuesta")
-    if (!respuestaColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN respuesta TEXT")
-    }
-    
-    // Obtener fecha y hora local
-    const fechaRespuesta = await getLocalDateTime()
-    
-    const result = await db.run(
-      `UPDATE contacto_mensajes 
-       SET respondido = 1, 
-           respondido_por = ?, 
-           fecha_respuesta = ?, 
-           respuesta = ? 
-       WHERE id = ?`,
-      [respondidoPor, fechaRespuesta.toISOString(), respuesta, id]
-    )
-    
-    if (result.changes === 0) {
-      return { success: false, message: "Mensaje no encontrado" }
-    }
-    
-    return { success: true }
-  } catch (error) {
-    console.error("Error al marcar mensaje como respondido:", error)
-    return { success: false, message: error.message }
-  }
-},
 
-// Registrar reenvío de mensaje
-async registrarReenvio(id, usuarioId, destinatario) {
-  const db = await getDb()
-  try {
-    // Verificar si existe la tabla de reenvíos
-    const tableExists = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='contacto_reenvios'")
-    
-    // Si no existe, crearla
-    if (!tableExists) {
-      await db.run(`
-        CREATE TABLE contacto_reenvios (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          contacto_id INTEGER,
-          usuario_id INTEGER,
-          destinatario TEXT,
-          fecha_reenvio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (contacto_id) REFERENCES contacto_mensajes(id)
-        )
+      console.log(mensaje.tipo_evento)
+
+      // Si hay un tipo de evento, obtener su nombre
+      if (mensaje.tipo_evento) {
+        try {
+          const tipoEvento = await tiposEventosRepo.getById(mensaje.tipo_evento)
+          if (tipoEvento) {
+            mensaje.tipo_evento_nombre = tipoEvento.nombre
+          }
+        } catch (err) {
+          console.error("Error al obtener nombre del tipo de evento:", err)
+        }
+      }
+
+      return { success: true, mensaje }
+    } catch (error) {
+      console.error("Error al obtener mensaje por id:", error)
+      return { success: false, message: error.message }
+    }
+  },
+
+  // Marcar mensaje como leído
+  async marcarLeido(id) {
+    try {
+      // Verificar si existe la columna leido
+      const leidoColumnCheck = await query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'contacto_mensajes' 
+        AND column_name = 'leido'
       `)
-    }
-    
-    const result = await db.run(
-      `INSERT INTO contacto_reenvios (contacto_id, usuario_id, destinatario)
-       VALUES (?, ?, ?)`,
-      [id, usuarioId, destinatario]
-    )
-    
-    return { success: true, id: result.lastID }
-  } catch (error) {
-    console.error("Error al registrar reenvío:", error)
-    return { success: false, message: error.message }
-  }
-},
 
-// Archivar mensaje
-async archivar(id) {
-  const db = await getDb()
-  try {
-    // Verificar si existe la columna archivado
-    const tableInfo = await db.all("PRAGMA table_info(contacto_mensajes)")
-    const archivadoColumnExists = tableInfo.some(column => column.name === "archivado")
-    
-    // Si no existe, crearla
-    if (!archivadoColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN archivado INTEGER DEFAULT 0")
-    }
-    
-    const result = await db.run("UPDATE contacto_mensajes SET archivado = 1 WHERE id = ?", id)
-    
-    if (result.changes === 0) {
-      return { success: false, message: "Mensaje no encontrado" }
-    }
-    
-    return { success: true }
-  } catch (error) {
-    console.error("Error al archivar mensaje:", error)
-    return { success: false, message: error.message }
-  }
-},
+      // Si no existe, crearla
+      if (leidoColumnCheck.rows.length === 0) {
+        await query("ALTER TABLE contacto_mensajes ADD COLUMN leido INTEGER DEFAULT 0")
+      }
 
-// Desarchivar mensaje
-async desarchivar(id) {
-  const db = await getDb()
-  try {
-    // Verificar si existe la columna archivado
-    const tableInfo = await db.all("PRAGMA table_info(contacto_mensajes)")
-    const archivadoColumnExists = tableInfo.some(column => column.name === "archivado")
-    
-    // Si no existe, crearla
-    if (!archivadoColumnExists) {
-      await db.run("ALTER TABLE contacto_mensajes ADD COLUMN archivado INTEGER DEFAULT 0")
-      return { success: true } // Si la columna no existía, no hay nada que desarchivar
+      const result = await query("UPDATE contacto_mensajes SET leido = 1 WHERE id = $1", [id])
+
+      if (result.rowCount === 0) {
+        return { success: false, message: "Mensaje no encontrado" }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error("Error al marcar mensaje como leído:", error)
+      return { success: false, message: error.message }
     }
-    
-    const result = await db.run("UPDATE contacto_mensajes SET archivado = 0 WHERE id = ?", id)
-    
-    if (result.changes === 0) {
-      return { success: false, message: "Mensaje no encontrado" }
+  },
+
+  // Marcar mensaje como respondido con fecha local
+  async marcarRespondido(id, respondidoPor, respuesta) {
+    try {
+      // Verificar si existen las columnas necesarias
+      const pool = await getDb()
+      const client = await pool.connect()
+
+      try {
+        // Verificar columna respondido
+        const respondidoColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'contacto_mensajes' 
+          AND column_name = 'respondido'
+        `)
+
+        if (respondidoColumnCheck.rows.length === 0) {
+          await client.query("ALTER TABLE contacto_mensajes ADD COLUMN respondido INTEGER DEFAULT 0")
+        }
+
+        // Verificar columna respondido_por
+        const respondidoPorColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'contacto_mensajes' 
+          AND column_name = 'respondido_por'
+        `)
+
+        if (respondidoPorColumnCheck.rows.length === 0) {
+          await client.query("ALTER TABLE contacto_mensajes ADD COLUMN respondido_por TEXT")
+        }
+
+        // Verificar columna fecha_respuesta
+        const fechaRespuestaColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'contacto_mensajes' 
+          AND column_name = 'fecha_respuesta'
+        `)
+
+        if (fechaRespuestaColumnCheck.rows.length === 0) {
+          await client.query("ALTER TABLE contacto_mensajes ADD COLUMN fecha_respuesta TIMESTAMP")
+        }
+
+        // Verificar columna respuesta
+        const respuestaColumnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'contacto_mensajes' 
+          AND column_name = 'respuesta'
+        `)
+
+        if (respuestaColumnCheck.rows.length === 0) {
+          await client.query("ALTER TABLE contacto_mensajes ADD COLUMN respuesta TEXT")
+        }
+
+        // Obtener fecha y hora local
+        const fechaRespuesta = await getLocalDateTime()
+
+        const result = await client.query(
+          `UPDATE contacto_mensajes 
+           SET respondido = 1, 
+               respondido_por = $1, 
+               fecha_respuesta = $2, 
+               respuesta = $3 
+           WHERE id = $4`,
+          [respondidoPor, fechaRespuesta.toISOString(), respuesta, id],
+        )
+
+        if (result.rowCount === 0) {
+          return { success: false, message: "Mensaje no encontrado" }
+        }
+
+        return { success: true }
+      } finally {
+        client.release()
+      }
+    } catch (error) {
+      console.error("Error al marcar mensaje como respondido:", error)
+      return { success: false, message: error.message }
     }
-    
-    return { success: true }
-  } catch (error) {
-    console.error("Error al desarchivar mensaje:", error)
-    return { success: false, message: error.message }
-  }
-},
-// Eliminar mensaje
-async eliminar(id) {
-  const db = await getDb()
-  try {
-    const result = await db.run("DELETE FROM contacto_mensajes WHERE id = ?", id)
-    
-    if (result.changes === 0) {
-      return { success: false, message: "Mensaje no encontrado" }
+  },
+
+  // Registrar reenvío de mensaje
+  async registrarReenvio(id, usuarioId, destinatario) {
+    try {
+      // Verificar si existe la tabla de reenvíos
+      const tableCheck = await query(`
+        SELECT table_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'contacto_reenvios'
+      `)
+
+      // Si no existe, crearla
+      if (tableCheck.rows.length === 0) {
+        await query(`
+          CREATE TABLE contacto_reenvios (
+            id SERIAL PRIMARY KEY,
+            contacto_id INTEGER,
+            usuario_id INTEGER,
+            destinatario TEXT,
+            fecha_reenvio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (contacto_id) REFERENCES contacto_mensajes(id)
+          )
+        `)
+      }
+
+      const result = await query(
+        `INSERT INTO contacto_reenvios (contacto_id, usuario_id, destinatario)
+         VALUES ($1, $2, $3) RETURNING id`,
+        [id, usuarioId, destinatario],
+      )
+
+      return { success: true, id: result.rows[0].id }
+    } catch (error) {
+      console.error("Error al registrar reenvío:", error)
+      return { success: false, message: error.message }
     }
-    
-    return { success: true }
-  } catch (error) {
-    console.error("Error al eliminar mensaje:", error)
-    return { success: false, message: error.message }
-  }
-}
-  
-          
+  },
+
+  // Archivar mensaje
+  async archivar(id) {
+    try {
+      // Verificar si existe la columna archivado
+      const archivadoColumnCheck = await query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'contacto_mensajes' 
+        AND column_name = 'archivado'
+      `)
+
+      // Si no existe, crearla
+      if (archivadoColumnCheck.rows.length === 0) {
+        await query("ALTER TABLE contacto_mensajes ADD COLUMN archivado INTEGER DEFAULT 0")
+      }
+
+      const result = await query("UPDATE contacto_mensajes SET archivado = 1 WHERE id = $1", [id])
+
+      if (result.rowCount === 0) {
+        return { success: false, message: "Mensaje no encontrado" }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error("Error al archivar mensaje:", error)
+      return { success: false, message: error.message }
+    }
+  },
+
+  // Desarchivar mensaje
+  async desarchivar(id) {
+    try {
+      // Verificar si existe la columna archivado
+      const archivadoColumnCheck = await query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'contacto_mensajes' 
+        AND column_name = 'archivado'
+      `)
+
+      // Si no existe, crearla
+      if (archivadoColumnCheck.rows.length === 0) {
+        await query("ALTER TABLE contacto_mensajes ADD COLUMN archivado INTEGER DEFAULT 0")
+        return { success: true } // Si la columna no existía, no hay nada que desarchivar
+      }
+
+      const result = await query("UPDATE contacto_mensajes SET archivado = 0 WHERE id = $1", [id])
+
+      if (result.rowCount === 0) {
+        return { success: false, message: "Mensaje no encontrado" }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error("Error al desarchivar mensaje:", error)
+      return { success: false, message: error.message }
+    }
+  },
+
+  // Eliminar mensaje
+  async eliminar(id) {
+    try {
+      const result = await query("DELETE FROM contacto_mensajes WHERE id = $1", [id])
+
+      if (result.rowCount === 0) {
+        return { success: false, message: "Mensaje no encontrado" }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error("Error al eliminar mensaje:", error)
+      return { success: false, message: error.message }
+    }
+  },
 }
 
 // Repositorio de cotizaciones
 export const cotizacionesRepo = {
   async guardarCotizacion(cotizacion) {
-    const db = await getDb()
     try {
-      const result = await db.run(
+      const result = await query(
         `
         INSERT INTO cotizaciones (
           nombre_cliente, 
@@ -2006,7 +2153,7 @@ export const cotizacionesRepo = {
           estado, 
           fecha_creacion
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id
       `,
         [
           cotizacion.fullName,
@@ -2029,7 +2176,7 @@ export const cotizacionesRepo = {
         ],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al guardar cotización:", error)
       return { success: false, message: "Error al guardar la cotización." }
@@ -2037,9 +2184,8 @@ export const cotizacionesRepo = {
   },
 
   async getAll() {
-    const db = await getDb()
     try {
-      const cotizaciones = await db.all(
+      const result = await query(
         `
         SELECT c.*, t.nombre as tipo_evento 
         FROM cotizaciones c
@@ -2047,7 +2193,7 @@ export const cotizacionesRepo = {
         ORDER BY c.fecha_creacion DESC
       `,
       )
-      return cotizaciones
+      return result.rows
     } catch (error) {
       console.error("Error al obtener cotizaciones:", error)
       return []
@@ -2055,17 +2201,17 @@ export const cotizacionesRepo = {
   },
 
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get(
+      const result = await query(
         `
         SELECT c.*, t.nombre as tipo_evento 
         FROM cotizaciones c
         LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
-        WHERE c.id = ?
+        WHERE c.id = $1
       `,
-        id,
+        [id],
       )
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener cotización con id ${id}:`, error)
       return null
@@ -2073,10 +2219,9 @@ export const cotizacionesRepo = {
   },
 
   async getCount() {
-    const db = await getDb()
     try {
-      const result = await db.get("SELECT COUNT(*) as count FROM cotizaciones")
-      return result.count
+      const result = await query("SELECT COUNT(*) as count FROM cotizaciones")
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de cotizaciones:", error)
       return 0
@@ -2085,14 +2230,14 @@ export const cotizacionesRepo = {
 
   // Nuevo método para obtener los mensajes más recientes
   async getRecent(limit = 5) {
-    const db = await getDb()
     try {
-      return await db.all(
+      const result = await query(
         `SELECT * FROM cotizaciones 
          ORDER BY fecha_creacion DESC 
-         LIMIT ?`,
+         LIMIT $1`,
         [limit],
       )
+      return result.rows
     } catch (error) {
       console.error("Error al obtener cotizaciones recientes:", error)
       return []
@@ -2100,10 +2245,9 @@ export const cotizacionesRepo = {
   },
 
   // Método para crear una cotización
-  async crear(cotizacion, getDb) {
+  async crear(cotizacion) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `
       INSERT INTO cotizaciones (
         nombre_cliente,
@@ -2123,7 +2267,7 @@ export const cotizacionesRepo = {
         costo_total,
         estado,
         fecha_creacion
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id
     `,
         [
           cotizacion.nombre_cliente,
@@ -2146,7 +2290,7 @@ export const cotizacionesRepo = {
         ],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al crear cotización:", error)
       return { success: false, message: `Error al crear cotización: ${error.message}` }
@@ -2154,29 +2298,28 @@ export const cotizacionesRepo = {
   },
 
   // Método para actualizar una cotización
-  async actualizar(cotizacion, getDb) {
+  async actualizar(cotizacion) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `
       UPDATE cotizaciones SET
-        nombre_cliente = ?,
-        email = ?,
-        telefono = ?,
-        fecha_evento = ?,
-        num_meseros = ?,
-        duracion_servicio = ?,
-        ubicacion = ?,
-        tipo_evento_id = ?,
-        lavalozas = ?,
-        cuida_coches = ?,
-        montaje_desmontaje = ?,
-        costo_base = ?,
-        costo_adicionales = ?,
-        cargo_ubicacion = ?,
-        costo_total = ?,
-        estado = ?
-      WHERE id = ?
+        nombre_cliente = $1,
+        email = $2,
+        telefono = $3,
+        fecha_evento = $4,
+        num_meseros = $5,
+        duracion_servicio = $6,
+        ubicacion = $7,
+        tipo_evento_id = $8,
+        lavalozas = $9,
+        cuida_coches = $10,
+        montaje_desmontaje = $11,
+        costo_base = $12,
+        costo_adicionales = $13,
+        cargo_ubicacion = $14,
+        costo_total = $15,
+        estado = $16
+      WHERE id = $17
     `,
         [
           cotizacion.nombre_cliente,
@@ -2199,7 +2342,7 @@ export const cotizacionesRepo = {
         ],
       )
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Cotización no encontrada" }
       }
 
@@ -2211,12 +2354,11 @@ export const cotizacionesRepo = {
   },
 
   // Método para eliminar una cotización
-  async eliminar(id, getDb) {
+  async eliminar(id) {
     try {
-      const db = await getDb()
-      const result = await db.run("DELETE FROM cotizaciones WHERE id = ?", [id])
+      const result = await query("DELETE FROM cotizaciones WHERE id = $1", [id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Cotización no encontrada" }
       }
 
@@ -2228,12 +2370,11 @@ export const cotizacionesRepo = {
   },
 
   // Método para actualizar el estado de una cotización
-  async actualizarEstado(id, estado, getDb) {
+  async actualizarEstado(id, estado) {
     try {
-      const db = await getDb()
-      const result = await db.run("UPDATE cotizaciones SET estado = ? WHERE id = ?", [estado, id])
+      const result = await query("UPDATE cotizaciones SET estado = $1 WHERE id = $2", [estado, id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Cotización no encontrada" }
       }
 
@@ -2245,12 +2386,10 @@ export const cotizacionesRepo = {
   },
 
   // Método para asociar servicios a una cotización
-  async asociarServicios(cotizacionId, serviciosIds, getDb) {
+  async asociarServicios(cotizacionId, serviciosIds) {
     try {
-      const db = await getDb()
-
       // Crear tabla de relación si no existe
-      await db.run(`
+      await query(`
       CREATE TABLE IF NOT EXISTS cotizacion_servicios (
         cotizacion_id INTEGER,
         servicio_id INTEGER,
@@ -2262,10 +2401,10 @@ export const cotizacionesRepo = {
 
       // Insertar relaciones
       for (const servicioId of serviciosIds) {
-        await db.run("INSERT OR IGNORE INTO cotizacion_servicios (cotizacion_id, servicio_id) VALUES (?, ?)", [
-          cotizacionId,
-          servicioId,
-        ])
+        await query(
+          "INSERT INTO cotizacion_servicios (cotizacion_id, servicio_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+          [cotizacionId, servicioId],
+        )
       }
 
       return { success: true }
@@ -2276,25 +2415,22 @@ export const cotizacionesRepo = {
   },
 
   // Método para eliminar servicios asociados a una cotización
-  async eliminarServicios(cotizacionId, getDb) {
+  async eliminarServicios(cotizacionId) {
     try {
-      const db = await getDb()
-
-      await db.run("DELETE FROM cotizacion_servicios WHERE cotizacion_id = ?", [cotizacionId])
-
+      await query("DELETE FROM cotizacion_servicios WHERE cotizacion_id = $1", [cotizacionId])
       return { success: true }
     } catch (error) {
       console.error("Error al eliminar servicios de cotización:", error)
       return { success: false, message: `Error al eliminar servicios: ${error.message}` }
     }
   },
-  // Add this method to cotizacionesRepo in postgress-db.js
-  async actualizarNumeroContrato(id, numeroContrato, getDb) {
-    try {
-      const db = await getDb()
-      const result = await db.run("UPDATE cotizaciones SET numero_contrato = ? WHERE id = ?", [numeroContrato, id])
 
-      if (result.changes === 0) {
+  // Método para actualizar número de contrato
+  async actualizarNumeroContrato(id, numeroContrato) {
+    try {
+      const result = await query("UPDATE cotizaciones SET numero_contrato = $1 WHERE id = $2", [numeroContrato, id])
+
+      if (result.rowCount === 0) {
         return { success: false, message: "Cotización no encontrada" }
       }
 
@@ -2308,29 +2444,29 @@ export const cotizacionesRepo = {
   // Método para obtener servicios asociados a una cotización
   async getServicios(cotizacionId) {
     try {
-      const db = await getDb()
-
       // Verificar si la tabla existe
-      const tableExists = await db.get(`
-      SELECT name FROM sqlite_master 
-      WHERE type='table' AND name='cotizacion_servicios'
+      const tableCheck = await query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_name = 'cotizacion_servicios'
     `)
 
-      if (!tableExists) {
+      if (tableCheck.rows.length === 0) {
         return []
       }
 
-      const servicios = await db.all(
+      const result = await query(
         `
       SELECT s.id, s.titulo, s.descripcion_corta, s.precio, s.precio_desde
       FROM servicios s
       JOIN cotizacion_servicios cs ON s.id = cs.servicio_id
-      WHERE cs.cotizacion_id = ?
+      WHERE cs.cotizacion_id = $1
     `,
         [cotizacionId],
       )
 
-      return servicios.map((s) => s.id)
+      return result.rows.map((s) => s.id)
     } catch (error) {
       console.error(`Error al obtener servicios de cotización ${cotizacionId}:`, error)
       return []
@@ -2340,29 +2476,28 @@ export const cotizacionesRepo = {
 
 // Repositorio de contratos
 export const contratosRepo = {
-  // Add to contratosRepo in postgress-db.js
+  // Método para obtener el conteo de contratos
   async getCount(estado = null) {
-    const db = await getDb()
     try {
-      let query = "SELECT COUNT(*) as count FROM contratos"
+      let queryText = "SELECT COUNT(*) as count FROM contratos"
       const params = []
 
       if (estado) {
-        query += " WHERE estado = ?"
+        queryText += " WHERE estado = $1"
         params.push(estado)
       }
 
-      const result = await db.get(query, params)
-      return result.count
+      const result = await query(queryText, params)
+      return Number.parseInt(result.rows[0].count)
     } catch (error) {
       console.error("Error al obtener el conteo de contratos:", error)
       return 0
     }
   },
+
   async getAll() {
-    const db = await getDb()
     try {
-      const contratos = await db.all(
+      const result = await query(
         `
         SELECT c.*, t.nombre as tipo_evento 
         FROM contratos c
@@ -2370,25 +2505,26 @@ export const contratosRepo = {
         ORDER BY c.fecha_creacion DESC
       `,
       )
-      console.log(`Obtenidos ${contratos.length} contratos`)
-      return contratos
+      console.log(`Obtenidos ${result.rows.length} contratos`)
+      return result.rows
     } catch (error) {
       console.error("Error al obtener contratos:", error)
       return []
     }
   },
+
   async getById(id) {
-    const db = await getDb()
     try {
-      return await db.get(
+      const result = await query(
         `
         SELECT c.*, t.nombre as tipo_evento 
         FROM contratos c
         LEFT JOIN tipos_eventos t ON c.tipo_evento_id = t.id
-        WHERE c.id = ?
+        WHERE c.id = $1
         `,
-        id,
+        [id],
       )
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener contrato con id ${id}:`, error)
       return null
@@ -2398,18 +2534,16 @@ export const contratosRepo = {
   // Método para obtener un contrato por número
   async getByNumero(numeroContrato) {
     try {
-      const db = await getDb()
-      const contrato = await db.get(
+      const result = await query(
         `
       SELECT c.*, te.nombre as tipo_evento
       FROM contratos c
       LEFT JOIN tipos_eventos te ON c.tipo_evento_id = te.id
-      WHERE c.numero_contrato = ?
+      WHERE c.numero_contrato = $1
     `,
         [numeroContrato],
       )
-
-      return contrato
+      return result.rows[0]
     } catch (error) {
       console.error(`Error al obtener contrato con número ${numeroContrato}:`, error)
       return null
@@ -2417,10 +2551,9 @@ export const contratosRepo = {
   },
 
   // Método para crear un contrato
-  async crear(contrato, getDb) {
+  async crear(contrato) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `
       INSERT INTO contratos (
         numero_contrato,
@@ -2429,7 +2562,7 @@ export const contratosRepo = {
         tipo_evento_id,
         estado,
         fecha_creacion
-      ) VALUES (?, ?, ?, ?, ?, ?)
+      ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
     `,
         [
           contrato.numero_contrato,
@@ -2441,7 +2574,7 @@ export const contratosRepo = {
         ],
       )
 
-      return { success: true, id: result.lastID }
+      return { success: true, id: result.rows[0].id }
     } catch (error) {
       console.error("Error al crear contrato:", error)
       return { success: false, message: `Error al crear contrato: ${error.message}` }
@@ -2449,23 +2582,21 @@ export const contratosRepo = {
   },
 
   // Método para crear o actualizar un contrato
-  async crearOActualizar(contrato, getDb) {
+  async crearOActualizar(contrato) {
     try {
-      const db = await getDb()
-
       // Verificar si ya existe un contrato con ese número
       const contratoExistente = await this.getByNumero(contrato.numero_contrato)
 
       if (contratoExistente) {
         // Actualizar contrato existente
-        const result = await db.run(
+        const result = await query(
           `
         UPDATE contratos SET
-          nombre_cliente = ?,
-          fecha_evento = ?,
-          tipo_evento_id = ?,
-          estado = ?
-        WHERE numero_contrato = ?
+          nombre_cliente = $1,
+          fecha_evento = $2,
+          tipo_evento_id = $3,
+          estado = $4
+        WHERE numero_contrato = $5
       `,
           [
             contrato.nombre_cliente,
@@ -2479,7 +2610,7 @@ export const contratosRepo = {
         return { success: true, id: contratoExistente.id, updated: true }
       } else {
         // Crear nuevo contrato
-        return await this.crear(contrato, getDb)
+        return await this.crear(contrato)
       }
     } catch (error) {
       console.error("Error al crear o actualizar contrato:", error)
@@ -2488,18 +2619,17 @@ export const contratosRepo = {
   },
 
   // Método para actualizar un contrato
-  async actualizar(contrato, getDb) {
+  async actualizar(contrato) {
     try {
-      const db = await getDb()
-      const result = await db.run(
+      const result = await query(
         `
       UPDATE contratos SET
-        numero_contrato = ?,
-        nombre_cliente = ?,
-        fecha_evento = ?,
-        tipo_evento_id = ?,
-        estado = ?
-      WHERE id = ?
+        numero_contrato = $1,
+        nombre_cliente = $2,
+        fecha_evento = $3,
+        tipo_evento_id = $4,
+        estado = $5
+      WHERE id = $6
     `,
         [
           contrato.numero_contrato,
@@ -2511,7 +2641,7 @@ export const contratosRepo = {
         ],
       )
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Contrato no encontrado" }
       }
 
@@ -2523,12 +2653,11 @@ export const contratosRepo = {
   },
 
   // Método para eliminar un contrato
-  async eliminar(id, getDb) {
+  async eliminar(id) {
     try {
-      const db = await getDb()
-      const result = await db.run("DELETE FROM contratos WHERE id = ?", [id])
+      const result = await query("DELETE FROM contratos WHERE id = $1", [id])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Contrato no encontrado" }
       }
 
@@ -2540,12 +2669,14 @@ export const contratosRepo = {
   },
 
   // Método para actualizar el estado de un contrato
-  async actualizarEstado(numeroContrato, estado, getDb) {
+  async actualizarEstado(numeroContrato, estado) {
     try {
-      const db = await getDb()
-      const result = await db.run("UPDATE contratos SET estado = ? WHERE numero_contrato = ?", [estado, numeroContrato])
+      const result = await query("UPDATE contratos SET estado = $1 WHERE numero_contrato = $2", [
+        estado,
+        numeroContrato,
+      ])
 
-      if (result.changes === 0) {
+      if (result.rowCount === 0) {
         return { success: false, message: "Contrato no encontrado" }
       }
 
@@ -2557,16 +2688,12 @@ export const contratosRepo = {
   },
 
   // Método para verificar si un contrato está siendo utilizado
-  async isInUse(numeroContrato, getDb) {
+  async isInUse(numeroContrato) {
     try {
-      const db = await getDb()
-
       // Verificar en reseñas
-      const resenasCount = await db.get("SELECT COUNT(*) as count FROM resenas WHERE numero_contrato = ?", [
-        numeroContrato,
-      ])
+      const result = await query("SELECT COUNT(*) as count FROM resenas WHERE numero_contrato = $1", [numeroContrato])
 
-      return resenasCount.count > 0
+      return Number.parseInt(result.rows[0].count) > 0
     } catch (error) {
       console.error("Error al verificar uso de contrato:", error)
       // En caso de error, asumimos que está en uso para prevenir eliminaciones incorrectas
@@ -2586,17 +2713,16 @@ export const contratosRepo = {
   },
 
   // Método para obtener el último número de contrato
-  async getUltimoNumero(year, month, getDb) {
+  async getUltimoNumero(year, month) {
     try {
-      const db = await getDb()
       const patron = `CONT-${year}-${month}-%`
 
-      const result = await db.get(
-        "SELECT numero_contrato FROM contratos WHERE numero_contrato LIKE ? ORDER BY id DESC LIMIT 1",
+      const result = await query(
+        "SELECT numero_contrato FROM contratos WHERE numero_contrato LIKE $1 ORDER BY id DESC LIMIT 1",
         [patron],
       )
 
-      return result ? result.numero_contrato : null
+      return result.rows.length > 0 ? result.rows[0].numero_contrato : null
     } catch (error) {
       console.error("Error al obtener último número de contrato:", error)
       return null
@@ -2606,7 +2732,7 @@ export const contratosRepo = {
 
 // Inicializar la base de datos al importar este módulo
 initializeDatabase().catch((err) => {
-  console.error("Error al inicializar la base de datos:", err)
+  console.error("Error al inicializar la base de datos PostgreSQL:", err)
 })
 
 // Actualizar el export default para incluir el nuevo repositorio
@@ -2625,4 +2751,3 @@ export default {
   cotizacionesRepo,
   contratosRepo,
 }
-
